@@ -7,7 +7,7 @@ import pytest
 from jsonschema import ValidationError
 
 from agent import AgentError, BedrockModel, Investigator, SYSTEM
-from contracts import TOOL_CONFIG, validate_report
+from contracts import TOOL_CONFIG, VALIDATORS, validate_report, validation_feedback
 from store import projected_event
 from conftest import EVENT_ID, EVENT_TIME, MemoryTools, ScriptedModel, report, successful_model, tool_response
 
@@ -116,8 +116,13 @@ def test_submit_cannot_share_a_batch_with_reads(settings):
     response["output"]["message"]["content"] += tool_response("get_rule", call_id="call-2")["output"]["message"][
         "content"
     ]
-    with pytest.raises(AgentError, match="separate_step"):
-        Investigator(ScriptedModel([response]), MemoryTools(), settings).run()
+    model = ScriptedModel(
+        [tool_response("get_source_event"), response, tool_response("submit_investigation", report())]
+    )
+    assert Investigator(model, MemoryTools(), settings).run() == report()
+    feedback = model.requests[-1][-1]["content"][0]["toolResult"]
+    assert feedback["status"] == "error"
+    assert feedback["content"][0]["json"]["error"] == "submit_must_be_a_separate_step"
 
 
 def test_context_projection_excludes_sensitive_and_arbitrary_fields():
@@ -181,7 +186,70 @@ def test_bedrock_errors_are_classified_without_leaking_messages(settings, code, 
         with pytest.raises(AgentError) as caught:
             BedrockModel(settings, client).converse([{"role": "user", "content": [{"text": "test"}]}])
         assert caught.value.retryable is retryable
+        assert caught.value.code == f"bedrock_{code}"
         assert "SECRET" not in str(caught.value)
+
+
+@pytest.mark.parametrize("status,retryable", [(500, True), (503, True), (429, True), (400, False), (None, True)])
+def test_model_error_preserves_safe_code_and_retries_only_transient_origin(settings, status, retryable):
+    client = boto3.client(
+        "bedrock-runtime", region_name="us-west-2", aws_access_key_id="test", aws_secret_access_key="test"
+    )
+    with Stubber(client) as stub:
+        stub.add_client_error(
+            "converse",
+            service_error_code="ModelErrorException",
+            service_message="SECRET",
+            modeled_fields={"originalStatusCode": status} if status is not None else {},
+        )
+        with pytest.raises(AgentError) as caught:
+            BedrockModel(settings, client).converse([{"role": "user", "content": [{"text": "test"}]}])
+        assert caught.value.code == "bedrock_ModelErrorException"
+        assert caught.value.retryable is retryable
+
+
+def test_validation_feedback_identifies_schema_problem_without_echoing_rejected_data():
+    value = report()
+    value["summary"]["evidence_refs"] = "SECRET_INVALID_VALUE"
+    with pytest.raises(ValidationError) as caught:
+        VALIDATORS["submit_investigation"].validate(value)
+    feedback = validation_feedback(caught.value, {})
+    assert feedback == {
+        "error": "schema_validation_failed",
+        "path": ["summary", "evidence_refs"],
+        "constraint": "type",
+        "expected": "array",
+    }
+    assert "SECRET" not in str(feedback)
+
+
+def test_successful_login_cannot_be_described_as_unauthenticated():
+    tools = MemoryTools()
+    tools.finding.update(rule_id="GOV-003", source_event_id=EVENT_ID)
+    tools.call("get_source_event")
+    tools.evidence["event:" + EVENT_ID]["event_type"] = "LOGIN_SUCCESS"
+    value = report()
+    value["summary"]["text"] = "An unauthenticated privileged session was observed."
+    with pytest.raises(ValueError, match="authenticated_without_mfa"):
+        validate_report(value, tools.evidence)
+    value["summary"]["text"] = "The identity authenticated successfully without MFA."
+    validate_report(value, tools.evidence)
+
+
+@pytest.mark.parametrize("negated", [False, True])
+def test_workload_rule_does_not_invent_an_approval_predicate(negated):
+    tools = MemoryTools()
+    tools.finding.update(rule_id="GOV-006", source_event_id=EVENT_ID)
+    tools.call("get_source_event")
+    value = report()
+    value["summary"]["text"] = (
+        "Rule GOV-006 " + ("does not require" if negated else "requires") + " workload change approval."
+    )
+    if negated:
+        validate_report(value, tools.evidence)
+    else:
+        with pytest.raises(ValueError, match="GOV006_matches"):
+            validate_report(value, tools.evidence)
 
 
 def test_report_rejects_additional_executable_fields():

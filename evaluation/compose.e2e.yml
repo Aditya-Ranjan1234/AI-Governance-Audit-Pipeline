@@ -1,0 +1,50 @@
+# Local end-to-end overlay. Reuses dependency images while mounting current sources.
+# Run with a separate Compose project so prior PostgreSQL volumes are preserved.
+services:
+  keycloak-adapter:
+    image: philstock-keycloak-adapter:v2
+    volumes:
+      - ./services/producer_adapters/keycloak/app.py:/app/app.py:ro
+      - ./services/producer_adapters/common:/app/common:ro
+      - ./schemas/governance-event.schema.json:/app/governance-event.schema.json:ro
+  kubernetes-audit-adapter:
+    image: philstock-kubernetes-audit-adapter:v2
+    volumes:
+      - ./services/producer_adapters/kubernetes_audit/app.py:/app/app.py:ro
+      - ./services/producer_adapters/common:/app/common:ro
+      - ./schemas/governance-event.schema.json:/app/governance-event.schema.json:ro
+  airflow-openlineage-adapter:
+    image: philstock-airflow-openlineage-adapter:v2
+    volumes:
+      - ./services/producer_adapters/airflow_openlineage/app.py:/app/app.py:ro
+      - ./services/producer_adapters/common:/app/common:ro
+      - ./schemas/governance-event.schema.json:/app/governance-event.schema.json:ro
+  model-registry-adapter:
+    image: philstock-model-registry-adapter:v2
+    volumes:
+      - ./services/producer_adapters/model_registry/app.py:/app/app.py:ro
+      - ./services/producer_adapters/common:/app/common:ro
+      - ./schemas/governance-event.schema.json:/app/governance-event.schema.json:ro
+  llm-gateway-adapter:
+    image: philstock-llm-gateway-adapter:v2
+    volumes:
+      - ./services/producer_adapters/llm_gateway/app.py:/app/app.py:ro
+      - ./services/producer_adapters/common:/app/common:ro
+      - ./schemas/governance-event.schema.json:/app/governance-event.schema.json:ro
+  stream-processor:
+    image: philstock-stream-processor:v2
+    volumes:
+      - ./stream-processor/target/stream-processor-1.0.0.jar:/app/app.jar:ro
+  risk-scorer:
+    image: philstock-risk-scorer:v2
+    volumes:
+      - ./services/risk-scorer:/app:ro
+  postgres-sink:
+    image: philstock-postgres-sink:v2
+    volumes:
+      - ./services/postgres-sink/app.py:/app/app.py:ro
+  evaluator:
+    image: philstock-evaluator:latest
+    volumes:
+      - ./evaluation/evaluator.py:/evaluation/evaluator.py:ro
+      - ./schemas/governance-event.schema.json:/evaluation/governance-event.schema.json:ro

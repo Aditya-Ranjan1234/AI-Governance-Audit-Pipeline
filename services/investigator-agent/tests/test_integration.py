@@ -239,3 +239,16 @@ def test_cli_shows_and_reuses_saved_report_without_model_call(database, monkeypa
     assert main(["investigate", FINDING_ID]) == 0
     assert json.loads(capsys.readouterr().out)[0]["finding_id"] == FINDING_ID
     assert len(store.jobs()) == 1
+
+
+def test_worker_stops_after_a_systemic_model_configuration_failure(database, monkeypatch, capsys):
+    store, _, settings = database
+    seed(store)
+    monkeypatch.setenv("INVESTIGATOR_POSTGRES_DSN", settings.dsn)
+    monkeypatch.setenv("BEDROCK_MODEL_ID", settings.model_id)
+    monkeypatch.setenv("AWS_REGION", settings.region)
+    monkeypatch.setattr("app.signal.signal", lambda *_: None)
+    monkeypatch.setattr("app.BedrockModel", lambda _: ScriptedModel([AgentError("bedrock_AccessDeniedException")]))
+    assert main(["worker"]) == 2
+    assert store.jobs()[0]["error_code"] == "bedrock_AccessDeniedException"
+    assert "bedrock_configuration_error" in capsys.readouterr().err

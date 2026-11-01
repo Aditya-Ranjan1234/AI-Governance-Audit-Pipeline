@@ -84,6 +84,25 @@ def main(argv=None):
             job = store.claim(selected["job_id"] if selected else None)
             if job:
                 state = process_job(store, job, model, catalog, settings)
+                if state == "failed":
+                    code = store.failure_code(job["job_id"])
+                    if code in {
+                        "bedrock_AccessDeniedException",
+                        "bedrock_ValidationException",
+                        "bedrock_ResourceNotFoundException",
+                        "bedrock_ServiceQuotaExceededException",
+                    }:
+                        print(
+                            json.dumps(
+                                {
+                                    "error": "bedrock_configuration_error",
+                                    "code": code,
+                                    "message": "Worker stopped; fix model access/configuration before resuming.",
+                                }
+                            ),
+                            file=sys.stderr,
+                        )
+                        return 2
             else:
                 state = "not_available"
             if args.command != "worker":

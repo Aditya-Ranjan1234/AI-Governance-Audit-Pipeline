@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import os
 from pathlib import Path
 
-AGENT_VERSION = "investigator-v1"
+AGENT_VERSION = "investigator-v1.1"
 DEFAULT_RULES = ("GOV-002", "GOV-003", "GOV-004", "GOV-006", "GOV-011", "GOV-012")
 
 

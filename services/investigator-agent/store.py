@@ -256,6 +256,12 @@ class Store:
                 FROM investigator.jobs ORDER BY updated_at DESC LIMIT 20""").fetchall()
             )
 
+    def failure_code(self, job_id):
+        with self.connection() as conn:
+            return conn.execute("SELECT error_code FROM investigator.jobs WHERE job_id=%s", (job_id,)).fetchone()[
+                "error_code"
+            ]
+
 
 ALLOWED_ATTRIBUTES = frozenset(
     {

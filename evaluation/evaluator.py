@@ -23,6 +23,43 @@ TOPICS = {
     "LLM_GATEWAY": "governance.llm-gateway.v1",
 }
 
+ADAPTER_URLS = {
+    "KEYCLOAK": ("KEYCLOAK_ADAPTER_URL", "http://keycloak-adapter:8080/events"),
+    "KUBERNETES": ("KUBERNETES_ADAPTER_URL", "http://kubernetes-audit-adapter:8080/events"),
+    "PIPELINE": ("PIPELINE_ADAPTER_URL", "http://airflow-openlineage-adapter:8080/events"),
+    "MODEL_REGISTRY": ("MODEL_REGISTRY_ADAPTER_URL", "http://model-registry-adapter:8080/events"),
+    "LLM_GATEWAY": ("LLM_GATEWAY_ADAPTER_URL", "http://llm-gateway-adapter:8080/events"),
+}
+
+
+def native_payload(event):
+    """Create source-shaped test input, preserving rule conditions and stable source IDs."""
+    raw = {key: event[key] for key in (
+        "event_time", "event_type", "actor", "subject", "action", "outcome",
+        "environment", "correlation_id", "attributes", "labels",
+    )}
+    source_id = event["event_id"]
+    producer = event["producer"]
+    if producer == "KEYCLOAK":
+        raw.update(id=source_id, type=event["event_type"], userId=event["actor"]["id"])
+    elif producer == "KUBERNETES":
+        raw.update(auditID=source_id, verb="create", user={"username": event["actor"]["id"]},
+                   objectRef={"resource": "resource", "name": event["subject"]["id"]})
+    elif producer == "PIPELINE":
+        raw.update(run={"runId": source_id}, job={"name": event["subject"]["id"], "namespace": "e2e"})
+    elif producer == "MODEL_REGISTRY":
+        raw.update(id=source_id, model={"name": event["subject"].get("model_name"),
+                                       "version": event["subject"].get("model_version")})
+    else:
+        raw.update(request_id=source_id, user_id=event["actor"]["id"],
+                   prompt="E2E_RAW_PROMPT_DO_NOT_STORE",
+                   model={"name": "e2e-endpoint", "version": "1"})
+    return raw
+
+
+def adapter_event_id(producer, source_id):
+    return str(uuid.uuid5(uuid.NAMESPACE_URL, f"governance:{producer}:{source_id}"))
+
 
 def envelope(producer, event_type, attributes, at, *, actor="evaluation-user", subject=None, environment="prod"):
     event_id = str(uuid.uuid4())
@@ -97,16 +134,26 @@ def scenarios(repeat, base, run_tag="fixture"):
 def inject(args):
     with open("governance-event.schema.json") as schema_file:
         validator = Draft202012Validator(json.load(schema_file), format_checker=FormatChecker())
-    producer = Producer({"bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:19092"), "enable.idempotence": True, "acks": "all"})
+    via_adapters = args.via_adapters
+    producer = None if via_adapters else Producer({"bootstrap.servers": os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:19092"), "enable.idempotence": True, "acks": "all"})
     run_id = uuid.uuid4()
     all_events, all_expected = [], []
-    base = datetime.now(timezone.utc).replace(microsecond=0) - timedelta(seconds=5)
+    # Keep each synthetic failed-login burst within one five-minute tumbling window.
+    now = datetime.now(timezone.utc)
+    base = now.replace(minute=(now.minute // 5) * 5, second=0, microsecond=0)
     for repeat in range(args.repeats):
         run_events, run_expected = scenarios(repeat + 1, base, str(run_id)[:8])
         all_events.extend(run_events)
         all_expected.extend(run_expected)
     for event in all_events:
         validator.validate(event)
+
+    payloads = [native_payload(event) for event in all_events] if via_adapters else []
+    if via_adapters:
+        mapped = {event["event_id"]: adapter_event_id(event["producer"], event["event_id"]) for event in all_events}
+        all_expected = [(mapped[event_id], rule) for event_id, rule in all_expected]
+        for event in all_events:
+            event["event_id"] = mapped[event["event_id"]]
 
     with psycopg.connect(os.environ["POSTGRES_DSN"]) as connection:
         with connection.cursor() as cursor:
@@ -123,16 +170,35 @@ def inject(args):
                 [(run_id, event_id, rule) for event_id, rule in all_expected],
             )
 
-    for event in all_events:
+    delivery_errors = []
+
+    def delivered(error, _message):
+        if error is not None:
+            delivery_errors.append(str(error))
+
+    for index, event in enumerate(all_events):
+        if via_adapters:
+            variable, default = ADAPTER_URLS[event["producer"]]
+            request = Request(os.getenv(variable, default), data=json.dumps(payloads[index]).encode(),
+                              headers={"Content-Type": "application/json"}, method="POST")
+            with urlopen(request, timeout=20) as response:
+                accepted = json.load(response)
+            if accepted.get("accepted") != 1 or accepted.get("event_ids") != [event["event_id"]]:
+                raise RuntimeError("Adapter acknowledgement did not match the expected event ID")
+            if args.delay_ms > 0:
+                time.sleep(args.delay_ms / 1000)
+            continue
         key = event["actor"]["id"]
         if event["subject"].get("model_name") and event["subject"].get("model_version"):
             key = f'{event["subject"]["model_name"]}:{event["subject"]["model_version"]}'
-        producer.produce(TOPICS[event["producer"]], key=key.encode(), value=json.dumps(event).encode())
+        producer.produce(TOPICS[event["producer"]], key=key.encode(), value=json.dumps(event).encode(), on_delivery=delivered)
         producer.poll(0)
         if args.delay_ms > 0:
             time.sleep(args.delay_ms / 1000)
-    producer.flush(30)
-    print(json.dumps({"run_id": str(run_id), "events": len(all_events), "expected_findings": len(all_expected)}, indent=2))
+    if producer is not None and (producer.flush(30) != 0 or delivery_errors):
+        raise RuntimeError("Kafka did not acknowledge every evaluation event")
+    print(json.dumps({"run_id": str(run_id), "events": len(all_events), "expected_findings": len(all_expected),
+                      "ingestion": "http_adapters" if via_adapters else "direct_kafka"}, indent=2))
 
 
 def percentile(values, q):
@@ -143,11 +209,12 @@ def report(args):
     dsn = os.environ["POSTGRES_DSN"]
     with psycopg.connect(dsn) as connection:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT run_id, expected_findings FROM evaluation_runs ORDER BY started_at DESC LIMIT 1")
+            cursor.execute("""SELECT run_id, expected_findings, injected_events FROM evaluation_runs
+                WHERE (%s::uuid IS NULL OR run_id=%s::uuid) ORDER BY started_at DESC LIMIT 1""", (args.run_id, args.run_id))
             latest = cursor.fetchone()
             if latest is None:
                 raise SystemExit("No evaluation run found. Run 'inject' first.")
-            run_id, expected_count = latest
+            run_id, expected_count, injected_count = latest
         deadline = time.time() + args.wait
         while True:
             with connection.cursor() as cursor:
@@ -157,7 +224,10 @@ def report(args):
                     (run_id,),
                 )
                 observed = cursor.fetchone()[0]
-            if observed >= expected_count or time.time() >= deadline:
+                cursor.execute("""SELECT count(*) FROM raw_events r JOIN evaluation_events e
+                    ON e.run_id=%s AND e.event_id=r.event_id""", (run_id,))
+                persisted = cursor.fetchone()[0]
+            if (observed >= expected_count and persisted >= injected_count) or time.time() >= deadline:
                 break
             time.sleep(2)
 
@@ -202,6 +272,11 @@ def report(args):
                 "throughput_events_per_second": round(event_count / max(float(duration or 0), 0.001), 2),
                 "observed_findings": len(actual),
                 "expected_findings": len(expected),
+                "injected_events": injected_count,
+                "persisted_events": event_count,
+                "missing_findings": sorted(expected - actual),
+                "unexpected_findings": sorted(actual - expected),
+                "passed": false_positive == 0 and false_negative == 0 and event_count == injected_count,
             }
             cursor.execute(
                 "UPDATE evaluation_runs SET completed_at=now(), results=%s WHERE run_id=%s",
@@ -209,6 +284,8 @@ def report(args):
             )
         connection.commit()
     print(json.dumps(result, indent=2))
+    if not result["passed"]:
+        raise SystemExit(1)
 
 
 def adapter_smoke(args):
@@ -281,9 +358,11 @@ def main():
     inject_parser = subparsers.add_parser("inject")
     inject_parser.add_argument("--repeats", type=int, default=3)
     inject_parser.add_argument("--delay-ms", type=float, default=0, help="Delay between events for failure testing")
+    inject_parser.add_argument("--via-adapters", action="store_true", help="Send every scenario through the five HTTP adapters")
     inject_parser.set_defaults(function=inject)
     report_parser = subparsers.add_parser("report")
     report_parser.add_argument("--wait", type=int, default=90)
+    report_parser.add_argument("--run-id", type=uuid.UUID, help="Measure this exact run instead of the latest run")
     report_parser.set_defaults(function=report)
     adapter_parser = subparsers.add_parser("adapter-smoke")
     adapter_parser.add_argument("--wait", type=int, default=90)

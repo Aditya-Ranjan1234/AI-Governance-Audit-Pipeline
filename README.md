@@ -106,3 +106,7 @@ The framework mappings are evidence-routing decisions for this prototype. They i
 ## Optional read-only investigator agent
 
 One Amazon Bedrock investigator can review persisted privileged-access and model-promotion findings. Its flow is **findings → durable jobs → bounded evidence tools → cited report**. It stores reports and audit records separately from the existing rule findings and never performs remediation. Enable the optional `agents` Compose profile after configuring Bedrock; see [setup, configuration and tests](docs/investigator-agent.md). The original offline project explanation is a source snapshot from before this optional service was added.
+
+## End-to-end results
+
+The November 2026 run exercised all five HTTP adapters, all 16 rules, risk scoring, PostgreSQL persistence, processor/broker recovery, and live Bedrock investigations. Open the [self-contained results page](docs/e2e-results-2026-11-01.html) or read the [execution and reproduction notes](docs/e2e-run.md). The final model is Amazon Nova 2 Lite; earlier model failures are retained in the evidence export.

@@ -1,9 +1,9 @@
 name: Investigator agent
 on:
   pull_request:
-    paths: ['services/investigator-agent/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', '.github/workflows/investigator.yml']
+    paths: ['services/investigator-agent/**', 'services/producer_adapters/**', 'evaluation/**', 'schemas/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', '.github/workflows/investigator.yml']
   push:
-    paths: ['services/investigator-agent/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', '.github/workflows/investigator.yml']
+    paths: ['services/investigator-agent/**', 'services/producer_adapters/**', 'evaluation/**', 'schemas/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', '.github/workflows/investigator.yml']
 permissions:
   contents: read
 jobs:
@@ -33,7 +33,12 @@ jobs:
       - run: pip install -r services/investigator-agent/requirements-dev.txt
       - run: ruff check services/investigator-agent
       - run: ruff format --check services/investigator-agent
+      - run: ruff check --select E4,E7,E9,F,B evaluation/evaluator.py evaluation/run_e2e_recovery.py evaluation/export_e2e_report.py evaluation/tests
       - run: pytest -q
         working-directory: services/investigator-agent
+      - run: pip install -r evaluation/requirements.txt
+      - run: python -m unittest discover -s evaluation/tests -v
+        env:
+          PYTHONPATH: evaluation:services/producer_adapters
       - run: docker compose --profile agents config --quiet
       - run: docker build -f services/investigator-agent/Dockerfile -t investigator-test .

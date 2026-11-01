@@ -99,6 +99,24 @@ A saved report contains:
 
 The SDK uses its standard AWS credential chain. No credentials enter model messages or committed configuration. The selected AWS role needs `bedrock:InvokeModel` on the configured model/profile and any underlying model resources required by that profile; access depends on the account and region.
 
+Provider failures retain an allowlisted AWS exception code in the job/run record, without retaining the provider's error message. `ModelErrorException` receives bounded retries when its `originalStatusCode` is absent, 429, or 5xx; Bedrock can omit the code when a model generates an invalid tool sequence. Permission and request-validation failures remain terminal. Invalid report fields receive schema-path feedback without echoing rejected text, and mixed read/submission batches must resubmit separately within the same turn budget.
+
+The worker stops with exit code 2 on model permission, validation, missing-resource, or service-quota configuration errors. It leaves other queued findings untouched so a single account/configuration problem does not fail the entire backlog.
+
+The November 2026 end-to-end run validated `us.amazon.nova-2-lite-v1:0` in `us-west-2`, with `INVESTIGATOR_MAX_TOKENS=3000`. Account availability must still be checked; listing a model or passing a plain-text probe does not prove full tool-use access. See `docs/e2e-run.md` for the measured results and earlier model failures.
+
+### Offline dependency builds
+
+Normal Docker builds use PyPI. When downloads are unreliable, supply a wheelhouse containing the requirements and all transitive dependencies for the image's Python version/CPU architecture. Verify wheel hashes before building:
+
+```bash
+docker build --build-context wheelhouse=/absolute/path/to/verified-wheels \
+  --build-arg PIP_NO_INDEX=1 \
+  -f services/investigator-agent/Dockerfile -t philstock-investigator-agent:e2e .
+```
+
+The default `wheelhouse` stage is an empty dependency placeholder; the named build context overrides it for an offline build. The final runtime image, source files, user and entrypoint are the same in both paths.
+
 ## Production database identity / EKS
 
 A database administrator applies migrations 001 (if needed) and 002, then provisions a dedicated login and grants membership:
