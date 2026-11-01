@@ -153,5 +153,39 @@ services:
       args: {ADAPTER: keycloak}
     command: ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]
 
+  investigator-db-init:
+    profiles: ["agents"]
+    build:
+      context: .
+      dockerfile: services/investigator-agent/Dockerfile
+    command: ["migrate"]
+    environment:
+      INVESTIGATOR_POSTGRES_DSN: ${INVESTIGATOR_ADMIN_DSN:-postgresql://governance:governance@postgres:5432/governance}
+    depends_on:
+      postgres: {condition: service_healthy}
+
+  investigator-agent:
+    profiles: ["agents"]
+    build:
+      context: .
+      dockerfile: services/investigator-agent/Dockerfile
+    init: true
+    stop_grace_period: 180s
+    environment:
+      INVESTIGATOR_POSTGRES_DSN: ${INVESTIGATOR_POSTGRES_DSN:-postgresql://governance:governance@postgres:5432/governance}
+      AWS_REGION: ${AWS_REGION:-}
+      BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      INVESTIGATOR_RULE_IDS: ${INVESTIGATOR_RULE_IDS:-GOV-002,GOV-003,GOV-004,GOV-006,GOV-011,GOV-012}
+      INVESTIGATOR_POLL_SECONDS: ${INVESTIGATOR_POLL_SECONDS:-5}
+      INVESTIGATOR_MAX_STEPS: ${INVESTIGATOR_MAX_STEPS:-6}
+      INVESTIGATOR_MAX_ATTEMPTS: ${INVESTIGATOR_MAX_ATTEMPTS:-3}
+      INVESTIGATOR_TIMEOUT_SECONDS: ${INVESTIGATOR_TIMEOUT_SECONDS:-120}
+      INVESTIGATOR_MAX_TOKENS: ${INVESTIGATOR_MAX_TOKENS:-1500}
+    depends_on:
+      investigator-db-init: {condition: service_completed_successfully}
+
 volumes:
   postgres-data:

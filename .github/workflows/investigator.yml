@@ -1,0 +1,39 @@
+name: Investigator agent
+on:
+  pull_request:
+    paths: ['services/investigator-agent/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', '.github/workflows/investigator.yml']
+  push:
+    paths: ['services/investigator-agent/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', '.github/workflows/investigator.yml']
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: governance_test
+          POSTGRES_USER: governance
+          POSTGRES_PASSWORD: ci-test-only
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U governance -d governance_test"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_POSTGRES_DSN: postgresql://governance:ci-test-only@127.0.0.1:5432/governance_test
+      AWS_EC2_METADATA_DISABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: services/investigator-agent/requirements*.txt
+      - run: pip install -r services/investigator-agent/requirements-dev.txt
+      - run: ruff check services/investigator-agent
+      - run: ruff format --check services/investigator-agent
+      - run: pytest -q
+        working-directory: services/investigator-agent
+      - run: docker compose --profile agents config --quiet
+      - run: docker build -f services/investigator-agent/Dockerfile -t investigator-test .

@@ -1,0 +1,47 @@
+# Optional: apply db/002_investigator.sql and fill all placeholders before deployment.
+# Use a dedicated IAM role permitting bedrock:InvokeModel only for the selected model/profile resources.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: governance-investigator
+  namespace: governance
+  annotations:
+    eks.amazonaws.com/role-arn: REPLACE_WITH_INVESTIGATOR_ROLE_ARN
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: governance-investigator
+  namespace: governance
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: governance-investigator}
+  template:
+    metadata:
+      labels: {app: governance-investigator}
+    spec:
+      serviceAccountName: governance-investigator
+      terminationGracePeriodSeconds: 180
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: investigator
+          image: REPLACE_WITH_INVESTIGATOR_IMAGE
+          args: [worker]
+          env:
+            - {name: AWS_REGION, value: REPLACE_WITH_AWS_REGION}
+            - {name: BEDROCK_MODEL_ID, value: REPLACE_WITH_BEDROCK_MODEL_OR_PROFILE_ID}
+            - {name: AWS_EC2_METADATA_DISABLED, value: 'true'}
+            - name: INVESTIGATOR_POSTGRES_DSN
+              valueFrom:
+                secretKeyRef: {name: governance-investigator-database, key: dsn}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: '1', memory: 512Mi}

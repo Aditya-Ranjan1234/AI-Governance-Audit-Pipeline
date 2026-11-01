@@ -102,3 +102,7 @@ Use `evaluation/RESILIENCE.md` for the corresponding EKS pod and three-broker MS
 5. Run the evaluation suite before recording results. The failure tests intentionally terminate a processor pod and, for broker testing, require an approved maintenance window.
 
 The framework mappings are evidence-routing decisions for this prototype. They identify the control or legal provision for which a finding is relevant; they do not by themselves establish conformity.
+
+## Optional read-only investigator agent
+
+One Amazon Bedrock investigator can review persisted privileged-access and model-promotion findings. Its flow is **findings → durable jobs → bounded evidence tools → cited report**. It stores reports and audit records separately from the existing rule findings and never performs remediation. Enable the optional `agents` Compose profile after configuring Bedrock; see [setup, configuration and tests](docs/investigator-agent.md). The original offline project explanation is a source snapshot from before this optional service was added.
