@@ -37,6 +37,9 @@ def test_bad_citation_can_be_corrected_but_never_saved(settings):
     audit = []
     assert Investigator(model, MemoryTools(), settings, audit.append).run() == report()
     assert any(x["kind"] == "tool_validation_failed" for x in audit)
+    rejected = next(x for x in audit if x["kind"] == "tool_validation_failed")
+    assert rejected["validation"] == {"error": "unknown_evidence_reference"}
+    assert "invented" not in str(rejected)
     assert model.requests[-1][-1]["content"][0]["toolResult"]["status"] == "error"
 
 
@@ -47,6 +50,14 @@ def test_timeline_cannot_invent_timestamp():
     result["timeline"][0]["event_time"] = "2020-01-01T00:00:00Z"
     with pytest.raises(ValueError, match="timeline"):
         validate_report(result, tools.evidence)
+
+
+@pytest.mark.parametrize("ref", ["rule:GOV-006:hash", "finding:" + EVENT_ID])
+def test_timeline_schema_rejects_non_event_references(ref):
+    value = report()
+    value["timeline"][0]["event_ref"] = ref
+    with pytest.raises(ValidationError, match="does not match"):
+        VALIDATORS["submit_investigation"].validate(value)
 
 
 def test_no_mutating_or_unknown_tools(settings):
@@ -154,6 +165,21 @@ def test_prompt_injection_is_data_and_never_a_tool_permission(settings):
     assert tools.calls == []
 
 
+def test_pod_projection_omits_irrelevant_rbac_default_but_preserves_rule_evidence():
+    raw = {
+        "event_type": "POD_CREATE",
+        "attributes": {
+            "change_approved": False,
+            "privileged": True,
+            "image_approved": True,
+        },
+    }
+    assert projected_event(raw)["attributes"] == {"privileged": True, "image_approved": True}
+    assert raw["attributes"]["change_approved"] is False
+    raw["event_type"] = "CLUSTER_ROLE_BINDING"
+    assert projected_event(raw)["attributes"]["change_approved"] is False
+
+
 def test_bedrock_converse_sdk_request_and_response(settings):
     client = boto3.client(
         "bedrock-runtime", region_name="us-west-2", aws_access_key_id="test", aws_secret_access_key="test"
@@ -246,6 +272,27 @@ def test_workload_rule_does_not_invent_an_approval_predicate(negated):
         "Rule GOV-006 " + ("does not require" if negated else "requires") + " workload change approval."
     )
     if negated:
+        validate_report(value, tools.evidence)
+    else:
+        with pytest.raises(ValueError, match="GOV006_matches"):
+            validate_report(value, tools.evidence)
+
+
+@pytest.mark.parametrize(
+    "text,valid",
+    [
+        ("GOV-006 triggers on privileged pod creation without change approval.", False),
+        ("GOV-006 matches privileged=true and change_approved=false.", False),
+        ("The rule requires either privileged=true or image approval to be false.", True),
+    ],
+)
+def test_workload_rule_distinguishes_image_and_change_approval(text, valid):
+    tools = MemoryTools()
+    tools.finding.update(rule_id="GOV-006", source_event_id=EVENT_ID)
+    tools.call("get_source_event")
+    value = report()
+    value["summary"]["text"] = text
+    if valid:
         validate_report(value, tools.evidence)
     else:
         with pytest.raises(ValueError, match="GOV006_matches"):

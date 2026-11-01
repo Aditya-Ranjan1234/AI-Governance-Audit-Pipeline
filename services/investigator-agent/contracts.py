@@ -33,8 +33,17 @@ REPORT_SCHEMA = {
                 "additionalProperties": False,
                 "required": ["event_ref", "event_time", "description"],
                 "properties": {
-                    "event_ref": {"type": "string", "maxLength": 200},
-                    "event_time": {"type": "string", "maxLength": 50},
+                    "event_ref": {
+                        "type": "string",
+                        "maxLength": 200,
+                        "pattern": "^event:",
+                        "description": "Copy an event: reference from retrieved event evidence. Never use a rule: or finding: reference in the timeline.",
+                    },
+                    "event_time": {
+                        "type": "string",
+                        "maxLength": 50,
+                        "description": "Copy the exact event_time of this retrieved event. Omit the timeline item if unavailable.",
+                    },
                     "description": TEXT,
                 },
             },
@@ -88,7 +97,10 @@ def validate_report(report: dict, evidence: dict) -> None:
         raise ValueError("successful_login_is_authenticated_without_mfa")
     if finding.get("rule_id") == "GOV-006":
         for match in re.finditer(
-            r"(?:rule|gov-006)[^.!?]{0,100}\b(?:requires?|mandates?)\b[^.!?]{0,60}\bapproval\b", claims, re.I
+            r"(?:rule|gov-006)[^.!?]{0,100}\b(?:requires?|mandates?|triggers?|matches?)\b"
+            r"[^.!?]{0,60}\bchange[ _-]approv(?:al|ed)\b",
+            claims,
+            re.I,
         ):
             if not re.search(r"\b(?:not|never)\s+(?:require|mandate)", match.group(0), re.I):
                 raise ValueError("GOV006_matches_privileged_or_unapproved_image_not_change_approval")
@@ -118,6 +130,9 @@ def validation_feedback(error, evidence):
     if code == "unknown_evidence_reference":
         result["valid_evidence_refs"] = sorted(evidence)
     elif code == "timeline_must_use_retrieved_event_and_exact_timestamp":
+        result["correction"] = (
+            "Use only event: references with the exact timestamps below. Remove all rule: and finding: timeline items. Omit any item you cannot match; an empty timeline is allowed."
+        )
         result["valid_event_timestamps"] = {
             ref: event["event_time"] for ref, event in evidence.items() if ref.startswith("event:")
         }

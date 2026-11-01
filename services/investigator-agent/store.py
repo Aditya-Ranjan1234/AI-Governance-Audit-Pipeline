@@ -326,6 +326,10 @@ def projected_event(raw):
     event["attributes"] = {
         key: scalar(value) for key, value in raw.get("attributes", {}).items() if key in ALLOWED_ATTRIBUTES
     }
+    if event["event_type"] == "POD_CREATE":
+        # The Kubernetes mapper defaults this RBAC field for every event. It is not
+        # a pod approval record or a GOV-006 predicate; retain it on RBAC events only.
+        event["attributes"].pop("change_approved", None)
     return serializable(event)
 
 

@@ -144,3 +144,7 @@ cd services/investigator-agent
 For database tests, set `TEST_POSTGRES_DSN` to an **isolated** database whose name ends in `_test`. The fixture clears that database's event/finding/investigator tables. Without this variable, database tests are explicitly skipped. The GitHub Actions workflow supplies an isolated PostgreSQL service and runs the full suite plus the Docker build and Compose validation.
 
 References: [Bedrock client-side tool use](https://docs.aws.amazon.com/bedrock/latest/userguide/tool-use-client-side.html), [Converse API](https://docs.aws.amazon.com/boto3/latest/reference/services/bedrock-runtime/client/converse.html).
+
+The v1.2 evidence projection omits `change_approved` from `POD_CREATE` events: the Kubernetes mapper defaults that RBAC field on all events, while GOV-006 tests privilege or image approval. The canonical event is unchanged. Narrow validation guards catch two observed domain-wording mistakes; they do not establish the truth of arbitrary model prose. Validation audit entries include safe error codes and schema locations without rejected model content.
+
+Version v1.3 restricts timeline references to `event:` IDs in the model-facing schema. Rules and findings can be cited in observations, but cannot appear as timeline events. GOV-006 catalog wording explicitly describes its existing OR predicate: a privileged pod is flagged even with an approved image.

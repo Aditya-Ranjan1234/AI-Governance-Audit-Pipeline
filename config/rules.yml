@@ -50,9 +50,9 @@ rules:
       NIST_SP_800_53: [AC-3, SC-4]
       GDPR: [Article-5, Article-32]
   - id: GOV-006
-    title: Unapproved privileged workload
+    title: Privileged pod or unapproved image
     severity: 4
-    description: A privileged pod or an image outside the approved inventory was deployed.
+    description: Any privileged pod is flagged, even when its image is approved. A nonprivileged pod is also flagged when its image is not approved. Workload change approval is not checked by this rule. Predicate is POD_CREATE AND (privileged=true OR image_approved=false).
     frameworks:
       NIST_AI_RMF: [GOVERN-1.7, MANAGE-4.1]
       ISO_IEC_42001: [8.4, A.4.5]
