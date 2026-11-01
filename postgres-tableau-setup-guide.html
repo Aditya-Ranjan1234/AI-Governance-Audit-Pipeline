@@ -1,0 +1,799 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Step-by-step guide for connecting Tableau on macOS to the private AI Governance PostgreSQL database on AWS.">
+  <title>PostgreSQL + Tableau — Setup Guide</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-2: #edf2f8;
+      --text: #172033;
+      --muted: #5b687c;
+      --line: #d8e0eb;
+      --blue: #2468d2;
+      --blue-soft: #e7f0ff;
+      --green: #167a54;
+      --green-soft: #e1f5ec;
+      --orange: #ad570d;
+      --orange-soft: #fff0e2;
+      --purple: #7043c4;
+      --purple-soft: #f0e9fe;
+      --red: #b23d4c;
+      --red-soft: #fdebee;
+      --code: #111a29;
+      --code-text: #edf3fb;
+      --shadow: 0 16px 42px rgba(31, 45, 75, .08);
+      --radius: 18px;
+      --max: 1120px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1320;
+        --surface: #151e2d;
+        --surface-2: #1d293b;
+        --text: #edf2fa;
+        --muted: #aab6c9;
+        --line: #304057;
+        --blue: #7bacff;
+        --blue-soft: #192e52;
+        --green: #70d5aa;
+        --green-soft: #183b31;
+        --orange: #ffad6b;
+        --orange-soft: #422b1d;
+        --purple: #bd9aff;
+        --purple-soft: #30244e;
+        --red: #ff91a0;
+        --red-soft: #44242b;
+        --code: #090e17;
+        --code-text: #edf3fb;
+        --shadow: 0 16px 42px rgba(0, 0, 0, .25);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 400 16px/1.62 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input { font: inherit; }
+    a { color: inherit; }
+    code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    .wrap { width: min(var(--max), calc(100% - 34px)); margin-inline: auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+    .brand { font-weight: 750; letter-spacing: -.02em; }
+    .brand span { color: var(--blue); }
+    nav { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+    nav a {
+      padding: 8px 10px;
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 9px;
+      font-size: 14px;
+    }
+    nav a:hover, nav a:focus-visible { background: var(--surface-2); color: var(--text); }
+
+    .hero {
+      padding: 76px 0 54px;
+      background:
+        radial-gradient(circle at 10% 18%, color-mix(in srgb, var(--blue) 14%, transparent), transparent 31%),
+        radial-gradient(circle at 90% 10%, color-mix(in srgb, var(--purple) 12%, transparent), transparent 28%);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 750;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 26px; height: 2px; background: currentColor; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 850px;
+      margin: 18px 0 20px;
+      font-size: clamp(39px, 7vw, 70px);
+      line-height: 1.04;
+      letter-spacing: -.052em;
+    }
+    h1 em { color: var(--blue); font-style: normal; }
+    .lead { max-width: 790px; color: var(--muted); font-size: clamp(17px, 2vw, 21px); }
+    .hero-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 28px; }
+    .tag, .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 680;
+    }
+    .tag { padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+
+    main section { padding: 68px 0; }
+    main section + section { border-top: 1px solid var(--line); }
+    .section-head { max-width: 800px; margin-bottom: 32px; }
+    .section-kicker { color: var(--blue); font-size: 13px; font-weight: 750; text-transform: uppercase; letter-spacing: .1em; }
+    h2 { margin: 7px 0 12px; font-size: clamp(29px, 4.5vw, 46px); line-height: 1.1; letter-spacing: -.035em; }
+    h3 { margin-bottom: 8px; font-size: 19px; line-height: 1.3; }
+    .section-head p, .muted { color: var(--muted); }
+
+    .flow {
+      display: grid;
+      grid-template-columns: 1fr 42px 1fr 42px 1fr 42px 1fr;
+      gap: 10px;
+      align-items: stretch;
+    }
+    .flow-card {
+      padding: 19px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .flow-card strong { display: block; margin-bottom: 5px; }
+    .flow-card small { color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .flow-card.mac { border-top: 4px solid var(--blue); }
+    .flow-card.eks { border-top: 4px solid var(--purple); }
+    .flow-card.rds { border-top: 4px solid var(--orange); }
+    .flow-card.tableau { border-top: 4px solid var(--green); }
+    .arrow { display: grid; place-items: center; color: var(--muted); font-size: 24px; font-weight: 750; }
+
+    .callout {
+      margin-top: 20px;
+      padding: 17px 19px;
+      background: var(--blue-soft);
+      border-left: 4px solid var(--blue);
+      border-radius: 12px;
+    }
+    .callout.warning { background: var(--orange-soft); border-color: var(--orange); }
+    .callout.danger { background: var(--red-soft); border-color: var(--red); }
+    .callout strong { display: block; margin-bottom: 3px; }
+    .callout p { margin: 0; }
+
+    .checklist { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+    .check-card {
+      padding: 19px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+    }
+    .check-card .num { color: var(--blue); font-size: 13px; font-weight: 800; }
+    .check-card p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+
+    .steps { display: grid; gap: 22px; }
+    .step {
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+    .step-number {
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      color: var(--blue);
+      background: var(--blue-soft);
+      border-radius: 15px;
+      font-weight: 800;
+      font-size: 18px;
+    }
+    .step-body {
+      min-width: 0;
+      padding: 22px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .step-body > p { color: var(--muted); }
+    .step-body > p:last-child { margin-bottom: 0; }
+
+    .code-block { position: relative; margin: 14px 0; }
+    pre {
+      margin: 0;
+      padding: 21px 92px 21px 21px;
+      overflow: auto;
+      color: var(--code-text);
+      background: var(--code);
+      border-radius: 14px;
+      font-size: 13px;
+      line-height: 1.58;
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 7px 10px;
+      color: var(--code-text);
+      background: rgba(255,255,255,.1);
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .copy-btn:hover, .copy-btn:focus-visible { background: rgba(255,255,255,.18); }
+    code.inline { padding: 2px 6px; color: var(--blue); background: var(--blue-soft); border-radius: 6px; font-size: .9em; }
+
+    .connection-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 16px; }
+    .field {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 12px;
+      padding: 13px 15px;
+      background: var(--surface-2);
+      border-radius: 11px;
+    }
+    .field span:first-child { color: var(--muted); font-size: 13px; }
+    .field code { overflow-wrap: anywhere; font-size: 13px; }
+
+    .source-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    .source-card {
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+    }
+    .source-card .status { padding: 4px 8px; margin-bottom: 10px; }
+    .source-card:nth-child(1) .status { color: var(--blue); background: var(--blue-soft); }
+    .source-card:nth-child(2) .status { color: var(--purple); background: var(--purple-soft); }
+    .source-card:nth-child(3) .status { color: var(--orange); background: var(--orange-soft); }
+    .source-card:nth-child(4) .status { color: var(--green); background: var(--green-soft); }
+    .source-card p { margin-bottom: 0; color: var(--muted); font-size: 14px; }
+
+    .dashboard {
+      padding: 18px;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+    .dash-panel {
+      min-height: 150px;
+      padding: 18px;
+      background: var(--surface);
+      border-radius: 13px;
+    }
+    .dash-panel.wide { grid-column: 1 / -1; }
+    .dash-panel strong { display: block; margin-bottom: 6px; }
+    .dash-panel span { color: var(--muted); font-size: 13px; }
+    .mini-bars { display: flex; align-items: end; gap: 8px; height: 74px; margin-top: 12px; }
+    .mini-bars i { flex: 1; min-width: 12px; background: var(--blue); border-radius: 5px 5px 2px 2px; opacity: .75; }
+    .mini-line { height: 58px; margin-top: 17px; position: relative; border-bottom: 1px solid var(--line); }
+    .mini-line::after { content: ""; position: absolute; inset: 9px 4px 14px; border-top: 3px solid var(--purple); transform: skewY(-8deg); }
+
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    th, td { padding: 13px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+    td { font-size: 14px; }
+    td code { color: var(--blue); }
+
+    details {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      overflow: hidden;
+    }
+    details + details { margin-top: 10px; }
+    summary { padding: 16px 18px; cursor: pointer; font-weight: 680; }
+    details > div { padding: 0 18px 18px; color: var(--muted); }
+    details p:last-child { margin-bottom: 0; }
+
+    .completion {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 14px 16px;
+      background: var(--surface-2);
+      border-radius: 11px;
+    }
+    .completion + .completion { margin-top: 9px; }
+    .completion input { width: 20px; height: 20px; accent-color: var(--green); }
+    .completion label { flex: 1; }
+
+    footer { padding: 38px 0 50px; color: var(--muted); border-top: 1px solid var(--line); }
+    footer .wrap { display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
+
+    @media (max-width: 900px) {
+      .flow { grid-template-columns: 1fr; }
+      .arrow { transform: rotate(90deg); min-height: 28px; }
+      .checklist { grid-template-columns: 1fr; }
+      .connection-grid, .source-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 680px) {
+      .topbar-inner { align-items: flex-start; padding: 13px 0; }
+      nav { display: none; }
+      .hero { padding-top: 54px; }
+      main section { padding: 52px 0; }
+      .step { grid-template-columns: 1fr; gap: 10px; }
+      .step-number { width: 44px; height: 44px; }
+      .step-body { padding: 18px; }
+      pre { padding: 58px 17px 18px; }
+      .field { grid-template-columns: 1fr; gap: 3px; }
+      .dashboard { grid-template-columns: 1fr; }
+      .dash-panel.wide { grid-column: auto; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand">AI Governance <span>Setup Guide</span></div>
+      <nav aria-label="Guide sections">
+        <a href="#connection">Connection</a>
+        <a href="#tableau">Tableau</a>
+        <a href="#sources">Data sources</a>
+        <a href="#public">Free edition</a>
+        <a href="#troubleshooting">Troubleshooting</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="eyebrow">macOS · AWS · Tableau</div>
+      <h1>Connect private PostgreSQL data to <em>Tableau</em></h1>
+      <p class="lead">A repeatable procedure for reaching the AI Governance database through a secure Kubernetes tunnel, connecting Tableau, and building four dashboard views without relationship errors.</p>
+      <div class="hero-tags">
+        <span class="tag"><span class="dot"></span> AWS region: us-west-2</span>
+        <span class="tag">Database: governance</span>
+        <span class="tag">No public RDS exposure</span>
+        <span class="tag">Tableau on Mac</span>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section id="connection">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">How the connection works</div>
+          <h2>Keep PostgreSQL private</h2>
+          <p>The RDS database is inside private AWS subnets. The Mac reaches it through the existing EKS cluster instead of opening PostgreSQL to the internet.</p>
+        </div>
+
+        <div class="flow" aria-label="Connection flow">
+          <div class="flow-card mac"><strong>Your Mac</strong><small>AWS CLI, kubectl and Tableau are installed locally.</small></div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="flow-card eks"><strong>Kubernetes tunnel</strong><small>A temporary forwarding pod runs inside the governance namespace.</small></div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="flow-card rds"><strong>Amazon RDS</strong><small>Private PostgreSQL database stores events, findings and dashboard views.</small></div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="flow-card tableau"><strong>Tableau</strong><small>Connects to localhost port 15432 as if PostgreSQL were local.</small></div>
+        </div>
+
+        <div class="callout">
+          <strong>Why localhost works</strong>
+          <p><code class="inline">kubectl port-forward</code> carries database traffic through the authenticated EKS API. Tableau connects to <code class="inline">127.0.0.1:15432</code>; the temporary pod forwards that traffic to private RDS.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="prerequisites">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">Before starting</div>
+          <h2>Three items to confirm</h2>
+          <p>Use the same AWS CLI profile that deployed the project.</p>
+        </div>
+
+        <div class="checklist">
+          <div class="check-card"><div class="num">01</div><h3>AWS access</h3><p><code class="inline">aws sts get-caller-identity</code> should return the deployment account.</p></div>
+          <div class="check-card"><div class="num">02</div><h3>Kubernetes access</h3><p><code class="inline">kubectl get nodes</code> should show three Ready EKS workers.</p></div>
+          <div class="check-card"><div class="num">03</div><h3>Tableau edition</h3><p>Desktop/trial supports PostgreSQL. Tableau Public uses extracted files and publishes public data.</p></div>
+        </div>
+
+        <div class="code-block">
+          <button class="copy-btn" type="button">Copy</button>
+          <pre><code>aws sts get-caller-identity
+aws eks update-kubeconfig --name ai-governance-eks --region us-west-2
+kubectl get nodes</code></pre>
+        </div>
+      </div>
+    </section>
+
+    <section id="procedure">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">Connection procedure</div>
+          <h2>Start the secure database tunnel</h2>
+          <p>Run these steps in Terminal. The forwarding session remains active only while the final command is running.</p>
+        </div>
+
+        <div class="steps">
+          <article class="step">
+            <div class="step-number">1</div>
+            <div class="step-body">
+              <h3>Create the temporary forwarding pod</h3>
+              <p>This pod has no database password. It only forwards network traffic from EKS to the private RDS endpoint.</p>
+              <div class="code-block">
+                <button class="copy-btn" type="button">Copy</button>
+                <pre><code>kubectl -n governance run tableau-rds-tunnel \
+  --image=alpine/socat \
+  --restart=Never \
+  -- TCP-LISTEN:5432,fork,reuseaddr \
+  TCP:ai-governance-postgres.c1eyg8c0m39g.us-west-2.rds.amazonaws.com:5432</code></pre>
+              </div>
+            </div>
+          </article>
+
+          <article class="step">
+            <div class="step-number">2</div>
+            <div class="step-body">
+              <h3>Wait until the pod is ready</h3>
+              <div class="code-block">
+                <button class="copy-btn" type="button">Copy</button>
+                <pre><code>kubectl -n governance wait \
+  --for=condition=Ready pod/tableau-rds-tunnel \
+  --timeout=90s</code></pre>
+              </div>
+              <p>Expected result: <code class="inline">pod/tableau-rds-tunnel condition met</code>.</p>
+            </div>
+          </article>
+
+          <article class="step">
+            <div class="step-number">3</div>
+            <div class="step-body">
+              <h3>Forward a local Mac port</h3>
+              <div class="code-block">
+                <button class="copy-btn" type="button">Copy</button>
+                <pre><code>kubectl -n governance port-forward \
+  pod/tableau-rds-tunnel 15432:5432</code></pre>
+              </div>
+              <div class="callout warning">
+                <strong>Keep this Terminal window open</strong>
+                <p>Closing it stops the tunnel. Tableau will then report that the database connection was lost.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="step">
+            <div class="step-number">4</div>
+            <div class="step-body">
+              <h3>Retrieve the AWS-managed database password</h3>
+              <p>Run this in a second Terminal window. Copy the displayed password directly into Tableau. Do not save it in the HTML guide or share it in messages.</p>
+              <div class="code-block">
+                <button class="copy-btn" type="button">Copy</button>
+                <pre><code>SECRET_ARN=$(aws rds describe-db-instances \
+  --db-instance-identifier ai-governance-postgres \
+  --region us-west-2 \
+  --query 'DBInstances[0].MasterUserSecret.SecretArn' \
+  --output text)
+
+aws secretsmanager get-secret-value \
+  --secret-id "$SECRET_ARN" \
+  --region us-west-2 \
+  --query SecretString \
+  --output text |
+python3 -c 'import json,sys; print(json.load(sys.stdin)["password"])'</code></pre>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="tableau">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">Tableau Desktop</div>
+          <h2>Enter the PostgreSQL connection</h2>
+          <p>Open Tableau, select <strong>Connect → To a Server → PostgreSQL</strong>, and use these values.</p>
+        </div>
+
+        <div class="connection-grid">
+          <div class="field"><span>Server</span><code>127.0.0.1</code></div>
+          <div class="field"><span>Port</span><code>15432</code></div>
+          <div class="field"><span>Database</span><code>governance</code></div>
+          <div class="field"><span>Username</span><code>governance_admin</code></div>
+          <div class="field"><span>Password</span><code>AWS Secrets Manager value</code></div>
+          <div class="field"><span>SSL</span><code>Required</code></div>
+        </div>
+
+        <div class="callout warning">
+          <strong>If Tableau asks for a driver</strong>
+          <p>Use Tableau’s displayed driver-download link, install the PostgreSQL driver for macOS, restart Tableau, and enter the connection again.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">Prevent relationship mismatch</div>
+          <h2>Create four separate data sources</h2>
+          <p>Do not drag all four database views onto one relationship canvas. Each view has a different level of detail. Create one Tableau data source and one worksheet for each view, then combine the worksheets in a dashboard.</p>
+        </div>
+
+        <div class="source-grid">
+          <div class="source-card">
+            <span class="status">Data source 1</span>
+            <h3><code>tableau_framework_status</code></h3>
+            <p>One row per day and framework. Use for framework finding counts, critical counts and average risk.</p>
+          </div>
+          <div class="source-card">
+            <span class="status">Data source 2</span>
+            <h3><code>tableau_risk_trend</code></h3>
+            <p>One row per five-minute bucket, producer and rule. Use for baseline versus Isolation Forest risk trends.</p>
+          </div>
+          <div class="source-card">
+            <span class="status">Data source 3</span>
+            <h3><code>tableau_incident_history</code></h3>
+            <p>One row per individual finding. Use for the incident table, severity, evidence and model status.</p>
+          </div>
+          <div class="source-card">
+            <span class="status">Data source 4</span>
+            <h3><code>tableau_pipeline_latency</code></h3>
+            <p>One row per five-minute bucket and producer. Use for p50, p95 and p99 end-to-end latency.</p>
+          </div>
+        </div>
+
+        <div class="callout danger">
+          <strong>Why Tableau showed “relationship mismatch”</strong>
+          <p>The views do not share one consistent key. Framework Status is aggregated by day and framework, Risk Trend by time bucket, producer and rule, Incident History by finding ID, and Pipeline Latency by time bucket and producer. Joining them can duplicate findings and distort totals.</p>
+        </div>
+
+        <div class="steps" style="margin-top: 24px">
+          <article class="step">
+            <div class="step-number">A</div>
+            <div class="step-body">
+              <h3>Add each view correctly</h3>
+              <ol>
+                <li>Connect to PostgreSQL and drag only <code class="inline">tableau_framework_status</code> onto the canvas.</li>
+                <li>Open <strong>Data → New Data Source</strong>.</li>
+                <li>Reconnect using the same localhost settings and add only <code class="inline">tableau_risk_trend</code>.</li>
+                <li>Repeat for Incident History and Pipeline Latency.</li>
+                <li>Create one worksheet from each data source.</li>
+              </ol>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">Recommended workbook</div>
+          <h2>Combine sheets at the dashboard level</h2>
+          <p>The dashboard can display all four sheets together without creating database relationships between their sources.</p>
+        </div>
+
+        <div class="dashboard" aria-label="Suggested Tableau dashboard layout">
+          <div class="dash-panel">
+            <strong>Framework Status</strong>
+            <span>Bar chart: finding count by framework</span>
+            <div class="mini-bars" aria-hidden="true"><i style="height:38%"></i><i style="height:72%"></i><i style="height:48%"></i><i style="height:87%"></i><i style="height:58%"></i></div>
+          </div>
+          <div class="dash-panel">
+            <strong>Risk Trend</strong>
+            <span>Line chart: baseline and model risk over time</span>
+            <div class="mini-line" aria-hidden="true"></div>
+          </div>
+          <div class="dash-panel wide">
+            <strong>Incident History</strong>
+            <span>Detail table: date, rule, producer, severity and recommended risk</span>
+          </div>
+          <div class="dash-panel wide">
+            <strong>Pipeline Latency</strong>
+            <span>Line chart: p50, p95 and p99 milliseconds by producer</span>
+          </div>
+        </div>
+
+        <div class="table-wrap" style="margin-top: 28px">
+          <table>
+            <thead><tr><th>Worksheet</th><th>Suggested columns</th><th>Suggested rows</th><th>Marks</th></tr></thead>
+            <tbody>
+              <tr><td>Framework Status</td><td><code>framework</code></td><td><code>finding_count</code></td><td>Bars; color by <code>average_risk</code></td></tr>
+              <tr><td>Risk Trend</td><td><code>time_bucket</code></td><td><code>baseline_risk</code>, <code>isolation_forest_risk</code></td><td>Lines; filter by producer</td></tr>
+              <tr><td>Incident History</td><td colspan="2"><code>detected_at</code>, <code>rule_id</code>, <code>title</code>, <code>producer</code>, <code>severity_label</code>, <code>recommended_risk</code></td><td>Text table</td></tr>
+              <tr><td>Pipeline Latency</td><td><code>time_bucket</code></td><td><code>p50_ms</code>, <code>p95_ms</code>, <code>p99_ms</code></td><td>Lines; color by percentile</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="public">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">Free Tableau account</div>
+          <h2>If your app is Tableau Public</h2>
+          <p>Tableau Public does not keep a private live PostgreSQL connection. Export each dashboard view to a CSV extract, then connect each CSV as a separate Tableau data source.</p>
+        </div>
+
+        <div class="callout danger">
+          <strong>Published Tableau Public data is public</strong>
+          <p>Use only synthetic or sanitized demonstration records. Do not publish real user identities, prompt contents, evidence payloads, credentials or confidential compliance findings.</p>
+        </div>
+
+        <div class="steps" style="margin-top: 24px">
+          <article class="step">
+            <div class="step-number">1</div>
+            <div class="step-body">
+              <h3>Keep the tunnel running</h3>
+              <p>The export tool still needs the same localhost tunnel described above.</p>
+            </div>
+          </article>
+          <article class="step">
+            <div class="step-number">2</div>
+            <div class="step-body">
+              <h3>Export the four views</h3>
+              <p>Use a PostgreSQL client such as <code class="inline">psql</code> to export each view with a header row. Store the files in a dedicated local folder.</p>
+              <div class="code-block">
+                <button class="copy-btn" type="button">Copy</button>
+                <pre><code>mkdir -p "$HOME/Downloads/tableau-governance"
+
+SECRET_ARN=$(aws rds describe-db-instances \
+  --db-instance-identifier ai-governance-postgres \
+  --region us-west-2 \
+  --query 'DBInstances[0].MasterUserSecret.SecretArn' \
+  --output text)
+
+DB_PASSWORD=$(aws secretsmanager get-secret-value \
+  --secret-id "$SECRET_ARN" \
+  --region us-west-2 \
+  --query SecretString \
+  --output text |
+python3 -c 'import json,sys; print(json.load(sys.stdin)["password"])')
+
+PGPASSWORD="$DB_PASSWORD" psql -h 127.0.0.1 -p 15432 \
+  -U governance_admin -d governance \
+  -c "\copy tableau_framework_status TO '$HOME/Downloads/tableau-governance/framework-status.csv' CSV HEADER"
+
+PGPASSWORD="$DB_PASSWORD" psql -h 127.0.0.1 -p 15432 \
+  -U governance_admin -d governance \
+  -c "\copy tableau_risk_trend TO '$HOME/Downloads/tableau-governance/risk-trend.csv' CSV HEADER"
+
+PGPASSWORD="$DB_PASSWORD" psql -h 127.0.0.1 -p 15432 \
+  -U governance_admin -d governance \
+  -c "\copy tableau_incident_history TO '$HOME/Downloads/tableau-governance/incident-history.csv' CSV HEADER"
+
+PGPASSWORD="$DB_PASSWORD" psql -h 127.0.0.1 -p 15432 \
+  -U governance_admin -d governance \
+  -c "\copy tableau_pipeline_latency TO '$HOME/Downloads/tableau-governance/pipeline-latency.csv' CSV HEADER"
+
+unset DB_PASSWORD</code></pre>
+              </div>
+            </div>
+          </article>
+          <article class="step">
+            <div class="step-number">3</div>
+            <div class="step-body">
+              <h3>Open the CSVs separately</h3>
+              <p>In Tableau Public, select <strong>Connect → Text File</strong>. Add one CSV, create its worksheet, then use <strong>Data → New Data Source</strong> for the next CSV. Combine the four worksheets in a dashboard.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="cleanup">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">After using Tableau</div>
+          <h2>Close and remove the tunnel</h2>
+          <p>Stop the port-forward command with <strong>Control+C</strong>, then delete the temporary forwarding pod.</p>
+        </div>
+        <div class="code-block">
+          <button class="copy-btn" type="button">Copy</button>
+          <pre><code>kubectl -n governance delete pod tableau-rds-tunnel</code></pre>
+        </div>
+        <div class="callout">
+          <strong>The database remains available to the pipeline</strong>
+          <p>Deleting the tunnel pod only removes access from the Mac. It does not delete PostgreSQL, dashboard views, findings or any governance service.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="troubleshooting">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">Troubleshooting</div>
+          <h2>Common connection problems</h2>
+          <p>Work from the tunnel outward: AWS identity, EKS access, forwarding pod, local port, then Tableau.</p>
+        </div>
+
+        <details>
+          <summary>Tableau says it cannot connect to PostgreSQL</summary>
+          <div><p>Confirm the Terminal window still shows <code class="inline">Forwarding from 127.0.0.1:15432</code>. If it was closed, run the port-forward command again. Also confirm Tableau uses server <code class="inline">127.0.0.1</code> and port <code class="inline">15432</code>.</p></div>
+        </details>
+        <details>
+          <summary>The tunnel pod already exists</summary>
+          <div><p>Reuse it if it is Running, or delete it and recreate it:</p><div class="code-block"><button class="copy-btn" type="button">Copy</button><pre><code>kubectl -n governance get pod tableau-rds-tunnel
+kubectl -n governance delete pod tableau-rds-tunnel</code></pre></div></div>
+        </details>
+        <details>
+          <summary>kubectl reports an authorization or timeout error</summary>
+          <div><p>Refresh the EKS configuration and retry:</p><div class="code-block"><button class="copy-btn" type="button">Copy</button><pre><code>aws eks update-kubeconfig --name ai-governance-eks --region us-west-2
+kubectl get nodes</code></pre></div><p>If the public IP of the Mac changed, the EKS API allowlist may also need to be updated.</p></div>
+        </details>
+        <details>
+          <summary>Tableau shows a relationship mismatch</summary>
+          <div><p>Remove the additional views from the current relationship canvas. Create a new Tableau data source for each view. Combine their worksheets in a dashboard instead of joining the views.</p></div>
+        </details>
+        <details>
+          <summary>No tables or views appear</summary>
+          <div><p>Confirm the database is <code class="inline">governance</code> and search for view names beginning with <code class="inline">tableau_</code>. The four expected views are listed in the Data Sources section above.</p></div>
+        </details>
+      </div>
+    </section>
+
+    <section id="checklist">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-kicker">Completion checklist</div>
+          <h2>Confirm the setup</h2>
+          <p>These checks are saved in this browser for convenience.</p>
+        </div>
+        <div class="completion"><input id="done-aws" type="checkbox"><label for="done-aws">AWS identity and EKS access verified</label></div>
+        <div class="completion"><input id="done-tunnel" type="checkbox"><label for="done-tunnel">Forwarding pod and localhost tunnel started</label></div>
+        <div class="completion"><input id="done-db" type="checkbox"><label for="done-db">Tableau connected to the governance database</label></div>
+        <div class="completion"><input id="done-sources" type="checkbox"><label for="done-sources">Four separate data sources created</label></div>
+        <div class="completion"><input id="done-dashboard" type="checkbox"><label for="done-dashboard">Four worksheets combined in one dashboard</label></div>
+        <div class="completion"><input id="done-cleanup" type="checkbox"><label for="done-cleanup">Temporary tunnel removed after use</label></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <span>AI Governance Audit Pipeline</span>
+      <span>PostgreSQL + Tableau setup · AWS us-west-2</span>
+    </div>
+  </footer>
+
+  <script>
+    document.querySelectorAll('.copy-btn').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const code = button.parentElement.querySelector('code').textContent;
+        try {
+          await navigator.clipboard.writeText(code);
+          const original = button.textContent;
+          button.textContent = 'Copied';
+          setTimeout(() => { button.textContent = original; }, 1400);
+        } catch {
+          button.textContent = 'Select text';
+        }
+      });
+    });
+
+    document.querySelectorAll('.completion input').forEach((checkbox) => {
+      const key = 'tableau-guide-' + checkbox.id;
+      checkbox.checked = localStorage.getItem(key) === 'true';
+      checkbox.addEventListener('change', () => {
+        localStorage.setItem(key, String(checkbox.checked));
+      });
+    });
+  </script>
+</body>
+</html>

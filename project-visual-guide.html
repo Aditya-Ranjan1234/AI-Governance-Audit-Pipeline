@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Visual guide to the AWS real-time AI governance audit pipeline.">
+  <title>AI Governance Audit Pipeline — Visual Guide</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --surface: #ffffff;
+      --surface-2: #eef2f8;
+      --text: #172033;
+      --muted: #5c687d;
+      --line: #d7deea;
+      --blue: #2367d1;
+      --blue-soft: #e8f0ff;
+      --purple: #7445cc;
+      --purple-soft: #f1eafe;
+      --orange: #b85a10;
+      --orange-soft: #fff0e4;
+      --green: #1c7b55;
+      --green-soft: #e3f5ed;
+      --red: #b73b4c;
+      --red-soft: #fdebed;
+      --shadow: 0 16px 40px rgba(31, 45, 75, .08);
+      --radius: 18px;
+      --max: 1180px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0d1320;
+        --surface: #151e2d;
+        --surface-2: #1d293b;
+        --text: #edf2fa;
+        --muted: #aab6c9;
+        --line: #304057;
+        --blue: #7bacff;
+        --blue-soft: #192e52;
+        --purple: #bd9aff;
+        --purple-soft: #30244e;
+        --orange: #ffad6b;
+        --orange-soft: #422b1d;
+        --green: #70d5aa;
+        --green-soft: #183b31;
+        --red: #ff91a0;
+        --red-soft: #44242b;
+        --shadow: 0 16px 40px rgba(0, 0, 0, .24);
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 400 16px/1.6 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    button, input { font: inherit; }
+    a { color: inherit; }
+    code, pre { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; }
+    .wrap { width: min(var(--max), calc(100% - 36px)); margin-inline: auto; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+    }
+    .topbar-inner {
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 22px;
+    }
+    .brand { font-weight: 700; letter-spacing: -.02em; }
+    .brand span { color: var(--blue); }
+    nav { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+    nav a {
+      padding: 8px 10px;
+      color: var(--muted);
+      text-decoration: none;
+      border-radius: 9px;
+      font-size: 14px;
+    }
+    nav a:hover, nav a:focus-visible { background: var(--surface-2); color: var(--text); }
+
+    .hero {
+      padding: 78px 0 54px;
+      background:
+        radial-gradient(circle at 12% 20%, color-mix(in srgb, var(--blue) 13%, transparent), transparent 30%),
+        radial-gradient(circle at 88% 10%, color-mix(in srgb, var(--purple) 12%, transparent), transparent 28%);
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .eyebrow::before { content: ""; width: 26px; height: 2px; background: currentColor; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 850px;
+      margin: 18px 0 22px;
+      font-size: clamp(40px, 7vw, 76px);
+      line-height: 1.03;
+      letter-spacing: -.055em;
+    }
+    h1 em { color: var(--blue); font-style: normal; }
+    .lead { max-width: 790px; color: var(--muted); font-size: clamp(17px, 2vw, 21px); }
+    .hero-tags { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 30px; }
+    .tag, .badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .tag { padding: 8px 12px; background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow); }
+
+    main section { padding: 72px 0; }
+    main section + section { border-top: 1px solid var(--line); }
+    .section-head { max-width: 790px; margin-bottom: 34px; }
+    .section-kicker { color: var(--blue); font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; }
+    h2 { margin: 7px 0 12px; font-size: clamp(30px, 4.5vw, 48px); line-height: 1.1; letter-spacing: -.035em; }
+    h3 { margin-bottom: 8px; font-size: 18px; line-height: 1.3; }
+    .section-head p, .muted { color: var(--muted); }
+
+    .architecture {
+      display: grid;
+      grid-template-columns: 1.35fr 36px 1.05fr 36px 1.08fr 36px .95fr;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .stage {
+      min-width: 0;
+      padding: 18px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .stage-title { margin-bottom: 14px; color: var(--muted); font-size: 12px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .node-list { display: grid; gap: 9px; }
+    .node {
+      width: 100%;
+      padding: 12px 13px;
+      text-align: left;
+      color: var(--text);
+      background: var(--surface-2);
+      border: 1px solid transparent;
+      border-radius: 12px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, opacity .18s ease;
+    }
+    button.node { cursor: pointer; }
+    button.node:hover { transform: translateY(-1px); border-color: var(--blue); }
+    button.node:focus-visible { outline: 3px solid color-mix(in srgb, var(--blue) 35%, transparent); outline-offset: 2px; }
+    .node strong { display: block; font-size: 14px; line-height: 1.35; }
+    .node small { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; line-height: 1.35; }
+    .producer .node { border-left: 4px solid var(--blue); }
+    .kafka .node { border-left: 4px solid var(--purple); }
+    .processor .node { border-left: 4px solid var(--orange); }
+    .outputs .node { border-left: 4px solid var(--green); }
+    .node.active { background: var(--blue-soft); border-color: var(--blue); }
+    .node.dimmed { opacity: .4; }
+    .arrow {
+      display: grid;
+      place-items: center;
+      color: var(--muted);
+      font-size: 26px;
+      font-weight: 700;
+    }
+    .vertical-arrow { height: 17px; display: grid; place-items: center; color: var(--muted); }
+    .selection {
+      margin-top: 18px;
+      padding: 17px 19px;
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 18px;
+      background: var(--blue-soft);
+      border-radius: 14px;
+      border-left: 4px solid var(--blue);
+    }
+    .selection strong { color: var(--blue); }
+    .selection p { margin: 0; }
+
+    .principles, .metrics, .aws-grid, .score-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .principle, .metric, .aws-card, .score-card {
+      padding: 20px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 15px;
+    }
+    .principle-num { color: var(--blue); font-weight: 800; font-size: 13px; }
+    .principle p, .score-card p, .aws-card p { margin: 0; color: var(--muted); font-size: 14px; }
+
+    .schema-layout { display: grid; grid-template-columns: 1.15fr .85fr; gap: 24px; align-items: start; }
+    pre {
+      margin: 0;
+      padding: 22px;
+      overflow: auto;
+      color: #e7edf7;
+      background: #111927;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .json-key { color: #90c2ff; }
+    .json-string { color: #9fe1bd; }
+    .schema-notes { display: grid; gap: 14px; }
+    .schema-note { padding: 16px 0; border-bottom: 1px solid var(--line); }
+    .schema-note:last-child { border-bottom: 0; }
+    .schema-note b { display: block; margin-bottom: 4px; }
+    .schema-note span { color: var(--muted); font-size: 14px; }
+
+    .rule-controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+    .filter-btn {
+      padding: 8px 12px;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      cursor: pointer;
+    }
+    .filter-btn[aria-pressed="true"] { color: var(--surface); background: var(--text); border-color: var(--text); }
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 780px; }
+    th, td { padding: 13px 12px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+    td { font-size: 14px; }
+    td:first-child { color: var(--blue); font-weight: 750; white-space: nowrap; }
+    tr[hidden] { display: none; }
+    .badge { padding: 3px 8px; background: var(--surface-2); color: var(--muted); }
+    .badge.state { background: var(--purple-soft); color: var(--purple); }
+    .frameworks { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 22px; }
+    .frameworks .badge { padding: 8px 11px; background: var(--green-soft); color: var(--green); }
+
+    .score-grid { grid-template-columns: 1fr 1fr 1fr; align-items: stretch; }
+    .score-card.baseline { border-top: 4px solid var(--orange); }
+    .score-card.model { border-top: 4px solid var(--purple); }
+    .score-card.decision { border-top: 4px solid var(--green); }
+    .formula { margin: 18px 0; font-size: 20px; font-weight: 750; letter-spacing: -.02em; }
+    .meter { height: 10px; margin: 10px 0 7px; background: var(--surface-2); border-radius: 99px; overflow: hidden; }
+    .meter span { display: block; height: 100%; border-radius: inherit; }
+    .baseline .meter span { width: 48%; background: var(--orange); }
+    .model .meter span { width: 71%; background: var(--purple); }
+    .decision .meter span { width: 71%; background: var(--green); }
+    .feature-list { margin: 14px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; }
+
+    .aws-shell {
+      padding: 24px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .aws-shell-title { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 18px; }
+    .aws-shell-title span { color: var(--muted); font-size: 13px; }
+    .aws-grid { grid-template-columns: 1.1fr 1.2fr 1fr; }
+    .aws-card { background: var(--surface-2); }
+    .aws-card.eks { border-top: 4px solid var(--blue); }
+    .aws-card.msk { border-top: 4px solid var(--purple); }
+    .aws-card.rds { border-top: 4px solid var(--green); }
+    .mini-list { margin: 12px 0 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+    .mini-list li { padding-left: 14px; position: relative; font-size: 13px; color: var(--muted); }
+    .mini-list li::before { content: ""; width: 5px; height: 5px; border-radius: 50%; background: var(--blue); position: absolute; left: 0; top: .72em; }
+
+    .metrics { grid-template-columns: repeat(4, 1fr); }
+    .metric-value { margin: 5px 0 2px; font-size: clamp(28px, 4vw, 43px); font-weight: 780; line-height: 1; letter-spacing: -.045em; }
+    .metric-label { color: var(--muted); font-size: 13px; }
+    .metric.good { border-top: 4px solid var(--green); }
+    .metric.speed { border-top: 4px solid var(--purple); }
+    .resilience { margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .resilience-item { padding: 18px; background: var(--surface-2); border-radius: 14px; }
+    .resilience-item b { display: block; }
+    .resilience-item span { color: var(--muted); font-size: 14px; }
+
+    .journey { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; counter-reset: step; }
+    .journey-step { position: relative; padding: 17px 14px; background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+    .journey-step::before {
+      counter-increment: step;
+      content: counter(step);
+      display: grid;
+      place-items: center;
+      width: 25px;
+      height: 25px;
+      margin-bottom: 10px;
+      border-radius: 50%;
+      color: var(--surface);
+      background: var(--blue);
+      font-size: 12px;
+      font-weight: 750;
+    }
+    .journey-step b { display: block; font-size: 14px; }
+    .journey-step span { color: var(--muted); font-size: 12px; }
+
+    .note {
+      margin-top: 24px;
+      padding: 16px 18px;
+      background: var(--orange-soft);
+      border-left: 4px solid var(--orange);
+      border-radius: 10px;
+      color: color-mix(in srgb, var(--text) 86%, var(--orange));
+      font-size: 14px;
+    }
+    footer { padding: 30px 0 48px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); }
+
+    @media (max-width: 980px) {
+      .architecture { grid-template-columns: 1fr; }
+      .arrow { transform: rotate(90deg); min-height: 24px; }
+      .principles, .metrics { grid-template-columns: 1fr 1fr; }
+      .journey { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 760px) {
+      .topbar-inner { align-items: flex-start; padding: 13px 0; }
+      nav { display: none; }
+      .hero { padding-top: 52px; }
+      main section { padding: 56px 0; }
+      .schema-layout, .score-grid, .aws-grid, .selection, .resilience { grid-template-columns: 1fr; }
+      .principles, .metrics { grid-template-columns: 1fr; }
+      .journey { grid-template-columns: 1fr 1fr; }
+      .selection { gap: 5px; }
+    }
+    @media (max-width: 440px) {
+      .wrap { width: min(100% - 24px, var(--max)); }
+      h1 { font-size: 39px; }
+      .journey { grid-template-columns: 1fr; }
+      .stage { padding: 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <div class="brand"><span>AI Governance</span> Audit Pipeline</div>
+      <nav aria-label="Page sections">
+        <a href="#architecture">Architecture</a>
+        <a href="#schema">Event schema</a>
+        <a href="#rules">Rules</a>
+        <a href="#risk">Risk</a>
+        <a href="#aws">AWS</a>
+        <a href="#results">Results</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="eyebrow">Real-time compliance evidence</div>
+      <h1>From scattered events to <em>auditable decisions</em>.</h1>
+      <p class="lead">Five independent producer services turn identity, infrastructure, pipeline, model-lifecycle, and LLM activity into one governance event contract. Kafka carries the evidence through real-time rules, risk scoring, PostgreSQL, and Tableau.</p>
+      <div class="hero-tags" aria-label="Project scope">
+        <span class="tag">5 independent adapters</span>
+        <span class="tag">16 governance rules</span>
+        <span class="tag">5 frameworks</span>
+        <span class="tag">AWS MSK · EKS · RDS</span>
+      </div>
+    </div>
+  </div>
+
+  <main>
+    <section id="architecture">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Architecture</span>
+          <h2>Independent services, connected by contracts</h2>
+          <p>Each source has its own adapter, container image, endpoint, autoscaling policy, service account, IAM role, and Kafka topic. Select a producer to trace its path and rule ownership.</p>
+        </div>
+
+        <div class="architecture" aria-label="System architecture diagram">
+          <div class="stage producer">
+            <div class="stage-title">1 · Producer services</div>
+            <div class="node-list">
+              <button class="node active" data-source="keycloak" type="button"><strong>Keycloak adapter</strong><small>Identity and access events</small></button>
+              <button class="node" data-source="kubernetes" type="button"><strong>Kubernetes audit adapter</strong><small>Cluster and workload events</small></button>
+              <button class="node" data-source="pipeline" type="button"><strong>Airflow / OpenLineage adapter</strong><small>Pipeline, lineage, drift and bias</small></button>
+              <button class="node" data-source="registry" type="button"><strong>Model registry adapter</strong><small>Approval, evaluation and promotion</small></button>
+              <button class="node" data-source="llm" type="button"><strong>LLM gateway adapter</strong><small>Inference policy signals</small></button>
+            </div>
+          </div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="stage kafka">
+            <div class="stage-title">2 · Amazon MSK</div>
+            <div class="node-list">
+              <div class="node active" data-topic="keycloak"><strong>keycloak.v1</strong><small>6 partitions</small></div>
+              <div class="node" data-topic="kubernetes"><strong>kubernetes.v1</strong><small>6 partitions</small></div>
+              <div class="node" data-topic="pipeline"><strong>pipeline.v1</strong><small>6 partitions</small></div>
+              <div class="node" data-topic="registry"><strong>model-registry.v1</strong><small>6 partitions</small></div>
+              <div class="node" data-topic="llm"><strong>llm-gateway.v1</strong><small>6 partitions</small></div>
+            </div>
+          </div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="stage processor">
+            <div class="stage-title">3 · Processing services</div>
+            <div class="node"><strong>Kafka Streams rule engine</strong><small>16 rules · windows · stateful joins</small></div>
+            <div class="vertical-arrow" aria-hidden="true">↓</div>
+            <div class="node"><strong>Risk scorer</strong><small>Baseline + Isolation Forest</small></div>
+            <div class="vertical-arrow" aria-hidden="true">↓</div>
+            <div class="node"><strong>PostgreSQL sink</strong><small>Idempotent event and finding writes</small></div>
+          </div>
+          <div class="arrow" aria-hidden="true">→</div>
+          <div class="stage outputs">
+            <div class="stage-title">4 · Evidence and insight</div>
+            <div class="node"><strong>RDS PostgreSQL</strong><small>Raw events, findings and metrics</small></div>
+            <div class="vertical-arrow" aria-hidden="true">↓</div>
+            <div class="node"><strong>Tableau</strong><small>Framework status, trends and incidents</small></div>
+          </div>
+        </div>
+
+        <div class="selection" aria-live="polite">
+          <strong id="selection-title">Keycloak adapter</strong>
+          <p id="selection-copy">Publishes identity events to <code>governance.keycloak.v1</code>. It owns GOV-001 through GOV-003: failed-login bursts, unapproved privileged role grants, and privileged login without MFA.</p>
+        </div>
+
+        <div class="principles" style="margin-top: 26px">
+          <article class="principle"><span class="principle-num">01</span><h3>Failure isolation</h3><p>A problem in one source adapter does not stop the other four producers or downstream consumers.</p></article>
+          <article class="principle"><span class="principle-num">02</span><h3>Independent scaling</h3><p>Each adapter scales for its own event rate. The Kafka rule engine scales separately through consumer groups.</p></article>
+          <article class="principle"><span class="principle-num">03</span><h3>Least privilege</h3><p>Each adapter’s IRSA role can write only to its own topic and the shared dead-letter topic.</p></article>
+          <article class="principle"><span class="principle-num">04</span><h3>Stable contracts</h3><p>Services share the versioned event schema and Kafka topics, not databases or runtime state.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section id="schema">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Unified event contract</span>
+          <h2>Different sources, one evidence envelope</h2>
+          <p>Every adapter converts its native payload into <code>GovernanceEvent v1</code>. The rule engine therefore reasons about the same fields regardless of where the evidence originated.</p>
+        </div>
+        <div class="schema-layout">
+          <pre aria-label="Example governance event"><code>{
+  <span class="json-key">"schema_version"</span>: <span class="json-string">"1.0"</span>,
+  <span class="json-key">"event_id"</span>: <span class="json-string">"f31d…"</span>,
+  <span class="json-key">"event_time"</span>: <span class="json-string">"2026-10-04T09:15:31Z"</span>,
+  <span class="json-key">"producer"</span>: <span class="json-string">"MODEL_REGISTRY"</span>,
+  <span class="json-key">"event_type"</span>: <span class="json-string">"MODEL_PROMOTED"</span>,
+  <span class="json-key">"actor"</span>: {
+    <span class="json-key">"id"</span>: <span class="json-string">"registry-service"</span>,
+    <span class="json-key">"type"</span>: <span class="json-string">"SERVICE"</span>,
+    <span class="json-key">"roles"</span>: []
+  },
+  <span class="json-key">"subject"</span>: {
+    <span class="json-key">"type"</span>: <span class="json-string">"MODEL"</span>,
+    <span class="json-key">"model_name"</span>: <span class="json-string">"credit-risk"</span>,
+    <span class="json-key">"model_version"</span>: <span class="json-string">"7"</span>
+  },
+  <span class="json-key">"environment"</span>: <span class="json-string">"prod"</span>,
+  <span class="json-key">"attributes"</span>: {
+    <span class="json-key">"approval_id"</span>: <span class="json-string">"CAB-1842"</span>
+  }
+}</code></pre>
+          <div class="schema-notes">
+            <div class="schema-note"><b>Identity and time</b><span>UUID event IDs, event time, ingestion time and correlation IDs make the evidence traceable and latency measurable.</span></div>
+            <div class="schema-note"><b>Actor and subject</b><span>A consistent actor describes who acted; the subject identifies the user, dataset, cluster resource, pipeline or model affected.</span></div>
+            <div class="schema-note"><b>Policy signals</b><span>The flexible <code>attributes</code> object carries rule inputs such as MFA use, approval status, drift metrics or prompt-safety detections.</span></div>
+            <div class="schema-note"><b>Privacy boundary</b><span>The LLM adapter keeps raw prompts out of the canonical event. It publishes detection flags, fingerprints and permitted redacted evidence only.</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="rules">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Real-time policy</span>
+          <h2>Sixteen rules across the AI lifecycle</h2>
+          <p>Thirteen rules evaluate one event immediately. The login-burst rule uses an event-time window, while two model-promotion rules join promotion events with stored approval and evaluation evidence.</p>
+        </div>
+        <div class="rule-controls" aria-label="Filter rules by source">
+          <button class="filter-btn" type="button" data-filter="all" aria-pressed="true">All 16</button>
+          <button class="filter-btn" type="button" data-filter="keycloak" aria-pressed="false">Identity</button>
+          <button class="filter-btn" type="button" data-filter="kubernetes" aria-pressed="false">Infrastructure</button>
+          <button class="filter-btn" type="button" data-filter="pipeline" aria-pressed="false">Pipelines</button>
+          <button class="filter-btn" type="button" data-filter="registry" aria-pressed="false">Model lifecycle</button>
+          <button class="filter-btn" type="button" data-filter="llm" aria-pressed="false">LLM inference</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Rule</th><th>Producer</th><th>Detection</th><th>Processing</th></tr></thead>
+            <tbody>
+              <tr data-rule-source="keycloak"><td>GOV-001</td><td>Keycloak</td><td>Five failed logins for one identity within five minutes</td><td><span class="badge state">Windowed</span></td></tr>
+              <tr data-rule-source="keycloak"><td>GOV-002</td><td>Keycloak</td><td>Privileged role granted without approved change evidence</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="keycloak"><td>GOV-003</td><td>Keycloak</td><td>Privileged identity signs in without MFA</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="kubernetes"><td>GOV-004</td><td>Kubernetes</td><td>Unapproved cluster-admin role binding</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="kubernetes"><td>GOV-005</td><td>Kubernetes</td><td>Secret accessed across namespace boundaries</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="kubernetes"><td>GOV-006</td><td>Kubernetes</td><td>Privileged or unapproved workload image</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="pipeline"><td>GOV-007</td><td>Pipeline</td><td>Dataset used without a recorded owner</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="pipeline"><td>GOV-008</td><td>Pipeline</td><td>Schema changed without a version increment</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="pipeline"><td>GOV-009</td><td>Pipeline</td><td>Model drift exceeds threshold without remediation</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="pipeline"><td>GOV-010</td><td>Pipeline</td><td>Bias metric exceeds threshold without an approved exception</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="registry"><td>GOV-011</td><td>Model registry</td><td>Production promotion has no matching approval</td><td><span class="badge state">Stateful join</span></td></tr>
+              <tr data-rule-source="registry"><td>GOV-012</td><td>Model registry</td><td>Production promotion has no passed evaluation</td><td><span class="badge state">Stateful join</span></td></tr>
+              <tr data-rule-source="registry"><td>GOV-013</td><td>Model registry</td><td>Artifact is unsigned or missing a SHA-256 digest</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="llm"><td>GOV-014</td><td>LLM gateway</td><td>PII detected in a prompt without permitted handling</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="llm"><td>GOV-015</td><td>LLM gateway</td><td>Inference request targets a disallowed model</td><td><span class="badge">Immediate</span></td></tr>
+              <tr data-rule-source="llm"><td>GOV-016</td><td>LLM gateway</td><td>Prompt-injection or data-exfiltration signal detected</td><td><span class="badge">Immediate</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="frameworks" aria-label="Framework mappings">
+          <span class="badge">NIST AI RMF 1.0</span>
+          <span class="badge">ISO/IEC 42001:2023</span>
+          <span class="badge">EU AI Act</span>
+          <span class="badge">NIST SP 800-53 Rev. 5</span>
+          <span class="badge">GDPR</span>
+        </div>
+        <div class="note">A framework mapping means the finding is relevant evidence for a control or obligation. It does not by itself certify that the organization conforms to the complete framework.</div>
+      </div>
+    </section>
+
+    <section id="risk">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Risk comparison</span>
+          <h2>Explainable baseline plus anomaly detection</h2>
+          <p>Every finding keeps both scores. The deterministic baseline is easy to audit; the Isolation Forest can elevate unusual behavior that simple severity and frequency buckets might undervalue.</p>
+        </div>
+        <div class="score-grid">
+          <article class="score-card baseline">
+            <h3>Baseline score</h3>
+            <p>Severity and occurrence count are converted to a transparent 0–100 score.</p>
+            <div class="formula">severity × frequency band × 4</div>
+            <div class="meter" aria-label="Example baseline score 48 out of 100"><span></span></div>
+            <small class="muted">Example: severity 4 × band 3 × 4 = 48</small>
+          </article>
+          <article class="score-card model">
+            <h3>Isolation Forest</h3>
+            <p>The model learns the normal shape of recent findings after a warm-up period.</p>
+            <ul class="feature-list"><li>Severity and frequency</li><li>Rule and producer</li><li>Hour-of-day pattern</li><li>Baseline score</li></ul>
+            <div class="meter" aria-label="Example anomaly score 71 out of 100"><span></span></div>
+            <small class="muted">Example anomaly score: 71</small>
+          </article>
+          <article class="score-card decision">
+            <h3>Recommended risk</h3>
+            <p>The pipeline retains both values and uses the larger score as the recommended operational priority.</p>
+            <div class="formula">max(48, 71) = 71</div>
+            <div class="meter" aria-label="Example recommended risk 71 out of 100"><span></span></div>
+            <small class="muted">Baseline, model score, delta and model status remain auditable.</small>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="aws">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">AWS deployment</span>
+          <h2>Private, resilient and independently scalable</h2>
+          <p>Terraform creates the network, EKS, three-broker MSK cluster, RDS PostgreSQL, ECR repositories and workload identities. Application services run in private subnets.</p>
+        </div>
+        <div class="aws-shell">
+          <div class="aws-shell-title"><b>Governance VPC · three availability zones</b><span>TLS in transit · encryption at rest</span></div>
+          <div class="aws-grid">
+            <article class="aws-card eks"><h3>Amazon EKS</h3><p>Runs eight independent application services.</p><ul class="mini-list"><li>Five producer adapters</li><li>Three rule-engine replicas</li><li>Risk scorer and sink</li><li>HPAs and disruption controls</li></ul></article>
+            <article class="aws-card msk"><h3>Amazon MSK</h3><p>Durable contract between every service boundary.</p><ul class="mini-list"><li>Three brokers</li><li>Six partitions per topic</li><li>Replication factor 3</li><li>Minimum in-sync replicas 2</li></ul></article>
+            <article class="aws-card rds"><h3>Amazon RDS</h3><p>Stores audit evidence and Tableau-ready views.</p><ul class="mini-list"><li>Encrypted PostgreSQL</li><li>Multi-AZ option</li><li>Idempotent writes</li><li>Seven-day backups</li></ul></article>
+          </div>
+        </div>
+        <div class="journey" style="margin-top: 22px" aria-label="Event processing journey">
+          <div class="journey-step"><b>Source action</b><span>A user, workload, pipeline or model produces activity.</span></div>
+          <div class="journey-step"><b>Normalize</b><span>One adapter builds and validates the canonical event.</span></div>
+          <div class="journey-step"><b>Stream</b><span>MSK persists the event under a stable partition key.</span></div>
+          <div class="journey-step"><b>Detect</b><span>The rule engine evaluates immediate and stateful policy.</span></div>
+          <div class="journey-step"><b>Score</b><span>Baseline and anomaly risk values are compared.</span></div>
+          <div class="journey-step"><b>Explain</b><span>RDS and Tableau expose status, trends and evidence.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="results">
+      <div class="wrap">
+        <div class="section-head">
+          <span class="section-kicker">Measured verification</span>
+          <h2>The complete path has been exercised</h2>
+          <p>The current independent-service implementation was tested locally with the same topics, schemas, consumer groups and SQL used by the AWS design.</p>
+        </div>
+        <div class="metrics">
+          <article class="metric good"><div class="metric-label">Precision</div><div class="metric-value">100%</div><small class="muted">No false positives</small></article>
+          <article class="metric good"><div class="metric-label">Recall</div><div class="metric-value">100%</div><small class="muted">48 of 48 expected findings</small></article>
+          <article class="metric speed"><div class="metric-label">p95 latency</div><div class="metric-value">2.71s</div><small class="muted">End to PostgreSQL persistence</small></article>
+          <article class="metric speed"><div class="metric-label">Observed throughput</div><div class="metric-value">667</div><small class="muted">events per second</small></article>
+        </div>
+        <div class="resilience">
+          <div class="resilience-item"><b>Processor replacement</b><span>48/48 expected findings were recovered after replacing the stream processor during injection. No labelled event was lost.</span></div>
+          <div class="resilience-item"><b>Broker restart</b><span>48/48 expected findings were recovered during an in-flight local broker restart. Producer retries preserved the workload.</span></div>
+        </div>
+        <div class="note">The local broker restart validates retry and recovery behavior. A three-broker MSK failover test must still be run in the target AWS account to measure leader election and replica recovery under the deployed configuration.</div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">AI Governance Audit Pipeline · Five independent producers · Sixteen real-time rules · Five governance frameworks</div>
+  </footer>
+
+  <script>
+    (() => {
+      const details = {
+        keycloak: {
+          title: "Keycloak adapter",
+          copy: "Publishes identity events to governance.keycloak.v1. It owns GOV-001 through GOV-003: failed-login bursts, unapproved privileged role grants, and privileged login without MFA."
+        },
+        kubernetes: {
+          title: "Kubernetes audit adapter",
+          copy: "Publishes infrastructure events to governance.kubernetes.v1. It owns GOV-004 through GOV-006: cluster-admin bindings, cross-namespace secret access, and privileged or unapproved workloads."
+        },
+        pipeline: {
+          title: "Airflow / OpenLineage adapter",
+          copy: "Publishes pipeline evidence to governance.pipeline.v1. It owns GOV-007 through GOV-010: ownership, schema versioning, model drift, and bias threshold controls."
+        },
+        registry: {
+          title: "Model registry adapter",
+          copy: "Publishes lifecycle events to governance.model-registry.v1. It owns GOV-011 through GOV-013: approval, evaluation, promotion, signature, and artifact-integrity evidence."
+        },
+        llm: {
+          title: "LLM gateway adapter",
+          copy: "Publishes privacy and inference-policy signals to governance.llm-gateway.v1. It owns GOV-014 through GOV-016 while deliberately excluding raw prompt content."
+        }
+      };
+
+      const producerButtons = [...document.querySelectorAll("button[data-source]")];
+      const topicNodes = [...document.querySelectorAll("[data-topic]")];
+      const title = document.getElementById("selection-title");
+      const copy = document.getElementById("selection-copy");
+
+      producerButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const source = button.dataset.source;
+          producerButtons.forEach((item) => item.classList.toggle("active", item === button));
+          topicNodes.forEach((item) => {
+            const selected = item.dataset.topic === source;
+            item.classList.toggle("active", selected);
+            item.classList.toggle("dimmed", !selected);
+          });
+          title.textContent = details[source].title;
+          copy.textContent = details[source].copy;
+        });
+      });
+
+      const filterButtons = [...document.querySelectorAll("[data-filter]")];
+      const rows = [...document.querySelectorAll("[data-rule-source]")];
+      filterButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const filter = button.dataset.filter;
+          filterButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+          rows.forEach((row) => { row.hidden = filter !== "all" && row.dataset.ruleSource !== filter; });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+confluent-kafka==2.8.0
+numpy==2.2.2
+scikit-learn==1.6.1
+aws-msk-iam-sasl-signer-python==1.0.2
+pytest==8.3.4
+

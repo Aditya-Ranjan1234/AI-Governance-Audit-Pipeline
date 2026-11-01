@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/governance-event-v1.json",
+  "title": "GovernanceEvent v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "event_id", "event_time", "ingested_at", "producer",
+    "event_type", "actor", "subject", "action", "outcome", "environment",
+    "correlation_id", "attributes", "labels"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "event_id": {"type": "string", "format": "uuid"},
+    "event_time": {"type": "string", "format": "date-time"},
+    "ingested_at": {"type": "string", "format": "date-time"},
+    "producer": {
+      "type": "string",
+      "enum": ["KEYCLOAK", "KUBERNETES", "PIPELINE", "MODEL_REGISTRY", "LLM_GATEWAY"]
+    },
+    "event_type": {"type": "string", "minLength": 1, "maxLength": 100},
+    "actor": {"$ref": "#/$defs/actor"},
+    "subject": {"$ref": "#/$defs/subject"},
+    "action": {"type": "string", "minLength": 1, "maxLength": 100},
+    "outcome": {"type": "string", "enum": ["SUCCESS", "FAILURE", "UNKNOWN"]},
+    "environment": {"type": "string", "enum": ["dev", "test", "stage", "prod"]},
+    "correlation_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "trace_id": {"type": ["string", "null"], "maxLength": 200},
+    "attributes": {"type": "object", "additionalProperties": true},
+    "labels": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    }
+  },
+  "$defs": {
+    "actor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "roles"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "type": {"type": "string", "enum": ["USER", "SERVICE", "WORKLOAD", "SYSTEM", "UNKNOWN"]},
+        "roles": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "ip": {"type": ["string", "null"]},
+        "namespace": {"type": ["string", "null"]}
+      }
+    },
+    "subject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["type", "id"],
+      "properties": {
+        "type": {"type": "string", "minLength": 1},
+        "id": {"type": "string", "minLength": 1},
+        "namespace": {"type": ["string", "null"]},
+        "model_name": {"type": ["string", "null"]},
+        "model_version": {"type": ["string", "null"]},
+        "data_classification": {
+          "type": ["string", "null"],
+          "enum": ["public", "internal", "confidential", "restricted", null]
+        }
+      }
+    }
+  }
+}
+

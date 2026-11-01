@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/compliance-finding-v1.json",
+  "title": "ComplianceFinding v1",
+  "type": "object",
+  "required": [
+    "schema_version", "finding_id", "rule_id", "title", "producer",
+    "source_event_id", "source_event_time", "detected_at", "severity",
+    "severity_label", "frequency", "frequency_band", "baseline_risk",
+    "frameworks", "evidence"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "finding_id": {"type": "string", "format": "uuid"},
+    "rule_id": {"type": "string", "pattern": "^GOV-[0-9]{3}$"},
+    "title": {"type": "string"},
+    "producer": {"type": "string"},
+    "source_event_id": {"type": "string"},
+    "source_event_time": {"type": "string", "format": "date-time"},
+    "detected_at": {"type": "string", "format": "date-time"},
+    "window_start": {"type": ["string", "null"], "format": "date-time"},
+    "window_end": {"type": ["string", "null"], "format": "date-time"},
+    "severity": {"type": "integer", "minimum": 1, "maximum": 5},
+    "severity_label": {"enum": ["low", "medium", "high", "critical"]},
+    "frequency": {"type": "integer", "minimum": 1},
+    "frequency_band": {"type": "integer", "minimum": 1, "maximum": 5},
+    "baseline_risk": {"type": "number", "minimum": 0, "maximum": 100},
+    "isolation_forest_risk": {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "risk_delta": {"type": ["number", "null"], "minimum": -100, "maximum": 100},
+    "recommended_risk": {"type": ["number", "null"], "minimum": 0, "maximum": 100},
+    "model_status": {"type": ["string", "null"]},
+    "frameworks": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
+    "evidence": {"type": "object"}
+  }
+}
+

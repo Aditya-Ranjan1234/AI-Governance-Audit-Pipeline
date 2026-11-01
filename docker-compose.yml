@@ -1,0 +1,157 @@
+x-producer-adapter: &producer-adapter
+  environment:
+    KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+    KAFKA_SECURITY_PROTOCOL: PLAINTEXT
+    PORT: "8080"
+  depends_on:
+    topic-init: {condition: service_completed_successfully}
+
+services:
+  redpanda:
+    image: redpandadata/redpanda:v24.3.5
+    command:
+      - redpanda
+      - start
+      - --overprovisioned
+      - --smp=1
+      - --memory=1G
+      - --reserve-memory=0M
+      - --node-id=0
+      - --check=false
+      - --kafka-addr=internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr=internal://redpanda:9092,external://localhost:19092
+    ports: ["19092:19092", "9644:9644"]
+    healthcheck:
+      test: ["CMD-SHELL", "rpk cluster health | grep -q 'Healthy:.*true'"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  topic-init:
+    image: redpandadata/redpanda:v24.3.5
+    depends_on:
+      redpanda: {condition: service_healthy}
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - >-
+        for topic in governance.keycloak.v1 governance.kubernetes.v1 governance.pipeline.v1
+        governance.model-registry.v1 governance.llm-gateway.v1 governance.findings.raw.v1
+        governance.findings.scored.v1 governance.dead-letter.v1; do
+          rpk topic create --brokers redpanda:9092 --partitions 6 --replicas 1 $$topic || true;
+        done
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: governance
+      POSTGRES_USER: governance
+      POSTGRES_PASSWORD: governance
+    ports: ["127.0.0.1:5432:5432"]
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./db/001_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U governance -d governance"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  keycloak-adapter:
+    <<: *producer-adapter
+    build:
+      context: .
+      dockerfile: services/producer_adapters/Dockerfile
+      args: {ADAPTER: keycloak}
+    ports: ["8101:8080"]
+
+  kubernetes-audit-adapter:
+    <<: *producer-adapter
+    build:
+      context: .
+      dockerfile: services/producer_adapters/Dockerfile
+      args: {ADAPTER: kubernetes_audit}
+    ports: ["8102:8080"]
+
+  airflow-openlineage-adapter:
+    <<: *producer-adapter
+    build:
+      context: .
+      dockerfile: services/producer_adapters/Dockerfile
+      args: {ADAPTER: airflow_openlineage}
+    ports: ["8103:8080"]
+
+  model-registry-adapter:
+    <<: *producer-adapter
+    build:
+      context: .
+      dockerfile: services/producer_adapters/Dockerfile
+      args: {ADAPTER: model_registry}
+    ports: ["8104:8080"]
+
+  llm-gateway-adapter:
+    <<: *producer-adapter
+    build:
+      context: .
+      dockerfile: services/producer_adapters/Dockerfile
+      args: {ADAPTER: llm_gateway}
+    ports: ["8105:8080"]
+
+  stream-processor:
+    build:
+      context: .
+      dockerfile: stream-processor/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      KAFKA_SECURITY_PROTOCOL: PLAINTEXT
+      KAFKA_INTERNAL_REPLICATION_FACTOR: "1"
+      KAFKA_STREAM_THREADS: "2"
+    depends_on:
+      topic-init: {condition: service_completed_successfully}
+
+  risk-scorer:
+    build:
+      context: .
+      dockerfile: services/risk-scorer/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      KAFKA_SECURITY_PROTOCOL: PLAINTEXT
+      RISK_MODEL_MIN_SAMPLES: ${RISK_MODEL_MIN_SAMPLES:-32}
+      RISK_MODEL_RETRAIN_EVERY: ${RISK_MODEL_RETRAIN_EVERY:-25}
+    depends_on:
+      topic-init: {condition: service_completed_successfully}
+
+  postgres-sink:
+    build:
+      context: .
+      dockerfile: services/postgres-sink/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      KAFKA_SECURITY_PROTOCOL: PLAINTEXT
+      POSTGRES_DSN: postgresql://governance:governance@postgres:5432/governance
+    depends_on:
+      topic-init: {condition: service_completed_successfully}
+      postgres: {condition: service_healthy}
+
+  evaluator:
+    profiles: ["evaluation"]
+    build:
+      context: .
+      dockerfile: evaluation/Dockerfile
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: redpanda:9092
+      POSTGRES_DSN: postgresql://governance:governance@postgres:5432/governance
+    depends_on:
+      topic-init: {condition: service_completed_successfully}
+      postgres: {condition: service_healthy}
+
+  producer-adapter-tests:
+    profiles: ["test"]
+    build:
+      context: .
+      dockerfile: services/producer_adapters/Dockerfile
+      args: {ADAPTER: keycloak}
+    command: ["python", "-m", "unittest", "discover", "-s", "tests", "-v"]
+
+volumes:
+  postgres-data:

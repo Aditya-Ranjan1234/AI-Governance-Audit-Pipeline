@@ -1,0 +1,23 @@
+.env
+.idea/
+.vscode/
+**/target/
+**/__pycache__/
+**/.pytest_cache/
+*.pyc
+evaluation/results/
+terraform.tfstate*
+.terraform/
+*.tfplan
+
+# Local credentials, generated data and development environments
+.DS_Store
+.env.*
+!.env.example
+*.tfvars
+*.pem
+*.key
+.venv/
+.coverage
+htmlcov/
+.ruff_cache/

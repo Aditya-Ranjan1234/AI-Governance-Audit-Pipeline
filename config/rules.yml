@@ -1,0 +1,162 @@
+rules:
+  - id: GOV-001
+    title: Failed login burst
+    severity: 4
+    description: Five or more failed logins for one identity in five minutes.
+    frameworks:
+      NIST_AI_RMF: [GOVERN-1.5, MANAGE-2.4]
+      ISO_IEC_42001: [6.1.2, 8.4]
+      EU_AI_ACT: [Article-9, Article-15]
+      NIST_SP_800_53: [AC-7, SI-4]
+      GDPR: [Article-32]
+  - id: GOV-002
+    title: Unapproved privileged role grant
+    severity: 5
+    description: An administrative role was granted without recorded change approval.
+    frameworks:
+      NIST_AI_RMF: [GOVERN-2.3, MANAGE-2.4]
+      ISO_IEC_42001: [5.3, A.3.2]
+      EU_AI_ACT: [Article-9, Article-26]
+      NIST_SP_800_53: [AC-2, AC-6]
+      GDPR: [Article-32]
+  - id: GOV-003
+    title: Privileged login without MFA
+    severity: 4
+    description: A privileged identity authenticated without a second factor.
+    frameworks:
+      NIST_AI_RMF: [GOVERN-1.5, MANAGE-2.4]
+      ISO_IEC_42001: [7.2, A.3.2]
+      EU_AI_ACT: [Article-9, Article-15]
+      NIST_SP_800_53: [IA-2, AC-6]
+      GDPR: [Article-32]
+  - id: GOV-004
+    title: Unapproved cluster-admin binding
+    severity: 5
+    description: A Kubernetes subject was bound to cluster-admin without approval evidence.
+    frameworks:
+      NIST_AI_RMF: [GOVERN-2.3, MANAGE-2.4]
+      ISO_IEC_42001: [5.3, 8.4]
+      EU_AI_ACT: [Article-9, Article-15]
+      NIST_SP_800_53: [AC-6, CM-5]
+      GDPR: [Article-32]
+  - id: GOV-005
+    title: Cross-namespace secret access
+    severity: 5
+    description: A workload read a secret outside its assigned namespace.
+    frameworks:
+      NIST_AI_RMF: [MAP-3.5, MANAGE-2.4]
+      ISO_IEC_42001: [8.4, A.7.4]
+      EU_AI_ACT: [Article-10, Article-15]
+      NIST_SP_800_53: [AC-3, SC-4]
+      GDPR: [Article-5, Article-32]
+  - id: GOV-006
+    title: Unapproved privileged workload
+    severity: 4
+    description: A privileged pod or an image outside the approved inventory was deployed.
+    frameworks:
+      NIST_AI_RMF: [GOVERN-1.7, MANAGE-4.1]
+      ISO_IEC_42001: [8.4, A.4.5]
+      EU_AI_ACT: [Article-9, Article-15]
+      NIST_SP_800_53: [CM-2, CM-7]
+      GDPR: [Article-25, Article-32]
+  - id: GOV-007
+    title: Dataset has no accountable owner
+    severity: 3
+    description: A pipeline consumed a dataset without declared ownership.
+    frameworks:
+      NIST_AI_RMF: [GOVERN-2.2, MAP-3.4]
+      ISO_IEC_42001: [5.3, A.7.2]
+      EU_AI_ACT: [Article-10, Article-12]
+      NIST_SP_800_53: [PM-5, PL-2]
+      GDPR: [Article-5, Article-30]
+  - id: GOV-008
+    title: Unversioned schema change
+    severity: 4
+    description: A dataset schema changed without a corresponding version increment.
+    frameworks:
+      NIST_AI_RMF: [MEASURE-2.5, MANAGE-4.1]
+      ISO_IEC_42001: [8.4, 9.1]
+      EU_AI_ACT: [Article-10, Article-12]
+      NIST_SP_800_53: [CM-3, SA-10]
+      GDPR: [Article-5, Article-30]
+  - id: GOV-009
+    title: Unremediated model drift
+    severity: 4
+    description: Drift exceeded its approved threshold and no remediation job started.
+    frameworks:
+      NIST_AI_RMF: [MEASURE-2.6, MANAGE-2.2]
+      ISO_IEC_42001: [9.1, A.6.2.6]
+      EU_AI_ACT: [Article-9, Article-15]
+      NIST_SP_800_53: [CA-7, SI-4]
+      GDPR: [Article-5, Article-25]
+  - id: GOV-010
+    title: Bias threshold exceeded
+    severity: 5
+    description: A monitored fairness metric exceeded policy without an approved exception.
+    frameworks:
+      NIST_AI_RMF: [MEASURE-2.11, MANAGE-1.1]
+      ISO_IEC_42001: [6.1.4, A.5.4]
+      EU_AI_ACT: [Article-9, Article-10]
+      NIST_SP_800_53: [RA-3, CA-7]
+      GDPR: [Article-5, Article-22]
+  - id: GOV-011
+    title: Unapproved model promotion
+    severity: 5
+    description: A model version was promoted to production without approval state.
+    frameworks:
+      NIST_AI_RMF: [GOVERN-1.3, MANAGE-1.3]
+      ISO_IEC_42001: [8.4, A.6.2.4]
+      EU_AI_ACT: [Article-9, Article-17]
+      NIST_SP_800_53: [CM-3, SA-10]
+      GDPR: [Article-25, Article-32]
+  - id: GOV-012
+    title: Promotion without evaluation evidence
+    severity: 5
+    description: A model version was promoted before required performance and safety evaluation completed.
+    frameworks:
+      NIST_AI_RMF: [MEASURE-2.3, MANAGE-1.3]
+      ISO_IEC_42001: [8.3, 9.1]
+      EU_AI_ACT: [Article-9, Article-15]
+      NIST_SP_800_53: [SA-11, CA-2]
+      GDPR: [Article-25, Article-35]
+  - id: GOV-013
+    title: Unsigned model artifact
+    severity: 4
+    description: A registered model artifact lacks a verified signature or SHA-256 digest.
+    frameworks:
+      NIST_AI_RMF: [GOVERN-1.7, MANAGE-4.1]
+      ISO_IEC_42001: [8.4, A.4.5]
+      EU_AI_ACT: [Article-12, Article-15]
+      NIST_SP_800_53: [SI-7, SA-10]
+      GDPR: [Article-32]
+  - id: GOV-014
+    title: PII detected in LLM prompt
+    severity: 5
+    description: Personal data was sent to an LLM without an allowed handling path.
+    frameworks:
+      NIST_AI_RMF: [MAP-3.5, MANAGE-2.2]
+      ISO_IEC_42001: [6.1.4, A.7.4]
+      EU_AI_ACT: [Article-10, Article-13]
+      NIST_SP_800_53: [AC-4, SI-12]
+      GDPR: [Article-5, Article-6, Article-32]
+  - id: GOV-015
+    title: Disallowed model invocation
+    severity: 4
+    description: The gateway routed an inference request to a model outside the approved inventory.
+    frameworks:
+      NIST_AI_RMF: [GOVERN-1.7, MANAGE-1.3]
+      ISO_IEC_42001: [8.4, A.4.5]
+      EU_AI_ACT: [Article-9, Article-17]
+      NIST_SP_800_53: [CM-8, CM-10]
+      GDPR: [Article-25, Article-30]
+  - id: GOV-016
+    title: Prompt injection or data exfiltration signal
+    severity: 5
+    description: Gateway detection identified a high-confidence injection or exfiltration attempt.
+    frameworks:
+      NIST_AI_RMF: [MEASURE-2.7, MANAGE-2.4]
+      ISO_IEC_42001: [8.4, A.6.2.6]
+      EU_AI_ACT: [Article-9, Article-15]
+      NIST_SP_800_53: [SI-3, SI-4, SC-7]
+      GDPR: [Article-32, Article-33]
+
