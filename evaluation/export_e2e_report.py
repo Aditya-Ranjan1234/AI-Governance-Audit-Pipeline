@@ -51,6 +51,7 @@ def collect(args):
         "recoveries": [json.loads((args.results / name / "result.json").read_text())
                        for name in ("processor-recovery", "broker-recovery")],
         "verification": json.loads((args.results / "verification.json").read_text()),
+        "quality_review": json.loads((ROOT / "evaluation/e2e-review-notes-2026-11-01.json").read_text()),
     }
     with psycopg.connect(args.dsn, row_factory=dict_row) as conn:
         data["findings"] = conn.execute("""SELECT finding_id,rule_id,title,producer,source_event_id,
@@ -76,6 +77,8 @@ def collect(args):
     for row in data["reports"]:
         validate_report(row["report"], row["evidence"])
     data["validated_reports"] = len(data["reports"])
+    report_ids = {row["finding_id"] for row in data["reports"]}
+    data["quality_review"]["notes"] = [note for note in data["quality_review"]["notes"] if note["finding_id"] in report_ids]
     final_jobs = [row for row in data["jobs"] if row["model_id"] == args.model and row["agent_version"] == AGENT_VERSION and row["policy_hash"] == policy_hash]
     checks = data["additional_checks"]
     data["passed"] = (
@@ -97,7 +100,7 @@ def render(data):
     time_local = datetime.fromisoformat(data["generated_at"]).astimezone(ZoneInfo("Asia/Kolkata"))
     metrics = data["baseline"]
     final_jobs = [row for row in data["jobs"] if row["model_id"] == data["final_model"] and row["agent_version"] == data["final_agent_version"] and row["policy_hash"] == data["final_policy_hash"]]
-    state = "PASS · final configuration" if data["passed"] else "IN PROGRESS / NEEDS ATTENTION"
+    state = "PASS · execution · AI review required" if data["passed"] else "IN PROGRESS / NEEDS ATTENTION"
     scenario_rows = "".join(
         f'<tr><td>{e(name)}</td><td>{m["persisted_events"]} / {m["injected_events"]}</td>'
         f'<td>{m["observed_findings"]} / {m["expected_findings"]}</td><td>{m["precision"]:.0%} / {m["recall"]:.0%}</td>'
@@ -114,17 +117,20 @@ def render(data):
         for rule, rows in sorted(grouped.items())
     )
     reports = []
+    review_notes = {note["finding_id"]: note["note"] for note in data["quality_review"]["notes"]}
     for row in data["reports"]:
         report = row["report"]
+        review_note = review_notes.get(row["finding_id"])
+        review_html = f'<div class="notice"><b>Review note from this run</b><p>{e(review_note)}</p></div>' if review_note else ''
         observations = "".join(f'<li>{e(item["text"])}<small>{e(" · ".join(item["evidence_refs"]))}</small></li>' for item in report["observations"])
         timeline = "".join(f'<li><code>{e(item["event_time"])}</code> — {e(item["description"])}<small>{e(item["event_ref"])}</small></li>' for item in report["timeline"])
         next_steps = "".join(f'<li>{e(item)}</li>' for item in report["recommended_next_steps"])
         missing = "".join(f'<li>{e(item)}</li>' for item in report["missing_evidence"]) or '<li>None listed by the model.</li>'
         reports.append(f'''<details class="report" id="report-{e(row['finding_id'])}"><summary><span class="rule">{e(row['rule_id'])}</span>
-            {e(row['title'])}<span class="assessment">{e(report['assessment'].replace('_',' '))}</span></summary>
-            <div class="report-body"><p class="report-summary">{e(report['summary']['text'])}</p>
+            {e(row['title'])}<span class="assessment">{'REVIEW NOTE · ' if review_note else ''}Model assessment: {e(report['assessment'].replace('_',' '))}</span></summary>
+            <div class="report-body">{review_html}<p class="report-summary">{e(report['summary']['text'])}</p>
             <small>Summary evidence: {e(' · '.join(report['summary']['evidence_refs']))}</small>
-            <h4>Observed evidence</h4><ul>{observations}</ul><h4>Timeline · recorded UTC timestamps</h4><ol>{timeline}</ol>
+            <h4>Model observations · verify against evidence</h4><ul>{observations}</ul><h4>Timeline · recorded UTC timestamps</h4><ol>{timeline}</ol>
             <div class="columns"><div><h4>Missing evidence</h4><ul>{missing}</ul></div><div><h4>Suggested next steps · advisory</h4><ul>{next_steps}</ul></div></div>
             <p class="meta">Finding <code>{e(row['finding_id'])}</code><br>Job <code>{e(row['job_id'])}</code><br>Model <code>{e(row['model_id'])}</code></p>
             <details><summary>Inspect the complete saved report and evidence snapshot</summary><pre>{pretty(row)}</pre></details></div></details>''')
@@ -147,6 +153,7 @@ main{{padding:40px;min-width:0}}header{{background:var(--navy);color:white;paddi
 <a href="#overview">Overview</a><a href="#flow">Executed flow</a><a href="#measurements">Measurements</a><a href="#findings">Findings</a><a href="#reports">Agent reports</a><a href="#communication">Agent communication</a><a href="#verification">Verification &amp; limits</a><a href="#reproduce">Reproduce &amp; inspect</a></nav><p>Offline report<br>No server or Tableau required<br>Export time uses IST. Evidence timestamps retain UTC (Z or +00:00).</p></aside>
 <main><header id="overview"><div class="eyebrow">Execution started · 01 November 2026</div><h1>From source events to<br>cited investigation reports.</h1><span class="badge">{e(state)}</span><p>{e(data['deployment'])}. Five source adapters, all 16 governance rules, risk scoring, durable storage, and one investigator.</p><div class="date">Exported {e(time_local.strftime('%d %B %Y · %I:%M %p IST'))}</div></header>
 <div class="cards"><div class="card"><strong>{len(data['source_events'])}</strong><span>unique events persisted</span></div><div class="card"><strong>{len(data['findings'])}</strong><span>governance findings</span></div><div class="card"><strong>{len(data['reports'])} / {data['eligible_findings']}</strong><span>eligible findings investigated</span></div><div class="card"><strong>{metrics['latency_ms']['p95']/1000:.2f}s</strong><span>baseline p95 detection latency</span></div></div>
+<div class="notice"><b>Execution passed; AI conclusions need review.</b> The final reports pass structural and citation checks. Source-based spot checks still found wording errors or unsupported inferences in {len(review_notes)} reports; each has a visible review note. Original model text remains intact. This is not an exhaustive semantic audit, and recommendations are advisory.</div>
 <section id="flow"><h2>The flow that actually ran</h2><p>Labelled, source-shaped synthetic events were posted to the five HTTP services. The existing native-format smoke cases also passed for every adapter. The broker and database ran locally; model inference used the real AWS Bedrock API in <code>us-west-2</code>.</p>
 <ol class="flow"><li><b>Five HTTP adapters</b>Keycloak, Kubernetes, Airflow/OpenLineage, model registry, LLM gateway.</li><li><b>Kafka-compatible broker</b>Redpanda; five source topics and raw/scored finding topics.</li><li><b>Kafka Streams rules</b>All 16 rules; failed-login windows and model-promotion joins.</li><li><b>Risk scorer</b>Baseline plus Isolation Forest; {rules_ready} of {len(data['findings'])} findings recorded after warm-up.</li><li><b>PostgreSQL sink</b>{len(data['source_events'])} canonical events and {len(data['findings'])} findings; replay verified.</li><li><b>One investigator</b>Durable jobs; restricted source reads; bounded tools and model turns.</li><li><b>Live Bedrock</b>Final model: Amazon Nova 2 Lite. No scripted model in the final flow.</li><li><b>Saved evidence</b>{len(data['reports'])} cited reports, evidence snapshots, job history and audit records.</li></ol>
 <div class="notice good">Tableau was skipped as permitted. All four reporting views contain data; the results and investigation reports are available directly in this file.</div></section>

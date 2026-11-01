@@ -1,0 +1,38 @@
+{
+  "status": "advisory_requires_review",
+  "scope": "Source-based spot review during this E2E run; not an exhaustive semantic audit or a second product agent. Original model reports are preserved. Unflagged reports are not certified correct.",
+  "notes": [
+    {
+      "finding_id": "42ca3e61-e14a-3611-b33d-d8ab37dd567a",
+      "note": "The model calls related LOGIN_SUCCESS events “unauthenticated.” They are successful authentication events without MFA. Treat the broader claim about systemic controls as an inference from synthetic fixtures, not an established operational fact."
+    },
+    {
+      "finding_id": "29417473-9345-3aa2-a5c1-7a4336036f4c",
+      "note": "The prose reverses event order: ROLE_GRANT is at 17:35:06Z and the non-MFA LOGIN_SUCCESS is at 17:35:07Z. The login follows the role grant by one second; it does not precede it. The cited timestamp fields themselves are valid."
+    },
+    {
+      "finding_id": "f5192b40-3f40-38b4-82d8-536327391ccd",
+      "note": "The prose reverses event order: ROLE_GRANT is at 18:00:06Z and the non-MFA LOGIN_SUCCESS is at 18:00:07Z. A shared actor and nearby times also do not establish session continuity."
+    },
+    {
+      "finding_id": "69709dc2-9039-3d34-88ec-86a8e1dba3e2",
+      "note": "The source event already establishes a privileged identity authenticating without MFA. A later MFA login does not negate that finding. The retrieved data does not establish whether the two logins share a session; separate-session wording is an inference."
+    },
+    {
+      "finding_id": "133a8555-a408-3c83-a095-114bf91504db",
+      "note": "The source proves a privileged login without MFA. Related role grants and bindings share an actor and time window, but their MFA/session context is not established. Do not extend the source login’s MFA status to every related action."
+    },
+    {
+      "finding_id": "cdd1419c-17d7-3c7f-ac0a-77ca2f8eb499",
+      "note": "The source proves a privileged login without MFA. Related role grants and bindings share an actor and time window, but their MFA/session context is not established. Do not extend the source login’s MFA status to every related action."
+    },
+    {
+      "finding_id": "dbdeef2e-dd32-30af-b793-592df52cd38a",
+      "note": "The cluster-admin binding has change_approved=false. The statement about related pods also lacking approval evidence is unsupported by the projected pod records. GOV-006 checks privilege or image approval; it does not evaluate workload change approval."
+    },
+    {
+      "finding_id": "52ae1408-3f45-3960-b5ee-17266f9c15ed",
+      "note": "The related-event tool returns at most 20 events in a bounded window. The supported statement is that no approval record appeared in that returned sample, not that none exists anywhere in the entire time window. The source’s change_approved=false still supports GOV-004."
+    }
+  ]
+}
