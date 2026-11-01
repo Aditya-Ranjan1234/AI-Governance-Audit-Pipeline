@@ -74,3 +74,7 @@ The final investigator version is `investigator-v1.3`. Manual review of the firs
 ## Remaining interpretation limits
 
 The execution pass is separate from interpretation quality. Source-based spot checks on the final v1.3 reports still found mistakes in prose about authentication, event order, session linkage and bounded-query absence. Eight reports have explicit review notes in the HTML and companion JSON; original model text is preserved. The notes are in `evaluation/e2e-review-notes-2026-11-01.json`. This review was part of the E2E task, not a second product agent, and was not an exhaustive semantic audit. No report recommendations were executed.
+
+## Final state
+
+All 32 final v1.3 jobs succeeded on their first attempt. Browser checks passed for all eight navigation links, report filtering, expansion, downloadable JSON and desktop/mobile overflow; no JavaScript errors were observed. Test containers are stopped. The PostgreSQL volume, stopped pipeline containers and fresh database snapshot are retained. The investigator container and its temporary AWS credential file were removed. The Java JAR was rebuilt with the clarified rule metadata for the next start.

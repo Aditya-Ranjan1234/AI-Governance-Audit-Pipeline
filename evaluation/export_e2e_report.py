@@ -74,6 +74,10 @@ def collect(args):
         for view in ("tableau_framework_status", "tableau_risk_trend", "tableau_incident_history", "tableau_pipeline_latency"):
             data["tableau_views"][view] = conn.execute(f"SELECT count(*) AS n FROM {view}").fetchone()["n"]
     data = serializable(data)
+    for name, key in (("runtime-state.json", "runtime_state"), ("browser-checks.json", "browser_checks")):
+        path = args.results / name
+        if path.exists():
+            data[key] = json.loads(path.read_text())
     for row in data["reports"]:
         validate_report(row["report"], row["evidence"])
     data["validated_reports"] = len(data["reports"])
@@ -137,6 +141,7 @@ def render(data):
     usage_rows = "".join(f'<tr><td><code>{e(row["model_id"])}</code></td><td>{row["model_responses"]}</td><td>{row["input_tokens"]:,}</td><td>{row["output_tokens"]:,}</td></tr>' for row in data["usage"])
     view_rows = "".join(f'<tr><td><code>{e(name)}</code></td><td>{count}</td></tr>' for name, count in data["tableau_views"].items())
     rules_ready = sum(row["model_status"] == "ready" for row in data["findings"])
+    runtime_note = '<p class="notice good">Test containers are stopped. The PostgreSQL data volume, stopped pipeline containers and database snapshot are retained. Temporary AWS container credentials were removed. This report opens without starting any service.</p>' if data.get("runtime_state", {}).get("test_containers_stopped") else ''
     payload = json.dumps(data, ensure_ascii=True).replace("<", "\\u003c")
     return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Governance pipeline · End-to-end results</title><style>
@@ -170,7 +175,7 @@ main{{padding:40px;min-width:0}}header{{background:var(--navy);color:white;paddi
 <details><summary>Inspect failed/retried attempts from all model trials</summary><pre>{pretty(data['failed_attempts'])}</pre></details>
 <h3>Recorded model usage</h3><div class="table-wrap"><table><thead><tr><th>Model / profile</th><th>Responses</th><th>Input tokens</th><th>Output tokens</th></tr></thead><tbody>{usage_rows}</tbody></table></div><p class="muted">Usage above comes from persisted agent audit entries. Separate connectivity and diagnostic probes are excluded; this is not an AWS billing total.</p>
 <h3>Tableau-ready views</h3><div class="table-wrap"><table><thead><tr><th>View</th><th>Rows</th></tr></thead><tbody>{view_rows}</tbody></table></div><p class="muted">No new EKS, MSK or RDS deployment was performed. The existing EKS check did not succeed. The verified scope is the local reference stack plus live Bedrock. Source systems were represented by synthetic requests.</p></section>
-<section id="reproduce"><h2>Reproduce and inspect</h2><p>Implementation commit: <code>{e(data['implementation_commit'])}</code>. Branch: <code>codex/e2e-validation</code>.</p><pre>docker compose -p philstock-e2e-20261101 -f docker-compose.yml -f evaluation/compose.e2e.yml up -d --no-build --pull never
+<section id="reproduce"><h2>Reproduce and inspect</h2>{runtime_note}<p>Implementation commit: <code>{e(data['implementation_commit'])}</code>. Branch: <code>codex/e2e-validation</code>.</p><pre>docker compose -p philstock-e2e-20261101 -f docker-compose.yml -f evaluation/compose.e2e.yml up -d --no-build --pull never
 docker compose -p philstock-e2e-20261101 -f docker-compose.yml -f evaluation/compose.e2e.yml --profile evaluation run --rm --no-deps evaluator inject --via-adapters --repeats 3
 docker compose -p philstock-e2e-20261101 -f docker-compose.yml -f evaluation/compose.e2e.yml --profile evaluation run --rm --no-deps evaluator report --run-id RUN_UUID</pre>
 <p>Commands assume the dependency images and the current Java JAR are available. Detailed configuration and offline-build instructions are in <code>docs/investigator-agent.md</code>; execution notes are in <code>docs/e2e-run.md</code>. Raw local artifacts and the database backup are under <code>evaluation/results/e2e-2026-11-01/</code>.</p><details><summary>Run IDs and exact metrics</summary><pre>{pretty({'baseline':data['baseline'],'adapter_smoke':data['adapter_smoke'],'recoveries':data['recoveries'],'additional_checks':data['additional_checks']})}</pre></details></section>
