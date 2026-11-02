@@ -170,6 +170,8 @@ The November 2 validation passed **83 automated tests**, lint/format checks, Com
 
 The [standalone results page](two-agent-results-2026-11-02.html) and its [JSON evidence](two-agent-results-2026-11-02.json) contain all 12 test cases, feedback, revisions, audit history and earlier trials. The reviewer challenged six of eight known-problem reports, but also three of four clean controls. Some challenges gave an incorrect diagnosis, and one incorrect reviewer suggestion introduced a chronology error into a previously clean report. Workflow completion is therefore **not a quality pass**. Keep this model configuration optional and advisory, with human verification of both feedback and revised reports. Additional evidence inspection is recorded in `evaluation/reviewer-inspection-2026-11-02.json`.
 
+All **30 workflow jobs** completed: 12 initial reviews, nine investigator revisions and nine rechecks. Latest outcomes were four advisory passes and eight `needs_human_review` results. Originals and evidence snapshots remained unchanged, and every review chain stayed within one revision. The final recheck caught the chronology error introduced by incorrect feedback and escalated it. Two original known-problem reports still received passing reviews, so the four passes must not be interpreted as four independently verified reports.
+
 The live run also exercised recovery: its final recheck exhausted three attempts after transport connection failures. An operator audit event records refreshing temporary credentials and requeuing only that job with a maximum of five total attempts, without deleting its failed run records. Failed jobs are otherwise terminal; workers do not silently reset attempt limits.
 
 ```bash

@@ -20,7 +20,7 @@
     },
     {
       "source_run_id": "7b143f7a-dbef-509c-9c1f-2b742be0935e",
-      "note": "Incorrect feedback turned a clean control into an incorrect revision. The reviewer requested an omitted login and said 17:35:07Z preceded 17:35:06Z by two seconds; the investigator repeated that claim. The stored timestamps show the login followed the role grant by one second. The agents' agreement is not independent evidence."
+      "note": "Incorrect feedback turned a clean control into an incorrect revision. The reviewer requested an omitted login and said 17:35:07Z preceded 17:35:06Z by two seconds; the investigator repeated that claim. The stored timestamps show the login followed the role grant by one second. The agents' agreement is not independent evidence. The final recheck detected this reversed chronology and returned needs_human_review; no second revision was queued."
     }
   ]
 }
