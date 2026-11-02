@@ -67,6 +67,8 @@ The UUID strings above are placeholders. Runtime validation requires real refere
 
 The reviewer has three tools: `get_report`, `get_evidence`, and `submit_review`. It must read both inputs before submitting. Its checks cover factual support, chronology, authentication/MFA, approval semantics, bounded-query absence and unsupported session/causal claims. Proposed actions and explicitly labelled hypotheses are not treated as executed actions or established facts.
 
+The reviewer receives the target finding and an explicit map of editable claim paths. It must judge the report's actual claims against that finding's pinned rule; omitting unrelated events is not itself an error. These prompt constraints reduce scope drift but do not guarantee that the model follows them.
+
 Conservative deterministic checks independently catch two observed classes: calling a cited successful non-MFA login unauthenticated, and explicitly claiming a cited login preceded a source role grant when its timestamp is later. These checks do not solve general natural-language verification. Their findings remain in the result and can force `revision_required` even if the model returns `review_passed`.
 
 The investigator uses its existing four-tool interface in revision mode, but reads exclusively from the original snapshot. It receives the saved report and cited feedback, and must produce a complete, validated replacement. It cannot retrieve newer live events during this correction cycle. Reports needing new evidence can remain for human review or a separately initiated investigation.
@@ -156,11 +158,19 @@ The profile enables revisions on the investigator and starts the reviewer as a s
 
 Investigator revision calls use `INVESTIGATOR_*` limits. A correction request's model must match the running investigator's `BEDROCK_MODEL_ID` to be claimed. Review configuration identity includes both model IDs. Each agent retains an independent conversation; they exchange saved outputs and cited feedback, not model reasoning traces.
 
+The reviewer and investigator revision loop wait their configured polling interval after each task. Bedrock throttling schedules a retry after 60 seconds, doubling up to 300 seconds, and pauses the affected worker for at least 60 seconds. This is backoff, not a shared request-rate limiter: each task can make multiple Converse calls, and both agents consume the account/model quota. Set both polling intervals to suit that quota and the number of replicas.
+
 Optional EKS manifests are in `deploy/k8s/investigator.yaml` and `deploy/k8s/reviewer.yaml`. They use separate service accounts, IAM-role placeholders and database secrets. Building this feature does not deploy it to AWS or change IAM permissions.
 
 ## Tests and evaluation
 
 The automated suite uses scripted models, botocore Stubber and a real isolated PostgreSQL database. It tests the complete review/correction/recheck exchange, source/result permissions, duplicate discovery, replay, stale leases, retries, cross-chain references, escalation and known regression cases.
+
+The November 2 validation passed **83 automated tests**, lint/format checks, Compose validation and the packaged container build. The live test used Amazon Nova 2 Lite (`us.amazon.nova-2-lite-v1:0`) in `us-west-2`, separate restricted database logins, and two containers running as UID 10001 with read-only filesystems and all Linux capabilities dropped. The account's observed cross-region model quota was 20 requests/minute; both worker polling intervals were set to 20 seconds and both output limits to 3,000 tokens. These are measured test settings, not claims about every AWS account.
+
+The [standalone results page](two-agent-results-2026-11-02.html) and its [JSON evidence](two-agent-results-2026-11-02.json) contain all 12 test cases, feedback, revisions, audit history and earlier trials. The reviewer challenged six of eight known-problem reports, but also three of four clean controls. Some challenges gave an incorrect diagnosis, and one incorrect reviewer suggestion introduced a chronology error into a previously clean report. Workflow completion is therefore **not a quality pass**. Keep this model configuration optional and advisory, with human verification of both feedback and revised reports. Additional evidence inspection is recorded in `evaluation/reviewer-inspection-2026-11-02.json`.
+
+The live run also exercised recovery: its final recheck exhausted three attempts after transport connection failures. An operator audit event records refreshing temporary credentials and requeuing only that job with a maximum of five total attempts, without deleting its failed run records. Failed jobs are otherwise terminal; workers do not silently reset attempt limits.
 
 ```bash
 TEST_POSTGRES_DSN='postgresql://USER:PASSWORD@127.0.0.1:5432/governance_review_test' \

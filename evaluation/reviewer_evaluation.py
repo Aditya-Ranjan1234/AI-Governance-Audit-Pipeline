@@ -1,6 +1,7 @@
 """Seed and measure a local two-agent regression corpus. Never calls a model itself."""
 
 import argparse
+from collections import Counter
 from copy import deepcopy
 from datetime import datetime, timezone
 import hashlib
@@ -92,6 +93,12 @@ def seed(args):
 
 def collect(args):
     data = json.loads((args.output / "manifest.json").read_text())
+    verification = args.output / "verification.json"
+    if verification.exists():
+        data["verification"] = json.loads(verification.read_text())
+    inspection = ROOT / "evaluation/reviewer-inspection-2026-11-02.json"
+    if inspection.exists():
+        data["additional_evidence_inspection"] = json.loads(inspection.read_text())
     roots = [row["source_run_id"] for row in data["cases"]]
     with psycopg.connect(args.dsn, row_factory=dict_row) as c:
         for table, key in (("reviewer.jobs", "review_jobs"), ("investigator.revision_jobs", "revision_jobs"), ("reviewer.latest_results", "results")):
@@ -125,7 +132,15 @@ def collect(args):
     }
     jobs = data["review_jobs"] + data["revision_jobs"]
     final = {row["source_run_id"]: row for row in data["results"]}
-    data["execution_complete"] = len(initial) == len(data["cases"]) and all(job["status"] == "succeeded" for job in jobs) and all(row["verdict"] != "revision_required" for row in final.values())
+    data["execution_complete"] = len(initial) == len(data["cases"]) and len(final) == len(data["cases"]) and all(job["status"] == "succeeded" for job in jobs) and all(row["verdict"] != "revision_required" for row in final.values())
+    data["final_verdicts"] = dict(Counter(row["verdict"] for row in final.values()))
+    data["job_statuses"] = dict(Counter(job["status"] for job in jobs))
+    data["quality_exceptions"] = [
+        dict(row, initial_verdict=initial[row["source_run_id"]]["effective_verdict"])
+        for row in data["cases"] if row["source_run_id"] in initial
+        and ((row["kind"] == "known_problem" and initial[row["source_run_id"]]["effective_verdict"] == "review_passed")
+             or (row["kind"] == "clean_control" and initial[row["source_run_id"]]["effective_verdict"] != "review_passed"))
+    ]
     data["revision_bound_passed"] = all(sum(job["source_run_id"] == row["source_run_id"] for job in data["revision_jobs"]) <= 1 for row in data["cases"])
     data["generated_at"] = datetime.now(timezone.utc).isoformat()
     data["implementation_commit"] = subprocess.check_output(["git","rev-parse","HEAD"],cwd=ROOT,text=True).strip()
@@ -139,22 +154,28 @@ def render(data):
     original = {row["run_id"]: row for row in data["originals"]}
     final = {row["source_run_id"]: row for row in data["results"]}
     cards = []
+    exceptions = ''.join(f'<li><b>{"Missed known problem" if row["kind"] == "known_problem" else "Clean control challenged"}</b>: <code>{e(row["source_run_id"])}</code> — {e(row["expected_note"])}</li>' for row in data["quality_exceptions"])
+    outcomes = ', '.join(f'{count} {verdict.replace("_", " ")}' for verdict, count in sorted(data["final_verdicts"].items())) or 'Pending'
+    job_states = ', '.join(f'{count} {state}' for state, count in sorted(data["job_statuses"].items())) or 'Pending'
+    verification = '<details><summary>Test, container and runtime permission checks</summary><pre>' + e(json.dumps(data.get("verification", {}), indent=2)) + '</pre></details>'
+    inspected = data.get("additional_evidence_inspection", {})
+    inspection = '<p class="note">' + e(inspected.get("conclusion", "")) + '</p><details><summary>Additional evidence inspection</summary><pre>' + e(json.dumps(inspected, indent=2)) + '</pre></details>' if inspected else ''
     for case in data["cases"]:
         root = case["source_run_id"]
         result = final.get(root, {})
         reviews = [row for row in data["reviews"] if row["source_run_id"] == root]
         revisions = [row for row in data["revisions"] if row["source_run_id"] == root]
-        body = {"expected_review_note":case["expected_note"],"original_report":original[root]["report"],"reviews":reviews,"revisions":revisions}
+        body = {"expected_review_note":case["expected_note"],"additional_inspection":[note["note"] for note in inspected.get("notes", []) if note["source_run_id"] == root],"original_report":original[root]["report"],"reviews":reviews,"revisions":revisions}
         cards.append(f'<details class="case"><summary>{e(case["kind"].replace("_"," "))} · {e(result.get("verdict","pending"))}<small>{e(root)}</small></summary><p><b>Original:</b> {e(original[root]["report"]["summary"]["text"])}</p><p><b>Final:</b> {e(result.get("report",{}).get("summary",{}).get("text","Pending"))}</p><details><summary>Feedback, evidence and revision trace</summary><pre>{e(json.dumps(body,indent=2))}</pre></details></details>')
     payload = json.dumps(data).replace('<','\\u003c')
     return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Two-agent review results</title><style>
-*{{box-sizing:border-box}}body{{margin:0;background:#eef3f5;color:#15333e;font:16px/1.6 system-ui,sans-serif}}main{{max-width:1100px;margin:auto;padding:30px}}header{{background:#0d2935;color:white;border-radius:16px;padding:32px}}header p{{color:#d5e6ea}}h1{{font-size:clamp(28px,5vw,43px);line-height:1.15}}nav{{display:flex;gap:20px;flex-wrap:wrap;margin:22px 0}}a{{color:#087663}}section,.case{{background:white;border:1px solid #d3e1e4;border-radius:12px;padding:22px;margin:18px 0}}.stats{{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}}.stat{{background:white;border-radius:12px;padding:20px;margin-top:20px}}.stat b{{display:block;font-size:30px}}.stat span,small{{font-size:13px;color:#536a73}}small{{display:block;overflow-wrap:anywhere}}summary{{cursor:pointer;font-weight:650}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;background:#eaf1f3;padding:18px;max-height:600px;overflow:auto;font-size:12px}}.flow{{display:flex;gap:12px;flex-wrap:wrap}}.flow b{{padding:15px;background:#e5f3ee;border-radius:8px;flex:1;min-width:180px}}button,input{{font:inherit;padding:10px;border:1px solid #abc2c8;border-radius:6px}}input{{width:min(100%,500px)}}.note{{border-left:4px solid #d7a548;padding:14px;background:#fff8e7}}[hidden]{{display:none!important}}@media(max-width:650px){{main{{padding:15px}}header{{padding:22px}}.stats{{grid-template-columns:repeat(2,1fr)}}section,.case{{padding:16px}}}}
+*{{box-sizing:border-box}}body{{margin:0;overflow-wrap:anywhere;background:#eef3f5;color:#15333e;font:16px/1.6 system-ui,sans-serif}}main{{max-width:1100px;margin:auto;padding:30px}}header{{background:#0d2935;color:white;border-radius:16px;padding:32px}}header p{{color:#d5e6ea}}h1{{font-size:clamp(28px,5vw,43px);line-height:1.15}}nav{{display:flex;gap:20px;flex-wrap:wrap;margin:22px 0}}a{{color:#087663}}section,.case{{background:white;border:1px solid #d3e1e4;border-radius:12px;padding:22px;margin:18px 0}}.stats{{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}}.stat{{background:white;border-radius:12px;padding:20px;margin-top:20px}}.stat b{{display:block;font-size:30px}}.stat span,small{{font-size:13px;color:#536a73}}small{{display:block;overflow-wrap:anywhere}}summary{{cursor:pointer;font-weight:650}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;background:#eaf1f3;padding:18px;max-height:600px;overflow:auto;font-size:12px}}.flow{{display:flex;gap:12px;flex-wrap:wrap}}.flow b{{padding:15px;background:#e5f3ee;border-radius:8px;flex:1;min-width:180px}}button,input{{font:inherit;padding:10px;border:1px solid #abc2c8;border-radius:6px}}input{{width:min(100%,500px)}}.note{{border-left:4px solid #d7a548;padding:14px;background:#fff8e7}}[hidden]{{display:none!important}}@media(max-width:650px){{main{{padding:15px}}header{{padding:22px}}.stats{{grid-template-columns:repeat(2,minmax(0,1fr))}}section,.case{{padding:16px}}}}
 </style></head><body><main><header><p>INVESTIGATOR + EVIDENCE REVIEWER</p><h1>Two agents. One bounded correction loop.</h1><p>Local PostgreSQL and live Amazon Bedrock. The corpus contains eight previously flagged reports and four constructed clean controls.</p><p>Execution complete: <b>{e(data['execution_complete'])}</b> · Original snapshots preserved: <b>{e(data['originals_preserved'])}</b></p></header>
 <nav><a href="#flow">Communication</a><a href="#results">Results</a><a href="#limits">Limits and evidence</a></nav><p>Final reviewer configuration: <code>{e(data['reviewer_version'])}</code>. Earlier trial records remain in the downloadable evidence.</p>
-<div class="stats"><div class="stat"><b>{data['quality']['known_problems_flagged']} / 8</b><span>known problems flagged</span></div><div class="stat"><b>{data['quality']['clean_controls_passed']} / 4</b><span>clean controls passed</span></div><div class="stat"><b>{len(data['revision_jobs'])}</b><span>revision requests</span></div><div class="stat"><b>1 maximum</b><span>revision per review chain</span></div></div>
+<div class="stats"><div class="stat"><b>{data['quality']['known_problems_flagged']} / 8</b><span>known problems flagged</span></div><div class="stat"><b>{data['quality']['clean_controls_passed']} / 4</b><span>clean controls passed</span></div><div class="stat"><b>{len(data['revision_jobs'])}</b><span>revision requests</span></div><div class="stat"><b>1</b><span>maximum revision per review chain</span></div></div>
 <section id="flow"><h2>Exactly how they communicate</h2><div class="flow"><b>Investigator saves report + immutable evidence</b><b>Reviewer polls and claims a review job</b><b>Reviewer saves cited feedback + revision request</b><b>Investigator saves one new revision</b><b>Reviewer rechecks; unresolved issues go to human review</b></div><ol><li>Each review references the original <code>source_run_id</code>. Review jobs are deduplicated and leased.</li><li>The reviewer reads the saved report and evidence using bounded tools. Deterministic checks cannot be overridden by a passing model verdict.</li><li>A successful initial review requesting correction atomically inserts a request in <code>investigator.revision_jobs</code>.</li><li>The investigator reads that feedback, uses the original snapshot, and writes a new <code>investigator.revision_runs</code> record.</li><li>The reviewer discovers that result by <code>revision_run_id</code>. A second correction request becomes <code>needs_human_review</code>; database checks reject another revision.</li></ol></section>
-<section id="results"><h2>Reports, feedback and revisions</h2><input id="search" type="search" placeholder="Filter cases or verdicts" aria-label="Filter cases"><button id="download">Download full JSON</button><p class="note">A review verdict is advisory. These counts measure this small regression corpus, not general factual accuracy or compliance. Inspect the issue explanations as well as the verdicts.</p>{''.join(cards)}</section>
-<section id="limits"><h2>Verification and practical limits</h2><p>Revision limit respected: <b>{e(data['revision_bound_passed'])}</b>. Worker errors and earlier attempts remain in the trace. The original investigations came from the earlier E2E run; the four controls were authored as test inputs. This run exercises the new review/revision exchange, not a new source-system or MSK/EKS deployment.</p><p>Both agents use restricted database roles and can write only their workflow records. No recommendations are executed. A model reviewer can miss errors or reject a correct statement; unresolved reviews remain visible.</p><p>Implementation commit: <code>{e(data['implementation_commit'])}</code>. Generated UTC: {e(data['generated_at'])}.</p></section></main>
+<section id="results"><h2>Reports, feedback and revisions</h2><p><b>Latest outcomes:</b> {e(outcomes)}. <b>Workflow jobs:</b> {e(job_states)}.</p><input id="search" type="search" placeholder="Filter cases or verdicts" aria-label="Filter cases"><button id="download">Download full JSON</button><p class="note">A review verdict is advisory. Initial verdict counts measure whether the reviewer challenged each report, not whether it identified every expected issue or corrected it successfully. These counts describe this small regression corpus, not general factual accuracy or compliance.</p>{inspection}<h3>Initial review disagreements with the test labels</h3><ul>{exceptions or '<li>None observed among completed initial reviews.</li>'}</ul>{''.join(cards)}</section>
+<section id="limits"><h2>Verification and practical limits</h2><p>Revision limit respected: <b>{e(data['revision_bound_passed'])}</b>. Worker errors and earlier attempts remain in the trace. The original investigations came from the earlier E2E run; the four controls were authored as test inputs. This run exercises the new review/revision exchange, not a new source-system or MSK/EKS deployment.</p><p>Both agents use restricted database roles and can write only their workflow records. No recommendations are executed. A model reviewer can miss errors or reject a correct statement; unresolved reviews remain visible.</p>{verification}<p>Implementation commit: <code>{e(data['implementation_commit'])}</code>. Generated UTC: {e(data['generated_at'])}.</p></section></main>
 <script type="application/json" id="data">{payload}</script><script>document.getElementById('search').addEventListener('input',event=>{{const q=event.target.value.toLowerCase();document.querySelectorAll('.case').forEach(c=>c.hidden=!c.textContent.toLowerCase().includes(q))}});document.getElementById('download').addEventListener('click',()=>{{const u=URL.createObjectURL(new Blob([document.getElementById('data').textContent],{{type:'application/json'}}));const a=document.createElement('a');a.href=u;a.download='two-agent-results.json';a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)}});</script></body></html>'''
 
 

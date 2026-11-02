@@ -107,6 +107,8 @@ The framework mappings are evidence-routing decisions for this prototype. They i
 
 Two Amazon Bedrock agents cooperate through durable PostgreSQL jobs: **finding → investigator report → evidence review → at most one investigator revision → recheck or human review**. Reports and evidence snapshots remain immutable, and neither agent performs remediation. Enable the optional `agents` Compose profile after configuring Bedrock; see the [two-agent setup and exact communication contract](docs/reviewer-agent.md) and [investigator configuration](docs/investigator-agent.md). The original offline project explanation is a historical source snapshot from before the optional agents were added.
 
+The reviewer is an advisory prototype. The [live two-agent results](docs/two-agent-results-2026-11-02.html) include the complete feedback/revision trace and measured quality problems: missed errors, incorrect objections, and an incorrect suggestion copied into a revision. A passing review must not serve as an automatic approval gate.
+
 ## End-to-end results
 
 The November 2026 run exercised all five HTTP adapters, all 16 rules, risk scoring, PostgreSQL persistence, processor/broker recovery, and live Bedrock investigations. Open the [self-contained results page](docs/e2e-results-2026-11-01.html) or read the [execution and reproduction notes](docs/e2e-run.md). The final model is Amazon Nova 2 Lite; earlier model failures are retained in the evidence export.
