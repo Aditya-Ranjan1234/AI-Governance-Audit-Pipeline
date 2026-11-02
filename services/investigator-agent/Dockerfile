@@ -12,6 +12,7 @@ RUN --mount=type=bind,from=wheelhouse,target=/wheels \
 COPY services/investigator-agent/*.py ./
 COPY config/rules.yml /app/config/rules.yml
 COPY db/002_investigator.sql /app/db/002_investigator.sql
+COPY db/003_reviewer.sql /app/db/003_reviewer.sql
 USER 10001
 ENTRYPOINT ["python", "app.py"]
 CMD ["worker"]

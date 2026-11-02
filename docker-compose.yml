@@ -184,6 +184,36 @@ services:
       INVESTIGATOR_MAX_ATTEMPTS: ${INVESTIGATOR_MAX_ATTEMPTS:-3}
       INVESTIGATOR_TIMEOUT_SECONDS: ${INVESTIGATOR_TIMEOUT_SECONDS:-120}
       INVESTIGATOR_MAX_TOKENS: ${INVESTIGATOR_MAX_TOKENS:-1500}
+      INVESTIGATOR_REVISIONS_ENABLED: "true"
+    depends_on:
+      investigator-db-init: {condition: service_completed_successfully}
+
+  reviewer-agent:
+    profiles: ["agents"]
+    build:
+      context: .
+      dockerfile: services/investigator-agent/Dockerfile
+    entrypoint: ["python", "reviewer_app.py"]
+    command: ["worker"]
+    init: true
+    stop_grace_period: 180s
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      REVIEWER_POSTGRES_DSN: ${REVIEWER_POSTGRES_DSN:-postgresql://governance:governance@postgres:5432/governance}
+      REVIEWER_MODEL_ID: ${REVIEWER_MODEL_ID:-${BEDROCK_MODEL_ID:-}}
+      BEDROCK_MODEL_ID: ${BEDROCK_MODEL_ID:-}
+      AWS_REGION: ${AWS_REGION:-}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      REVIEWER_RULE_IDS: ${REVIEWER_RULE_IDS:-GOV-002,GOV-003,GOV-004,GOV-006,GOV-011,GOV-012}
+      REVIEWER_POLL_SECONDS: ${REVIEWER_POLL_SECONDS:-5}
+      REVIEWER_MAX_STEPS: ${REVIEWER_MAX_STEPS:-6}
+      REVIEWER_MAX_ATTEMPTS: ${REVIEWER_MAX_ATTEMPTS:-3}
+      REVIEWER_TIMEOUT_SECONDS: ${REVIEWER_TIMEOUT_SECONDS:-120}
+      REVIEWER_MAX_TOKENS: ${REVIEWER_MAX_TOKENS:-3000}
     depends_on:
       investigator-db-init: {condition: service_completed_successfully}
 

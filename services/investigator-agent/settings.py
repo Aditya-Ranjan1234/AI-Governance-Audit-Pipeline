@@ -29,19 +29,19 @@ class Settings:
     max_tokens: int = 1500
 
     @classmethod
-    def from_env(cls, require_model: bool = True):
-        dsn = os.getenv("INVESTIGATOR_POSTGRES_DSN", "")
-        model = os.getenv("BEDROCK_MODEL_ID", "").strip()
+    def from_env(cls, require_model: bool = True, *, prefix="INVESTIGATOR", model_env="BEDROCK_MODEL_ID"):
+        dsn = os.getenv(f"{prefix}_POSTGRES_DSN", "")
+        model = os.getenv(model_env, "").strip()
         region = os.getenv("AWS_REGION", "").strip()
         if not dsn:
-            raise ValueError("INVESTIGATOR_POSTGRES_DSN is required")
+            raise ValueError(f"{prefix}_POSTGRES_DSN is required")
         if require_model and (not model or not region):
-            raise ValueError("BEDROCK_MODEL_ID and AWS_REGION are required; select a Converse tool-use model")
+            raise ValueError(f"{model_env} and AWS_REGION are required; select a Converse tool-use model")
         rules = tuple(
-            x.strip() for x in os.getenv("INVESTIGATOR_RULE_IDS", ",".join(DEFAULT_RULES)).split(",") if x.strip()
+            x.strip() for x in os.getenv(f"{prefix}_RULE_IDS", ",".join(DEFAULT_RULES)).split(",") if x.strip()
         )
         if not rules or any(r not in {f"GOV-{n:03d}" for n in range(1, 17)} for r in rules):
-            raise ValueError("INVESTIGATOR_RULE_IDS must contain known GOV-001..GOV-016 IDs")
+            raise ValueError(f"{prefix}_RULE_IDS must contain known GOV-001..GOV-016 IDs")
         root = Path(__file__).resolve().parents[2]
         return cls(
             dsn,
@@ -49,9 +49,9 @@ class Settings:
             region,
             Path(os.getenv("INVESTIGATOR_RULES_PATH", str(root / "config/rules.yml"))),
             rules,
-            integer("INVESTIGATOR_POLL_SECONDS", 5, 1, 300),
-            integer("INVESTIGATOR_MAX_STEPS", 6, 2, 12),
-            integer("INVESTIGATOR_MAX_ATTEMPTS", 3, 1, 5),
-            integer("INVESTIGATOR_TIMEOUT_SECONDS", 120, 10, 300),
-            integer("INVESTIGATOR_MAX_TOKENS", 1500, 256, 4096),
+            integer(f"{prefix}_POLL_SECONDS", 5, 1, 300),
+            integer(f"{prefix}_MAX_STEPS", 6, 2, 12),
+            integer(f"{prefix}_MAX_ATTEMPTS", 3, 1, 5),
+            integer(f"{prefix}_TIMEOUT_SECONDS", 120, 10, 300),
+            integer(f"{prefix}_MAX_TOKENS", 3000 if prefix == "REVIEWER" else 1500, 256, 4096),
         )

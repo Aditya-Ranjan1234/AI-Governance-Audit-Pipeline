@@ -1,9 +1,9 @@
-name: Investigator agent
+name: Investigator and reviewer agents
 on:
   pull_request:
-    paths: ['services/investigator-agent/**', 'services/producer_adapters/**', 'evaluation/**', 'schemas/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', '.github/workflows/investigator.yml']
+    paths: ['services/investigator-agent/**', 'services/producer_adapters/**', 'evaluation/**', 'schemas/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', 'deploy/k8s/reviewer.yaml', '.github/workflows/investigator.yml']
   push:
-    paths: ['services/investigator-agent/**', 'services/producer_adapters/**', 'evaluation/**', 'schemas/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', '.github/workflows/investigator.yml']
+    paths: ['services/investigator-agent/**', 'services/producer_adapters/**', 'evaluation/**', 'schemas/**', 'db/**', 'config/rules.yml', 'docker-compose.yml', '.dockerignore', 'deploy/k8s/investigator.yaml', 'deploy/k8s/reviewer.yaml', '.github/workflows/investigator.yml']
 permissions:
   contents: read
 jobs:
@@ -42,3 +42,4 @@ jobs:
           PYTHONPATH: evaluation:services/producer_adapters
       - run: docker compose --profile agents config --quiet
       - run: docker build -f services/investigator-agent/Dockerfile -t investigator-test .
+      - run: docker run --rm --entrypoint python investigator-test reviewer_app.py --help

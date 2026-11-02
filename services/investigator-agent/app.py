@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 import signal
 import sys
@@ -13,6 +14,8 @@ import psycopg
 from agent import AgentError, BedrockModel, Investigator
 from settings import Settings
 from store import EvidenceTools, LeaseLost, Store, load_catalog, serializable
+from review_store import TaskStore
+from review_worker import CONFIGURATION_ERRORS, process_task, workflow_model
 
 
 def process_job(store, job, model, catalog, settings):
@@ -47,6 +50,9 @@ def main(argv=None):
     commands.add_parser("migrate", help="Apply additive schema as DB owner; does not invoke Bedrock")
     commands.add_parser("worker", help="Continuously discover and investigate persisted findings")
     commands.add_parser("once", help="Discover findings and process at most one available job")
+    commands.add_parser(
+        "revise-once", help="Consume at most one reviewer correction request using the original evidence"
+    )
     investigate = commands.add_parser(
         "investigate", help="Investigate one persisted finding; reuse existing successful result"
     )
@@ -55,12 +61,12 @@ def main(argv=None):
     show.add_argument("finding_id", type=uuid.UUID, nargs="?")
     commands.add_parser("status", help="Print recent job statuses, without calling Bedrock")
     args = parser.parse_args(argv)
-    settings = Settings.from_env(require_model=args.command in ("worker", "once", "investigate"))
+    settings = Settings.from_env(require_model=args.command in ("worker", "once", "investigate", "revise-once"))
     if args.command == "migrate":
-        sql = Path(__file__).resolve().parents[2] / "db/002_investigator.sql"
         with psycopg.connect(settings.dsn, autocommit=True, connect_timeout=5) as connection:
-            connection.execute(sql.read_text())
-        print('{"migration":"002_investigator","status":"applied"}')
+            for name in ("002_investigator.sql", "003_reviewer.sql"):
+                connection.execute((Path(__file__).resolve().parents[2] / "db" / name).read_text())
+        print('{"migration":"003_reviewer","status":"applied"}')
         return 0
     catalog, policy_hash = load_catalog(settings.rules_path)
     store = Store(settings, policy_hash)
@@ -68,21 +74,50 @@ def main(argv=None):
     if args.command in ("show", "status"):
         print(json.dumps(store.reports(args.finding_id) if args.command == "show" else store.jobs(), indent=2))
         return 0
+    enabled = os.getenv("INVESTIGATOR_REVISIONS_ENABLED", "false").lower()
+    if enabled not in ("true", "false"):
+        raise ValueError("INVESTIGATOR_REVISIONS_ENABLED must be true or false")
+    revisions = (
+        TaskStore(settings, reviewing=False)
+        if args.command == "revise-once" or (args.command in ("worker", "once") and enabled == "true")
+        else None
+    )
+    if revisions:
+        revisions.check_permissions()
+    revision_model = None
     selected = store.enqueue(args.finding_id) if args.command == "investigate" else None
     if selected and selected["status"] == "succeeded":
         print(json.dumps(store.reports(args.finding_id), indent=2))
         return 0
-    model = BedrockModel(settings)
+    model = None
     stop = Event()
     for sig in (signal.SIGINT, signal.SIGTERM):
         signal.signal(sig, lambda *_: stop.set())
     while not stop.is_set():
         job, state = None, "not_available"
         try:
+            if revisions:
+                revision_job = revisions.claim()
+                if revision_job:
+                    revision_model = revision_model or workflow_model(settings, reviewing=False)
+                    state = process_task(revisions, revision_job, revision_model)
+                    if state == "failed" and revisions.failure_code(revision_job["job_id"]) in CONFIGURATION_ERRORS:
+                        print(
+                            '{"error":"bedrock_configuration_error","message":"Investigator revision worker stopped."}',
+                            file=sys.stderr,
+                        )
+                        return 2
+                    if args.command != "worker":
+                        return 0 if state == "succeeded" else 1
+                    continue
+                if args.command == "revise-once":
+                    print('{"revision":"not_available"}')
+                    return 0
             if selected is None:
                 store.enqueue()
             job = store.claim(selected["job_id"] if selected else None)
             if job:
+                model = model or BedrockModel(settings)
                 state = process_job(store, job, model, catalog, settings)
                 if state == "failed":
                     code = store.failure_code(job["job_id"])

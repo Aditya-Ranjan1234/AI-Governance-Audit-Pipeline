@@ -41,7 +41,7 @@ class AgentError(Exception):
 
 
 class BedrockModel:
-    def __init__(self, settings, client=None):
+    def __init__(self, settings, client=None, *, system=SYSTEM, tool_config=TOOL_CONFIG):
         if client is None:
             import boto3
             from botocore.config import Config
@@ -54,6 +54,7 @@ class BedrockModel:
                 ),
             )
         self.client, self.settings = client, settings
+        self.system, self.tool_config = system, tool_config
 
     def converse(self, messages):
         from botocore.exceptions import BotoCoreError, ClientError
@@ -61,9 +62,9 @@ class BedrockModel:
         try:
             return self.client.converse(
                 modelId=self.settings.model_id,
-                system=[{"text": SYSTEM}],
+                system=[{"text": self.system}],
                 messages=messages,
-                toolConfig=TOOL_CONFIG,
+                toolConfig=self.tool_config,
                 inferenceConfig={"maxTokens": self.settings.max_tokens, "temperature": 0},
             )
         except ClientError as exc:
@@ -99,8 +100,25 @@ class BedrockModel:
 
 
 class Investigator:
+    validators = VALIDATORS
+    submit_tool = "submit_investigation"
+    required_reads = {"get_source_event", "get_rule"}
+
     def __init__(self, model, tools, settings, audit=lambda event: None, clock=time.monotonic):
         self.model, self.tools, self.settings, self.audit, self.clock = model, tools, settings, audit, clock
+
+    def initial_payload(self):
+        return {
+            "task": "Investigate this finding using the bounded read-only tools.",
+            "finding": self.tools.finding,
+            "finding_evidence_ref": self.tools.finding_ref,
+        }
+
+    def validate_submission(self, arguments):
+        validate_report(arguments, self.tools.evidence)
+
+    def feedback(self, error):
+        return validation_feedback(error, self.tools.evidence)
 
     def run(self):
         messages = [
@@ -109,11 +127,7 @@ class Investigator:
                 "content": [
                     {
                         "text": json.dumps(
-                            {
-                                "task": "Investigate this finding using the bounded read-only tools.",
-                                "finding": self.tools.finding,
-                                "finding_evidence_ref": self.tools.finding_ref,
-                            },
+                            self.initial_payload(),
                             ensure_ascii=True,
                         )
                     }
@@ -149,17 +163,17 @@ class Investigator:
             results = []
             for call in calls:
                 name, arguments = call.get("name", ""), call.get("input")
-                if name not in VALIDATORS:
+                if name not in self.validators:
                     self.audit({"kind": "tool_rejected", "step": step, "reason": "unknown_tool"})
                     raise AgentError("unknown_tool")
                 try:
-                    VALIDATORS[name].validate(arguments)
-                    if name == "submit_investigation":
+                    self.validators[name].validate(arguments)
+                    if name == self.submit_tool:
                         if len(calls) != 1:
                             raise ValueError("submit_must_be_a_separate_step")
-                        if not {"get_source_event", "get_rule"} <= observed:
+                        if not self.required_reads <= observed:
                             raise ValueError("read_source_event_and_rule_before_submission")
-                        validate_report(arguments, self.tools.evidence)
+                        self.validate_submission(arguments)
                         self.audit(
                             {"kind": "report_validated", "step": step, "evidence_refs": sorted(self.tools.evidence)}
                         )
@@ -171,7 +185,7 @@ class Investigator:
                         {"kind": "tool_read", "step": step, "tool": name, "evidence_refs": sorted(self.tools.evidence)}
                     )
                 except (ValidationError, ValueError) as error:
-                    payload = validation_feedback(error, self.tools.evidence)
+                    payload = self.feedback(error)
                     status = "error"
                     self.audit(
                         {

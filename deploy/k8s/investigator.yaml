@@ -1,4 +1,4 @@
-# Optional: apply db/002_investigator.sql and fill all placeholders before deployment.
+# Optional: apply db/002_investigator.sql and db/003_reviewer.sql before deployment.
 # Use a dedicated IAM role permitting bedrock:InvokeModel only for the selected model/profile resources.
 apiVersion: v1
 kind: ServiceAccount
@@ -35,6 +35,7 @@ spec:
             - {name: AWS_REGION, value: REPLACE_WITH_AWS_REGION}
             - {name: BEDROCK_MODEL_ID, value: REPLACE_WITH_BEDROCK_MODEL_OR_PROFILE_ID}
             - {name: AWS_EC2_METADATA_DISABLED, value: 'true'}
+            - {name: INVESTIGATOR_REVISIONS_ENABLED, value: 'true'}
             - name: INVESTIGATOR_POSTGRES_DSN
               valueFrom:
                 secretKeyRef: {name: governance-investigator-database, key: dsn}

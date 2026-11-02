@@ -1,0 +1,48 @@
+# Apply migrations 002/003 and provision a distinct governance_reviewer login first.
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: governance-reviewer
+  namespace: governance
+  annotations:
+    eks.amazonaws.com/role-arn: REPLACE_WITH_REVIEWER_ROLE_ARN
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: governance-reviewer
+  namespace: governance
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: governance-reviewer}
+  template:
+    metadata:
+      labels: {app: governance-reviewer}
+    spec:
+      serviceAccountName: governance-reviewer
+      terminationGracePeriodSeconds: 180
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: reviewer
+          image: REPLACE_WITH_INVESTIGATOR_IMAGE
+          command: [python, reviewer_app.py]
+          args: [worker]
+          env:
+            - {name: AWS_REGION, value: REPLACE_WITH_AWS_REGION}
+            - {name: REVIEWER_MODEL_ID, value: REPLACE_WITH_REVIEWER_MODEL_OR_PROFILE_ID}
+            - {name: BEDROCK_MODEL_ID, value: REPLACE_WITH_INVESTIGATOR_MODEL_OR_PROFILE_ID}
+            - {name: AWS_EC2_METADATA_DISABLED, value: 'true'}
+            - name: REVIEWER_POSTGRES_DSN
+              valueFrom:
+                secretKeyRef: {name: governance-reviewer-database, key: dsn}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: [ALL]}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: '1', memory: 512Mi}
