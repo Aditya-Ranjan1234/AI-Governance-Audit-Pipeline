@@ -103,9 +103,9 @@ Use `evaluation/RESILIENCE.md` for the corresponding EKS pod and three-broker MS
 
 The framework mappings are evidence-routing decisions for this prototype. They identify the control or legal provision for which a finding is relevant; they do not by themselves establish conformity.
 
-## Optional read-only investigator agent
+## Optional investigator and evidence reviewer agents
 
-One Amazon Bedrock investigator can review persisted privileged-access and model-promotion findings. Its flow is **findings → durable jobs → bounded evidence tools → cited report**. It stores reports and audit records separately from the existing rule findings and never performs remediation. Enable the optional `agents` Compose profile after configuring Bedrock; see [setup, configuration and tests](docs/investigator-agent.md). The original offline project explanation is a source snapshot from before this optional service was added.
+Two Amazon Bedrock agents cooperate through durable PostgreSQL jobs: **finding → investigator report → evidence review → at most one investigator revision → recheck or human review**. Reports and evidence snapshots remain immutable, and neither agent performs remediation. Enable the optional `agents` Compose profile after configuring Bedrock; see the [two-agent setup and exact communication contract](docs/reviewer-agent.md) and [investigator configuration](docs/investigator-agent.md). The original offline project explanation is a historical source snapshot from before the optional agents were added.
 
 ## End-to-end results
 

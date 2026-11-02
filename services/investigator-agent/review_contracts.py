@@ -12,7 +12,12 @@ ISSUE = {
     "additionalProperties": False,
     "required": ["claim_path", "code", "explanation", "evidence_refs", "requested_correction"],
     "properties": {
-        "claim_path": {"type": "string", "maxLength": 150},
+        "claim_path": {
+            "type": "string",
+            "maxLength": 150,
+            "pattern": "^/(summary/text|observations/[0-9]+/text|timeline/[0-9]+/description|missing_evidence/[0-9]+|recommended_next_steps/[0-9]+)$",
+            "description": "Copy an exact JSON-pointer key from get_report.claims, for example /summary/text or /observations/0/text. Do not use dot notation or /assessment.",
+        },
         "code": {
             "enum": ["contradiction", "chronology", "unsupported_claim", "scope_overstatement", "invalid_citation"]
         },

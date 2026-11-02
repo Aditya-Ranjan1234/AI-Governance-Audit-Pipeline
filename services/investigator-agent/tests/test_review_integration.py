@@ -162,6 +162,17 @@ def test_final_expired_attempt_becomes_failed_without_model_calls(workflow):
     assert reviewer.jobs()[0]["error_code"] == "lease_expired"
 
 
+def test_throttled_model_waits_at_least_a_minute_before_retry(workflow):
+    _, reviewer, investigator, root, settings = workflow
+    reviewer.enqueue(root)
+    process_task(reviewer, reviewer.claim(), ScriptedModel([AgentError("bedrock_ThrottlingException", True)]))
+    assert reviewer.claim() is None
+    assert investigator.jobs() == []
+    with psycopg.connect(settings.dsn) as c:
+        seconds = c.execute("SELECT extract(epoch FROM available_at-now()) FROM reviewer.jobs").fetchone()[0]
+        assert 55 < seconds <= 60
+
+
 def test_cross_chain_revision_review_is_rejected(workflow):
     _, reviewer, investigator, root, settings = workflow
     request_revision(reviewer, root)

@@ -86,7 +86,7 @@ def test_invalid_review_cannot_be_accepted(mutation):
 
 def test_unknown_claim_path_can_be_corrected_with_bounded_feedback(settings):
     invalid = decision("revision_required")
-    invalid["issues"][0]["claim_path"] = "/invented"
+    invalid["issues"][0]["claim_path"] = "/observations/99/text"
     model = ScriptedModel(
         [
             tool_response("get_report"),
@@ -99,7 +99,7 @@ def test_unknown_claim_path_can_be_corrected_with_bounded_feedback(settings):
     feedback = model.requests[-1][-1]["content"][0]["toolResult"]["content"][0]["json"]
     assert feedback["error"] == "unknown_claim_path"
     assert "/summary/text" in feedback["valid_claim_paths"]
-    assert "/invented" not in str(feedback)
+    assert "/observations/99/text" not in str(feedback)
 
 
 def test_reviewer_cannot_submit_before_reading_both_tools(settings):

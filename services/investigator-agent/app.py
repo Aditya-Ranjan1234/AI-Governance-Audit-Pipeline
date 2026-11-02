@@ -109,6 +109,8 @@ def main(argv=None):
                         return 2
                     if args.command != "worker":
                         return 0 if state == "succeeded" else 1
+                    throttled = revisions.failure_code(revision_job["job_id"]) == "bedrock_ThrottlingException"
+                    stop.wait(max(60, settings.poll_seconds) if throttled else settings.poll_seconds)
                     continue
                 if args.command == "revise-once":
                     print('{"revision":"not_available"}')

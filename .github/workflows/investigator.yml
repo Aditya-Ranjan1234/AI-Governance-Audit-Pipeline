@@ -33,7 +33,7 @@ jobs:
       - run: pip install -r services/investigator-agent/requirements-dev.txt
       - run: ruff check services/investigator-agent
       - run: ruff format --check services/investigator-agent
-      - run: ruff check --select E4,E7,E9,F,B evaluation/evaluator.py evaluation/run_e2e_recovery.py evaluation/export_e2e_report.py evaluation/tests
+      - run: ruff check --select E4,E7,E9,F,B evaluation/evaluator.py evaluation/run_e2e_recovery.py evaluation/export_e2e_report.py evaluation/reviewer_evaluation.py evaluation/tests
       - run: pytest -q
         working-directory: services/investigator-agent
       - run: pip install -r evaluation/requirements.txt

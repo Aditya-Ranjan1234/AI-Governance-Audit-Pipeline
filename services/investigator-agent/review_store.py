@@ -10,8 +10,8 @@ from psycopg.types.json import Jsonb
 from agent import AgentError
 from store import LeaseLost, serializable
 
-REVIEWER_VERSION = "evidence-reviewer-v1"
-REVISION_VERSION = "investigator-revision-v1"
+REVIEWER_VERSION = "evidence-reviewer-v1.1"
+REVISION_VERSION = "investigator-revision-v1.1"
 
 
 class TaskStore:
@@ -208,6 +208,7 @@ class TaskStore:
             else "failed"
         )
         run_id = uuid.uuid4()
+        base_delay = 60 if error and error.code == "bedrock_ThrottlingException" else 5
         with self.connection() as c:
             locked = c.execute(
                 f"""UPDATE {self.prefix}jobs SET status=%s,error_code=%s,
@@ -216,7 +217,7 @@ class TaskStore:
                 (
                     state,
                     error.code if error else None,
-                    min(300, 5 * 2 ** (job["attempts"] - 1)),
+                    min(300, base_delay * 2 ** (job["attempts"] - 1)),
                     job["job_id"],
                     job["lease_token"],
                 ),

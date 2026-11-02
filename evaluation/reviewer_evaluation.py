@@ -8,6 +8,7 @@ from html import escape
 import json
 from pathlib import Path
 import subprocess
+import sys
 import uuid
 
 import psycopg
@@ -16,6 +17,8 @@ from psycopg.rows import dict_row
 from psycopg.types.json import Jsonb
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "services/investigator-agent"))
+from review_store import REVIEWER_VERSION  # noqa: E402
 
 
 def digest(value):
@@ -104,6 +107,16 @@ def collect(args):
         data["originals"] = c.execute("SELECT run_id,report,evidence FROM investigator.runs ORDER BY run_id").fetchall()
         preserved = [(row["run_id"],row["report"],row["evidence"]) for row in data["originals"]]
     data = json.loads(json.dumps(data, default=str))
+    data["previous_configurations"] = {key: data[key] for key in ("review_jobs", "revision_jobs", "results", "reviews", "revisions")}
+    data["review_jobs"] = [job for job in data["review_jobs"] if job["worker_version"] == REVIEWER_VERSION]
+    job_ids = {job["job_id"] for job in data["review_jobs"]}
+    data["reviews"] = [row for row in data["reviews"] if row["job_id"] in job_ids]
+    review_ids = {row["run_id"] for row in data["reviews"]}
+    data["revision_jobs"] = [job for job in data["revision_jobs"] if job["review_run_id"] in review_ids]
+    revision_job_ids = {job["job_id"] for job in data["revision_jobs"]}
+    data["revisions"] = [row for row in data["revisions"] if row["job_id"] in revision_job_ids]
+    data["results"] = [row for row in data["results"] if row["worker_version"] == REVIEWER_VERSION]
+    data["reviewer_version"] = REVIEWER_VERSION
     data["originals_preserved"] = digest(preserved) == data["original_snapshot_hash"]
     initial = {row["source_run_id"]: row["payload"] for row in data["reviews"] if not row["revision_run_id"] and row["status"] == "succeeded"}
     data["quality"] = {
@@ -137,7 +150,7 @@ def render(data):
     return f'''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Two-agent review results</title><style>
 *{{box-sizing:border-box}}body{{margin:0;background:#eef3f5;color:#15333e;font:16px/1.6 system-ui,sans-serif}}main{{max-width:1100px;margin:auto;padding:30px}}header{{background:#0d2935;color:white;border-radius:16px;padding:32px}}header p{{color:#d5e6ea}}h1{{font-size:clamp(28px,5vw,43px);line-height:1.15}}nav{{display:flex;gap:20px;flex-wrap:wrap;margin:22px 0}}a{{color:#087663}}section,.case{{background:white;border:1px solid #d3e1e4;border-radius:12px;padding:22px;margin:18px 0}}.stats{{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}}.stat{{background:white;border-radius:12px;padding:20px;margin-top:20px}}.stat b{{display:block;font-size:30px}}.stat span,small{{font-size:13px;color:#536a73}}small{{display:block;overflow-wrap:anywhere}}summary{{cursor:pointer;font-weight:650}}pre{{white-space:pre-wrap;overflow-wrap:anywhere;background:#eaf1f3;padding:18px;max-height:600px;overflow:auto;font-size:12px}}.flow{{display:flex;gap:12px;flex-wrap:wrap}}.flow b{{padding:15px;background:#e5f3ee;border-radius:8px;flex:1;min-width:180px}}button,input{{font:inherit;padding:10px;border:1px solid #abc2c8;border-radius:6px}}input{{width:min(100%,500px)}}.note{{border-left:4px solid #d7a548;padding:14px;background:#fff8e7}}[hidden]{{display:none!important}}@media(max-width:650px){{main{{padding:15px}}header{{padding:22px}}.stats{{grid-template-columns:repeat(2,1fr)}}section,.case{{padding:16px}}}}
 </style></head><body><main><header><p>INVESTIGATOR + EVIDENCE REVIEWER</p><h1>Two agents. One bounded correction loop.</h1><p>Local PostgreSQL and live Amazon Bedrock. The corpus contains eight previously flagged reports and four constructed clean controls.</p><p>Execution complete: <b>{e(data['execution_complete'])}</b> · Original snapshots preserved: <b>{e(data['originals_preserved'])}</b></p></header>
-<nav><a href="#flow">Communication</a><a href="#results">Results</a><a href="#limits">Limits and evidence</a></nav>
+<nav><a href="#flow">Communication</a><a href="#results">Results</a><a href="#limits">Limits and evidence</a></nav><p>Final reviewer configuration: <code>{e(data['reviewer_version'])}</code>. Earlier trial records remain in the downloadable evidence.</p>
 <div class="stats"><div class="stat"><b>{data['quality']['known_problems_flagged']} / 8</b><span>known problems flagged</span></div><div class="stat"><b>{data['quality']['clean_controls_passed']} / 4</b><span>clean controls passed</span></div><div class="stat"><b>{len(data['revision_jobs'])}</b><span>revision requests</span></div><div class="stat"><b>1 maximum</b><span>revision per review chain</span></div></div>
 <section id="flow"><h2>Exactly how they communicate</h2><div class="flow"><b>Investigator saves report + immutable evidence</b><b>Reviewer polls and claims a review job</b><b>Reviewer saves cited feedback + revision request</b><b>Investigator saves one new revision</b><b>Reviewer rechecks; unresolved issues go to human review</b></div><ol><li>Each review references the original <code>source_run_id</code>. Review jobs are deduplicated and leased.</li><li>The reviewer reads the saved report and evidence using bounded tools. Deterministic checks cannot be overridden by a passing model verdict.</li><li>A successful initial review requesting correction atomically inserts a request in <code>investigator.revision_jobs</code>.</li><li>The investigator reads that feedback, uses the original snapshot, and writes a new <code>investigator.revision_runs</code> record.</li><li>The reviewer discovers that result by <code>revision_run_id</code>. A second correction request becomes <code>needs_human_review</code>; database checks reject another revision.</li></ol></section>
 <section id="results"><h2>Reports, feedback and revisions</h2><input id="search" type="search" placeholder="Filter cases or verdicts" aria-label="Filter cases"><button id="download">Download full JSON</button><p class="note">A review verdict is advisory. These counts measure this small regression corpus, not general factual accuracy or compliance. Inspect the issue explanations as well as the verdicts.</p>{''.join(cards)}</section>

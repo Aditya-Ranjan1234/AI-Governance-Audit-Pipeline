@@ -1,4 +1,6 @@
-# One read-only investigator
+# Read-only investigator
+
+The project also includes an Evidence Reviewer Agent. The investigator can consume its cited correction requests and save one new revision using the original evidence snapshot. See [the two-agent setup and communication contract](reviewer-agent.md). This page describes the investigator's original finding-analysis mode; `app.py migrate` now applies migrations 002 and 003, and the `agents` Compose profile includes both workers.
 
 The optional investigator uses Amazon Bedrock Converse to investigate **persisted findings**. It has four tools: read the source event, read related events, read configured rule metadata, and submit a structured advisory report. It cannot execute SQL supplied by a model, modify a source system, change a finding's risk score, send a message, or perform remediation.
 
@@ -15,7 +17,7 @@ Existing Kafka pipeline → PostgreSQL findings
           investigator.latest_reports + audit_events
 ```
 
-Database polling deliberately starts after finding persistence. This first version adds no Kafka topic/consumer, agent framework, web interface, or automated action executor. Existing services remain independent. The `agents` Compose profile is opt-in.
+Database polling deliberately starts after finding persistence. The investigator adds no Kafka topic/consumer, agent framework, web interface, or automated action executor. Existing services remain independent. The `agents` Compose profile is opt-in.
 
 ## Start locally
 

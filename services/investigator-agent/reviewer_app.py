@@ -46,6 +46,7 @@ def main(argv=None):
     model = None
     while not stop.is_set():
         job = None
+        throttled = False
         try:
             store.enqueue(selected)
             job = store.claim(selected)
@@ -53,7 +54,9 @@ def main(argv=None):
             if job:
                 model = model or workflow_model(settings, reviewing=True)
                 state = process_task(store, job, model)
-                if state == "failed" and store.failure_code(job["job_id"]) in CONFIGURATION_ERRORS:
+                code = store.failure_code(job["job_id"]) if state in ("failed", "retry") else None
+                throttled = code == "bedrock_ThrottlingException"
+                if state == "failed" and code in CONFIGURATION_ERRORS:
                     print(
                         '{"error":"bedrock_configuration_error","message":"Reviewer stopped; fix model access/configuration."}',
                         file=sys.stderr,
@@ -72,7 +75,7 @@ def main(argv=None):
             )
             if args.command != "worker":
                 return 1
-        stop.wait(settings.poll_seconds if not job else 0)
+        stop.wait(max(60, settings.poll_seconds) if throttled else settings.poll_seconds)
     return 0
 
 
