@@ -15,7 +15,6 @@
 \newcommand{\shot}[3]{%
   \begin{figure}[H]\centering
   \includegraphics[width=\textwidth,height=#2,keepaspectratio]{#1}
-  \caption{#3}
   \end{figure}}
 \title{Source-Code Evidence for the Real-Time AI Governance Audit Pipeline}
 \author{Aditya Ranjan \and Arindam Gupta \and Gnanendra Naidu N}
@@ -50,8 +49,6 @@ The screenshots are not mock-ups or reconstructed examples. They are rendered vi
 \clearpage
 \section{1. Producer adapters and event normalization}
 The pipeline starts with five producer domains: Keycloak identity, Kubernetes audit, Airflow/OpenLineage pipeline activity, model registry activity, and LLM gateway activity. The shared mapper layer converts source-specific payloads into the canonical governance-event contract while retaining source identifiers and evidence metadata.
-\shot{01-github-producer-adapter-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the producer adapter mapping layer.}
-\shot{01-github-producer-adapter-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
 \shot{01-github-producer-adapter-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
 \shot{01-github-producer-adapter-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
 \shot{01-github-producer-adapter-5.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
@@ -60,7 +57,6 @@ The pipeline starts with five producer domains: Keycloak identity, Kubernetes au
 \shot{01-github-producer-adapter-8.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
 \shot{01-github-producer-adapter-9.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
 \shot{01-github-producer-adapter-10.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
-\shot{02-github-kafka-configuration-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for Kafka configuration.}
 \shot{02-github-kafka-configuration-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
 \shot{02-github-kafka-configuration-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
 \shot{02-github-kafka-configuration-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
@@ -74,7 +70,6 @@ The pipeline starts with five producer domains: Keycloak identity, Kubernetes au
 \clearpage
 \section{2. Kafka topics and stream processing}
 The normalized events are published to dedicated raw topics. The stream processor consumes those topics using Kafka Streams. The implementation uses event timestamps, state stores, windows, table-table joins, stream-table joins, keyed findings, and JSON serialization. The screenshot below is the actual topology source used to connect those operations.
-\shot{03-github-stream-topology-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the Kafka Streams topology.}
 \shot{03-github-stream-topology-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Kafka Streams continuedology.}
 \shot{03-github-stream-topology-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Kafka Streams continuedology.}
 \shot{03-github-stream-topology-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Kafka Streams continuedology.}
@@ -85,7 +80,6 @@ The normalized events are published to dedicated raw topics. The stream processo
 \clearpage
 \section{3. Governance rule catalogue}
 The rule catalogue is configuration-driven. It associates executable controls with severity and governance-framework metadata. Rule identity is preserved in every finding so that a reviewer can connect a result to the exact configured condition.
-\shot{04-github-rule-catalogue-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the governance rule catalogue.}
 \shot{04-github-rule-catalogue-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the governance rule catalogue.}
 \shot{04-github-rule-catalogue-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the governance rule catalogue.}
 \shot{04-github-rule-catalogue-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the governance rule catalogue.}
@@ -96,11 +90,9 @@ The rule catalogue is configuration-driven. It associates executable controls wi
 \clearpage
 \section{4. Risk scoring and durable evidence}
 After stream processing, findings are scored and persisted. The risk service keeps the deterministic baseline visible and adds an online Isolation Forest comparison once sufficient history is available. The PostgreSQL sink performs idempotent writes for events, findings, evidence, and scores.
-\shot{05-github-risk-scoring-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for risk scoring.}
 \shot{05-github-risk-scoring-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for risk scoring.}
 \shot{05-github-risk-scoring-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for risk scoring.}
 \shot{05-github-risk-scoring-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for risk scoring.}
-\shot{06-github-postgres-persistence-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for PostgreSQL persistence.}
 \shot{06-github-postgres-persistence-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for PostgreSQL persistence.}
 \shot{06-github-postgres-persistence-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for PostgreSQL persistence.}
 \shot{06-github-postgres-persistence-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for PostgreSQL persistence.}
@@ -110,7 +102,6 @@ After stream processing, findings are scored and persisted. The risk service kee
 \clearpage
 \section{5. Investigator and Evidence Reviewer agents}
 The agents run after durable evidence exists. The Investigator retrieves eligible evidence and writes a structured report. The Evidence Reviewer checks citations and completeness, may request a bounded correction, and can terminate with human review. Neither agent is an infrastructure-remediation authority.
-\shot{07-github-investigator-agent-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the Investigator agent.}
 \shot{07-github-investigator-agent-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
 \shot{07-github-investigator-agent-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
 \shot{07-github-investigator-agent-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
@@ -120,7 +111,6 @@ The agents run after durable evidence exists. The Investigator retrieves eligibl
 \shot{07-github-investigator-agent-8.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
 \shot{07-github-investigator-agent-9.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
 \shot{07-github-investigator-agent-10.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
-\shot{08-github-reviewer-workflow-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the Reviewer workflow.}
 \shot{08-github-reviewer-workflow-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Reviewer workflow.}
 \shot{08-github-reviewer-workflow-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Reviewer workflow.}
 \shot{08-github-reviewer-workflow-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Reviewer workflow.}
