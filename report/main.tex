@@ -25,11 +25,17 @@
 \thispagestyle{empty}
 
 \begin{center}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lr}
+\begin{tabular}[t]{l}\includegraphics[width=1.25cm]{rvlogo.png}\end{tabular}
+&\begin{tabular}[t]{r}\textit{Go, change the world}\end{tabular}
+\end{tabular*}\\[0.25cm]
 {\Large\textbf{RV COLLEGE OF ENGINEERING\textsuperscript{\textregistered}}}\\[0.15cm]
 {\large\textbf{BENGALURU--560059}}\\[0.2cm]
 {\normalsize (Autonomous Institution Affiliated to VTU, Belagavi)}\\[0.7cm]
 
-{\large\textbf{DEPARTMENT OF ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING}}\\[0.5cm]
+{\large\textcolor{red}{\textbf{DEPARTMENT OF ARTIFICIAL INTELLIGENCE}}}\\[0.15cm]
+{\large\textcolor{red}{\textbf{AND MACHINE LEARNING}}}\\[0.25cm]
+{\small Bengaluru -- 560059}\\[0.5cm]
 
 \includegraphics[width=3.0cm]{rvlogo.png}\\[0.6cm]
 
@@ -147,6 +153,30 @@ AI systems generate evidence across identity, infrastructure, pipelines, model r
 The project uses Python for adapters, scoring, evaluation, and agent workers; Java and Apache Kafka Streams for stateful stream processing; PostgreSQL for durable evidence; Docker Compose and Redpanda for local execution; Amazon MSK, RDS, EKS, CloudWatch, and Tableau for cloud deployment and reporting; Terraform and Kubernetes manifests for infrastructure automation; and XeLaTeX for this report. These tools correspond to the repository's service boundaries and deployment artefacts.
 \section{Techniques}
 The implementation applies schema-first event normalization, event-time windows, stateful joins, rule-based detection, deterministic severity-frequency scoring, Isolation Forest comparison, idempotent persistence, consumer-group recovery, evidence retrieval, structured validation, and bounded agent revision. These techniques were chosen to keep findings traceable, reproducible, and operationally recoverable.
+\subsection{Project pipeline and flow}
+Figure~\ref{fig:pipeline-flow} summarizes the implemented path from source systems to governance reporting. Each producer adapter exposes an HTTP event endpoint, validates and maps source-specific input into the versioned governance-event contract, and publishes to its dedicated Kafka topic. Kafka Streams consumes the five topics, evaluates stateless predicates, applies event-time windows and joins, and emits keyed compliance findings. The risk scorer adds a deterministic baseline and an online Isolation Forest comparison. The PostgreSQL sink persists events, findings, evidence, and scores, while Tableau and the optional agents read durable outputs.
+\begin{figure}[H]\centering
+\resizebox{0.97\textwidth}{!}{%
+\begin{tikzpicture}[block/.style={draw,rectangle,rounded corners=1pt,align=center,minimum height=0.8cm,minimum width=2.5cm,font=\small},line/.style={-Latex,line width=0.8pt},node distance=0.75cm and 0.8cm]
+\node[block] (sources) {Source systems\\identity, Kubernetes, pipeline,\\model registry, LLM gateway};
+\node[block,right=of sources] (adapters) {Five HTTP\\producer adapters\\validate + normalize};
+\node[block,right=of adapters] (kafka) {Kafka topics\\five raw streams\\six partitions};
+\node[block,right=of kafka] (streams) {Kafka Streams\\rules, windows,\\joins, state stores};
+\node[block,right=of streams] (findings) {Raw findings\\keyed by finding ID};
+\node[block,below=of findings] (risk) {Risk scorer\\baseline + Isolation Forest};
+\node[block,left=of risk] (postgres) {PostgreSQL sink\\idempotent evidence\\and score upserts};
+\node[block,left=of postgres] (outputs) {Tableau views\\Investigator\\Evidence Reviewer};
+\draw[line] (sources) -- (adapters);\draw[line] (adapters) -- (kafka);\draw[line] (kafka) -- (streams);\draw[line] (streams) -- (findings);\draw[line] (findings) -- (risk);\draw[line] (risk) |- (postgres);\draw[line] (postgres) -- (outputs);
+\end{tikzpicture}}
+\caption{Implemented project pipeline from source events through Kafka Streams, scoring, persistence, and reporting.}
+\label{fig:pipeline-flow}
+\end{figure}
+\subsection{Kafka features incorporated}
+The project uses Kafka as an integration and recovery boundary rather than as a direct service-to-service call graph. The five producer topics isolate source contracts and allow each adapter to evolve independently. Keys are selected for the required state operation: actor IDs for failed-login windows and model keys for approval, evaluation, and promotion joins. The topology uses an event timestamp extractor so late or out-of-order records are evaluated against event time. A five-minute window with a one-minute grace period detects the fifth failed login without treating arrival time as the business event time.
+
+Kafka Streams state stores materialize the model-approval state, model-evaluation state, combined model-governance evidence, and the failed-login window. The topology uses a table-table outer join to combine approval and evaluation evidence, then a stream-table left join to check a production promotion against that evidence. Stateless rule findings and stateful findings are merged into one raw-finding topic, and the finding ID becomes the output key for downstream correlation. JSON serdes keep the event and finding records typed while retaining a human-readable contract.
+
+The deployment separates consumer groups for rule processing, risk scoring, persistence, and evaluation. This allows each downstream function to replay from its own committed offsets and prevents a reporting slowdown from blocking detection. The local Compose configuration creates six partitions per topic, runs two Kafka Streams threads, and uses Redpanda as the local Kafka-compatible broker. The AWS configuration raises durability through a three-broker MSK cluster, replication factor three, and minimum in-sync replica policy. These features support parallelism, replay, fault recovery, and independent scaling while keeping the audit trail reconstructable.
 
 \chapter{Implementation}
 \section{Background Information}
@@ -247,7 +277,9 @@ Baseline & 72 & 48/48 & 1.0000 & 1.0000 & 130.90/s\\
 Processor replacement & 72 & 48/48 & 1.0000 & 1.0000 & 11.50/s\\
 Broker restart & 72 & 48/48 & 1.0000 & 1.0000 & 11.48/s\\
 Independent adapters & 72 & 48/48 & 1.0000 & 1.0000 & 667.12/s\\\bottomrule\end{tabular}\caption{Repository-reported local evaluation results.}\end{table}
-The fresh 3 November evidence also reports 72 synthetic source-shaped events, 48 expected findings across all 16 rules, p50 353.84 ms, p95 1,878.88 ms, p99 2,181.69 ms, and 39.04 events/s over the observed persistence interval. These are small-workload measurements, not general model-accuracy claims.
+The fresh 3 November evidence also reports 72 synthetic source-shaped events, 48 expected findings across all 16 rules, p50 353.84 ms, p95 1,878.88 ms, p99 2,181.69 ms, and 39.04 events/s over the observed persistence interval. These are small-workload measurements, not general model-accuracy claims. The project dashboard in Figure~\ref{fig:dashboard-reference} presents the same reporting concepts in a compact view, while Figure~\ref{fig:ml-agent-reference} summarizes how the deterministic rule engine, Isolation Forest scorer, and Bedrock agents work together.
+\begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{figures/cloud/11-tableau-dashboard-reference.jpg}\caption{Supplied Tableau-style governance dashboard reference showing findings, risk, framework associations, latency, and incident details.}\label{fig:dashboard-reference}\end{figure}
+\begin{figure}[H]\centering\includegraphics[width=0.78\textwidth]{figures/cloud/12-ml-agents-reference.jpg}\caption{Supplied project explanation reference for the Isolation Forest scorer, deterministic rules, and cooperating Bedrock agents.}\label{fig:ml-agent-reference}\end{figure}
 \begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{figures/01-pipeline-run.png}\caption{Pipeline benchmark evidence for the labelled functional run.}\end{figure}
 \begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{figures/08-tests-and-consumer-checks.png}\caption{Automated tests and consumer-tail verification.}\end{figure}
 
