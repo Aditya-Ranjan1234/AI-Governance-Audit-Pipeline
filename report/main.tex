@@ -163,7 +163,7 @@ The system is a modular event-to-framework pipeline. Five independent adapters n
 \noindent\textit{This chapter defines the governance and engineering problem addressed by the pipeline and establishes the background needed to understand its relevance.}\par
 \section{Problem Statement}
 AI systems generate evidence across identity, infrastructure, pipelines, model registries, and LLM gateways. Without a shared event contract and durable correlation, governance teams cannot reliably connect raw activity to controls, risk, evidence, and review outcomes. The project addresses this by combining source-specific adapters, event-time rules, risk scoring, persistence, and human-review boundaries. This emphasis on traceability and lifecycle controls is consistent with recent AI governance guidance \cite{nist2023,iso42001,euaiact2024,owasllm2025}.
-\section{Background Information and Literature Review}
+\section{Literature Review}
 Recent literature frames AI governance as a lifecycle discipline rather than a final compliance checklist. NIST AI RMF 1.0 defines a voluntary risk-management structure around governing, mapping, measuring, and managing; its Generative AI Profile extends that structure to risks that are specific to generative systems \cite{nist2023,nistgenai2024}. ISO/IEC 42001 formalizes the management-system perspective, while the OECD and UNESCO recommendations emphasize accountability, transparency, human oversight, and social impact \cite{iso42001,oecd2024,unesco2021}. The EU AI Act adds a risk-tiered regulatory context, but a framework mapping in this project is treated as routing metadata rather than a legal-conformity claim \cite{euaiact2024}.
 
 Security and systems literature identifies complementary operational concerns. OWASP and MITRE ATLAS catalogue prompt injection, data leakage, excessive agency, and adversarial techniques for AI-enabled applications \cite{owasllm2025,mitreatlas2024}; Google SAIF and OpenSSF emphasize secure development and supply-chain controls \cite{google2023,openssf2024}. Research on retrieval-augmented generation and autonomous agents highlights grounding, evaluation, citation quality, and bounded execution as open engineering challenges \cite{ragsurvey2024,agentsurvey2024}. Kafka Streams and Kubernetes documentation provide the implementation foundations for event-time state, joins, recovery, health checks, scaling, and disruption handling \cite{kafkastreams2024,kubernetes2024}.
@@ -251,12 +251,6 @@ Kafka Streams state stores materialize the model-approval state, model-evaluatio
 The deployment separates consumer groups for rule processing, risk scoring, persistence, and evaluation. This allows each downstream function to replay from its own committed offsets and prevents a reporting slowdown from blocking detection. The local Compose configuration creates six partitions per topic, runs two Kafka Streams threads, and uses Redpanda as the local Kafka-compatible broker. The AWS configuration raises durability through a three-broker MSK cluster, replication factor three, and minimum in-sync replica policy. These features support parallelism, replay, fault recovery, and independent scaling while keeping the audit trail reconstructable.
 \chapter{Implementation}
 \noindent\textit{This chapter explains how the repository implements the architecture, contracts, rules, scoring, persistence, agent integration, deployment, and operational controls.}\par
-\section{Implementation Context}
-This section describes how the repository turns the governance principles and research gap established in Chapter 2 into executable services, schemas, stream-processing logic, persistence models, and deployment artefacts. It is implementation context rather than a second literature review.
-\section{Research gap and project position}
-The literature provides principles, controls, and security taxonomies, but governance teams still need an operational evidence path that connects source activity to a finding, score, stored record, and review outcome. This repository occupies that implementation gap. Its contribution is systems integration and measurable traceability, not a new foundation model or a claim of legal certification.
-
-\section{Implementation architecture}
 \section{High-level architecture}
 \begin{figure}[H]
 \centering
