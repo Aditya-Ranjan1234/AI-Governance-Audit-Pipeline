@@ -14,7 +14,7 @@
 \pagestyle{fancy}\fancyhf{}\fancyhead[L]{\textit{\ProjTitle}}\fancyhead[R]{2026--2027}\fancyfoot[L]{Department of AIML, RVCE}\fancyfoot[R]{\thepage}\fancyheadoffset[L]{0.69cm}\fancyheadoffset[R]{0.70cm}\fancyfootoffset[L]{0.69cm}\fancyfootoffset[R]{0.70cm}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}
 \fancypagestyle{plain}{\fancyhf{}\fancyhead[L]{\textit{\ProjTitle}}\fancyhead[R]{2026--2027}\fancyfoot[L]{Department of AIML, RVCE}\fancyfoot[R]{\thepage}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}}
 \fancypagestyle{front}{\fancyhf{}\fancyfoot[R]{\thepage}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}}
-\AddToShipoutPictureFG{\begin{tikzpicture}[overlay,remember picture]\draw[line width=1.6pt]([shift={(1.55cm,-1.15cm)}]current page.north west) rectangle ([shift={(-1.15cm,1.15cm)}]current page.south east);\end{tikzpicture}}
+\AddToShipoutPictureFG{\begin{tikzpicture}[overlay,remember picture]\draw[line width=1.6pt]([shift={(1.85cm,-1.75cm)}]current page.north west) rectangle ([shift={(-1.45cm,1.75cm)}]current page.south east);\end{tikzpicture}}
 \SetWatermarkText{\includegraphics[width=8cm]{logo.png}}\SetWatermarkScale{1}\SetWatermarkAngle{0}\SetWatermarkColor[gray]{0.9}\SetWatermarkHorCenter{11.355cm}\SetWatermarkVerCenter{14.85cm}
 \definecolor{codebg}{rgb}{0.96,0.96,0.98}\lstdefinestyle{code}{backgroundcolor=\color{codebg},basicstyle=\ttfamily\scriptsize,breaklines=true,frame=single,columns=fullflexible,keepspaces=true}\lstset{style=code}
 \begin{document}
@@ -23,11 +23,12 @@
 \pagestyle{fancy}
 \begin{titlepage}
 \thispagestyle{empty}
+\SetWatermarkText{}
 
 \begin{center}
 \begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}lr}
-\begin{tabular}[t]{l}\includegraphics[width=3.05cm]{rvlogo.png}\end{tabular}
-&\begin{tabular}[t]{r}{\fontsize{19}{22}\selectfont\textit{Go, change the world}}\end{tabular}
+\begin{tabular}[t]{l}\includegraphics[width=7.0cm]{front_header.png}\end{tabular}
+&\begin{tabular}[t]{r}{\fontsize{23}{27}\selectfont\textit{Go, change the world}}\end{tabular}
 \end{tabular*}\\[0.25cm]
 {\fontsize{16}{19}\selectfont\textbf{RV COLLEGE OF ENGINEERING\textsuperscript{\textregistered}}}\\[0.1cm]
 {\fontsize{12}{14}\selectfont\textbf{BENGALURU--560059}}\\[0.15cm]
@@ -35,9 +36,7 @@
 
 {\fontsize{19}{22}\selectfont\textcolor{red}{\textbf{DEPARTMENT OF}}}\\[0.1cm]
 {\fontsize{19}{22}\selectfont\textcolor{red}{\textbf{ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING}}}\\[0.25cm]
-{\small Bengaluru -- 560059}\\[0.5cm]
-
-\includegraphics[width=3.0cm]{rvlogo.png}\\[0.6cm]
+{\small Bengaluru -- 560059}\\[0.75cm]
 
 {\fontsize{17}{21}\selectfont\textbf{Real-Time AI Governance}}\\[0.15cm]
 {\fontsize{17}{21}\selectfont\textbf{Audit Pipeline}}\\[0.6cm]
@@ -60,6 +59,7 @@
 \end{center}
 
 \end{titlepage}
+\SetWatermarkText{\includegraphics[width=8cm]{logo.png}}
 \newpage
 \cleardoublepage
 \pagestyle{empty}
