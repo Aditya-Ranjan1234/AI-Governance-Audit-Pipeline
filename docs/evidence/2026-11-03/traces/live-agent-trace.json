@@ -1,0 +1,607 @@
+{
+  "captured_at": "2026-11-03T16:58:22.589822+00:00",
+  "started_at": "2026-11-03T16:58:08.094103+00:00",
+  "source": "Fresh isolated Docker pipeline and live Amazon Bedrock, 3 November 2026",
+  "region": "us-west-2",
+  "model_id": "us.amazon.nova-2-lite-v1:0",
+  "input_is_synthetic": true,
+  "event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+  "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+  "source_run_id": "de499241-c17f-4236-95af-46aa85b0f0a4",
+  "original": {
+    "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+    "job_id": "8bbb2403-a40c-4a88-9a96-88d63b8963d0",
+    "agent_version": "investigator-v1.3",
+    "policy_hash": "55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2",
+    "model_id": "us.amazon.nova-2-lite-v1:0",
+    "rule_id": "GOV-003",
+    "title": "Privileged login without MFA",
+    "severity_label": "high",
+    "recommended_risk": "43.95",
+    "run_id": "de499241-c17f-4236-95af-46aa85b0f0a4",
+    "report": {
+      "summary": {
+        "text": "A privileged login occurred without MFA, matching GOV-003.",
+        "evidence_refs": [
+          "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "timeline": [
+        {
+          "event_ref": "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "event_time": "2026-11-03T16:58:08.386498Z",
+          "description": "Privileged identity 'evidence-demo-admin' logged in without MFA to client 'model-registry'."
+        }
+      ],
+      "assessment": "evidence_review_complete",
+      "observations": [
+        {
+          "text": "The event shows privileged_identity=true and mfa_used=false for a LOGIN_SUCCESS.",
+          "evidence_refs": [
+            "event:9edbc195-3705-5aba-a0cc-dbed51530700"
+          ]
+        },
+        {
+          "text": "GOV-003 rule description confirms the requirement for second-factor authentication on privileged logins.",
+          "evidence_refs": [
+            "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+          ]
+        }
+      ],
+      "missing_evidence": [],
+      "recommended_next_steps": [
+        "Implement MFA enforcement for privileged identities in Keycloak.",
+        "Audit recent privileged logins for MFA usage patterns.",
+        "Review Keycloak MFA policy configuration."
+      ]
+    },
+    "evidence": {
+      "event:9edbc195-3705-5aba-a0cc-dbed51530700": {
+        "actor": {
+          "id": "evidence-demo-admin"
+        },
+        "action": "login_success",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "model-registry",
+          "type": "CLIENT",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+        "producer": "KEYCLOAK",
+        "attributes": {
+          "mfa_used": false,
+          "privileged_identity": true
+        },
+        "event_time": "2026-11-03T16:58:08.386498Z",
+        "event_type": "LOGIN_SUCCESS",
+        "environment": "prod",
+        "ingested_at": "2026-11-03T16:58:08.406731Z",
+        "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2"
+      },
+      "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de": {
+        "title": "Privileged login without MFA",
+        "rule_id": "GOV-003",
+        "producer": "KEYCLOAK",
+        "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+        "detected_at": "2026-11-03T16:58:08.417558Z",
+        "baseline_risk": 16.0,
+        "severity_label": "high",
+        "source_event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+        "recommended_risk": 43.95,
+        "source_event_time": "2026-11-03T16:58:08.386498Z"
+      },
+      "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2": {
+        "id": "GOV-003",
+        "title": "Privileged login without MFA",
+        "severity": 4,
+        "frameworks": {
+          "GDPR": [
+            "Article-32"
+          ],
+          "EU_AI_ACT": [
+            "Article-9",
+            "Article-15"
+          ],
+          "NIST_AI_RMF": [
+            "GOVERN-1.5",
+            "MANAGE-2.4"
+          ],
+          "ISO_IEC_42001": [
+            7.2,
+            "A.3.2"
+          ],
+          "NIST_SP_800_53": [
+            "IA-2",
+            "AC-6"
+          ]
+        },
+        "description": "A privileged identity authenticated without a second factor."
+      }
+    },
+    "finished_at": "2026-11-03 16:58:16.723279+00:00"
+  },
+  "review_jobs": [
+    {
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "source_run_id": "de499241-c17f-4236-95af-46aa85b0f0a4",
+      "revision_run_id": null,
+      "worker_version": "evidence-reviewer-v1.1",
+      "model_id": "us.amazon.nova-2-lite-v1:0",
+      "revision_model_id": "us.amazon.nova-2-lite-v1:0",
+      "status": "succeeded",
+      "attempts": 1,
+      "available_at": "2026-11-03 16:58:27.472676+00:00",
+      "lease_token": null,
+      "lease_until": null,
+      "error_code": null,
+      "created_at": "2026-11-03 16:58:17.048847+00:00",
+      "updated_at": "2026-11-03 16:58:22.472676+00:00"
+    }
+  ],
+  "revision_jobs": [],
+  "reviews": [
+    {
+      "run_id": "d330cb4d-f3a5-47d3-adbe-532aea3098f5",
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "attempt": 1,
+      "status": "succeeded",
+      "payload": {
+        "review": {
+          "issues": [],
+          "summary": "The report accurately reflects the evidence: a single LOGIN_SUCCESS event shows privileged_identity=true and mfa_used=false, directly matching GOV-003 requirements. All claims are supported by the cited evidence without overstatement or unsupported inference.",
+          "verdict": "review_passed"
+        },
+        "effective_verdict": "review_passed",
+        "deterministic_issues": [],
+        "revision_limit_reached": false
+      },
+      "evidence": {
+        "event:9edbc195-3705-5aba-a0cc-dbed51530700": {
+          "actor": {
+            "id": "evidence-demo-admin"
+          },
+          "action": "login_success",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "model-registry",
+            "type": "CLIENT",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "mfa_used": false,
+            "privileged_identity": true
+          },
+          "event_time": "2026-11-03T16:58:08.386498Z",
+          "event_type": "LOGIN_SUCCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-03T16:58:08.406731Z",
+          "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2"
+        },
+        "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de": {
+          "title": "Privileged login without MFA",
+          "rule_id": "GOV-003",
+          "producer": "KEYCLOAK",
+          "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+          "detected_at": "2026-11-03T16:58:08.417558Z",
+          "baseline_risk": 16.0,
+          "severity_label": "high",
+          "source_event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+          "recommended_risk": 43.95,
+          "source_event_time": "2026-11-03T16:58:08.386498Z"
+        },
+        "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2": {
+          "id": "GOV-003",
+          "title": "Privileged login without MFA",
+          "severity": 4,
+          "frameworks": {
+            "GDPR": [
+              "Article-32"
+            ],
+            "EU_AI_ACT": [
+              "Article-9",
+              "Article-15"
+            ],
+            "NIST_AI_RMF": [
+              "GOVERN-1.5",
+              "MANAGE-2.4"
+            ],
+            "ISO_IEC_42001": [
+              7.2,
+              "A.3.2"
+            ],
+            "NIST_SP_800_53": [
+              "IA-2",
+              "AC-6"
+            ]
+          },
+          "description": "A privileged identity authenticated without a second factor."
+        }
+      },
+      "error_code": null,
+      "finished_at": "2026-11-03 16:58:22.472676+00:00"
+    }
+  ],
+  "revisions": [],
+  "latest_result": {
+    "source_run_id": "de499241-c17f-4236-95af-46aa85b0f0a4",
+    "revision_run_id": null,
+    "worker_version": "evidence-reviewer-v1.1",
+    "model_id": "us.amazon.nova-2-lite-v1:0",
+    "revision_model_id": "us.amazon.nova-2-lite-v1:0",
+    "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+    "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+    "review_run_id": "d330cb4d-f3a5-47d3-adbe-532aea3098f5",
+    "verdict": "review_passed",
+    "review": {
+      "review": {
+        "issues": [],
+        "summary": "The report accurately reflects the evidence: a single LOGIN_SUCCESS event shows privileged_identity=true and mfa_used=false, directly matching GOV-003 requirements. All claims are supported by the cited evidence without overstatement or unsupported inference.",
+        "verdict": "review_passed"
+      },
+      "effective_verdict": "review_passed",
+      "deterministic_issues": [],
+      "revision_limit_reached": false
+    },
+    "report": {
+      "summary": {
+        "text": "A privileged login occurred without MFA, matching GOV-003.",
+        "evidence_refs": [
+          "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "timeline": [
+        {
+          "event_ref": "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "event_time": "2026-11-03T16:58:08.386498Z",
+          "description": "Privileged identity 'evidence-demo-admin' logged in without MFA to client 'model-registry'."
+        }
+      ],
+      "assessment": "evidence_review_complete",
+      "observations": [
+        {
+          "text": "The event shows privileged_identity=true and mfa_used=false for a LOGIN_SUCCESS.",
+          "evidence_refs": [
+            "event:9edbc195-3705-5aba-a0cc-dbed51530700"
+          ]
+        },
+        {
+          "text": "GOV-003 rule description confirms the requirement for second-factor authentication on privileged logins.",
+          "evidence_refs": [
+            "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+          ]
+        }
+      ],
+      "missing_evidence": [],
+      "recommended_next_steps": [
+        "Implement MFA enforcement for privileged identities in Keycloak.",
+        "Audit recent privileged logins for MFA usage patterns.",
+        "Review Keycloak MFA policy configuration."
+      ]
+    },
+    "evidence": {
+      "event:9edbc195-3705-5aba-a0cc-dbed51530700": {
+        "actor": {
+          "id": "evidence-demo-admin"
+        },
+        "action": "login_success",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "model-registry",
+          "type": "CLIENT",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+        "producer": "KEYCLOAK",
+        "attributes": {
+          "mfa_used": false,
+          "privileged_identity": true
+        },
+        "event_time": "2026-11-03T16:58:08.386498Z",
+        "event_type": "LOGIN_SUCCESS",
+        "environment": "prod",
+        "ingested_at": "2026-11-03T16:58:08.406731Z",
+        "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2"
+      },
+      "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de": {
+        "title": "Privileged login without MFA",
+        "rule_id": "GOV-003",
+        "producer": "KEYCLOAK",
+        "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+        "detected_at": "2026-11-03T16:58:08.417558Z",
+        "baseline_risk": 16.0,
+        "severity_label": "high",
+        "source_event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+        "recommended_risk": 43.95,
+        "source_event_time": "2026-11-03T16:58:08.386498Z"
+      },
+      "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2": {
+        "id": "GOV-003",
+        "title": "Privileged login without MFA",
+        "severity": 4,
+        "frameworks": {
+          "GDPR": [
+            "Article-32"
+          ],
+          "EU_AI_ACT": [
+            "Article-9",
+            "Article-15"
+          ],
+          "NIST_AI_RMF": [
+            "GOVERN-1.5",
+            "MANAGE-2.4"
+          ],
+          "ISO_IEC_42001": [
+            7.2,
+            "A.3.2"
+          ],
+          "NIST_SP_800_53": [
+            "IA-2",
+            "AC-6"
+          ]
+        },
+        "description": "A privileged identity authenticated without a second factor."
+      }
+    },
+    "finished_at": "2026-11-03 16:58:22.472676+00:00"
+  },
+  "audit": [
+    {
+      "audit_id": "00db56de-d328-4145-bd6e-3a164ff592da",
+      "job_id": "8bbb2403-a40c-4a88-9a96-88d63b8963d0",
+      "attempt": 1,
+      "kind": "attempt_started",
+      "details": {
+        "kind": "attempt_started"
+      },
+      "created_at": "2026-11-03 16:58:10.867519+00:00",
+      "agent": "investigator"
+    },
+    {
+      "audit_id": "0a9a18e2-dfe5-4b9c-906a-489cf7af58c7",
+      "job_id": "8bbb2403-a40c-4a88-9a96-88d63b8963d0",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 1,
+        "input_tokens": 2129,
+        "output_tokens": 36
+      },
+      "created_at": "2026-11-03 16:58:13.204423+00:00",
+      "agent": "investigator"
+    },
+    {
+      "audit_id": "6e928d49-1eec-46fd-84d5-441ef91e4985",
+      "job_id": "8bbb2403-a40c-4a88-9a96-88d63b8963d0",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_source_event",
+        "evidence_refs": [
+          "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de"
+        ]
+      },
+      "created_at": "2026-11-03 16:58:13.248374+00:00",
+      "agent": "investigator"
+    },
+    {
+      "audit_id": "7455275f-cad3-45d6-b5ef-3eeb89db02cd",
+      "job_id": "8bbb2403-a40c-4a88-9a96-88d63b8963d0",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_rule",
+        "evidence_refs": [
+          "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de",
+          "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-03 16:58:13.263999+00:00",
+      "agent": "investigator"
+    },
+    {
+      "audit_id": "ea036507-a2cc-4507-9d25-b955666e447d",
+      "job_id": "8bbb2403-a40c-4a88-9a96-88d63b8963d0",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_related_events",
+        "evidence_refs": [
+          "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de",
+          "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-03 16:58:13.290252+00:00",
+      "agent": "investigator"
+    },
+    {
+      "audit_id": "231b9b41-6059-4def-b700-696a75b873a5",
+      "job_id": "8bbb2403-a40c-4a88-9a96-88d63b8963d0",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 2,
+        "input_tokens": 2668,
+        "output_tokens": 373
+      },
+      "created_at": "2026-11-03 16:58:16.699669+00:00",
+      "agent": "investigator"
+    },
+    {
+      "audit_id": "ab57e60a-2c34-427d-b0dc-eee72b567280",
+      "job_id": "8bbb2403-a40c-4a88-9a96-88d63b8963d0",
+      "attempt": 1,
+      "kind": "report_validated",
+      "details": {
+        "kind": "report_validated",
+        "step": 2,
+        "evidence_refs": [
+          "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de",
+          "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-03 16:58:16.712327+00:00",
+      "agent": "investigator"
+    },
+    {
+      "audit_id": "2f8435a9-56c7-4907-9f06-78b719922ce1",
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "attempt": 1,
+      "kind": "attempt_started",
+      "details": {
+        "kind": "attempt_started",
+        "source_run_id": "de499241-c17f-4236-95af-46aa85b0f0a4"
+      },
+      "created_at": "2026-11-03 16:58:17.188201+00:00",
+      "agent": "reviewer"
+    },
+    {
+      "audit_id": "de80cd10-d158-4bd1-b66b-f41ce3f35f05",
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 1,
+        "input_tokens": 1963,
+        "output_tokens": 14
+      },
+      "created_at": "2026-11-03 16:58:19.603174+00:00",
+      "agent": "reviewer"
+    },
+    {
+      "audit_id": "85fcad33-a070-40b2-b738-4c15a1c53e6c",
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_report",
+        "evidence_refs": []
+      },
+      "created_at": "2026-11-03 16:58:19.617727+00:00",
+      "agent": "reviewer"
+    },
+    {
+      "audit_id": "1ae566e4-aa01-436a-b315-9427571369aa",
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 2,
+        "input_tokens": 2512,
+        "output_tokens": 15
+      },
+      "created_at": "2026-11-03 16:58:20.472975+00:00",
+      "agent": "reviewer"
+    },
+    {
+      "audit_id": "f804e849-9635-48e5-b6c7-14aafaf50823",
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 2,
+        "tool": "get_evidence",
+        "evidence_refs": [
+          "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de",
+          "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-03 16:58:20.487792+00:00",
+      "agent": "reviewer"
+    },
+    {
+      "audit_id": "6cbe25d2-5423-4e2d-912d-97787bfce9f1",
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 3,
+        "input_tokens": 3164,
+        "output_tokens": 92
+      },
+      "created_at": "2026-11-03 16:58:22.426735+00:00",
+      "agent": "reviewer"
+    },
+    {
+      "audit_id": "1d0171f5-086e-4c50-922e-938c6708bbb2",
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "attempt": 1,
+      "kind": "report_validated",
+      "details": {
+        "kind": "report_validated",
+        "step": 3,
+        "evidence_refs": [
+          "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+          "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de",
+          "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-03 16:58:22.455900+00:00",
+      "agent": "reviewer"
+    },
+    {
+      "audit_id": "27a83c81-29e5-4d01-aff3-c075d5c2a298",
+      "job_id": "ef7d070a-624d-49b6-b065-3f76b3afe893",
+      "attempt": 1,
+      "kind": "task_finished",
+      "details": {
+        "kind": "task_finished",
+        "run_id": "d330cb4d-f3a5-47d3-adbe-532aea3098f5",
+        "status": "succeeded",
+        "verdict": "review_passed",
+        "source_run_id": "de499241-c17f-4236-95af-46aa85b0f0a4"
+      },
+      "created_at": "2026-11-03 16:58:22.472676+00:00",
+      "agent": "reviewer"
+    }
+  ],
+  "executions": [
+    {
+      "stage": "investigation",
+      "started_at": "2026-11-03T16:58:10.459601+00:00",
+      "finished_at": "2026-11-03T16:58:16.796826+00:00",
+      "exit_code": 0
+    },
+    {
+      "stage": "initial-review",
+      "started_at": "2026-11-03T16:58:16.819972+00:00",
+      "finished_at": "2026-11-03T16:58:22.562901+00:00",
+      "exit_code": 0
+    }
+  ],
+  "database_counts": {
+    "events": 73,
+    "findings": 49
+  },
+  "original_preserved": true,
+  "completed": true
+}

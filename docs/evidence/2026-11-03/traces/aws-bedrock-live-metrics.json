@@ -1,0 +1,59 @@
+{
+  "source": "AWS CloudWatch GetMetricStatistics",
+  "namespace": "AWS/Bedrock",
+  "region": "us-west-2",
+  "model_id": "us.amazon.nova-2-lite-v1:0",
+  "scope": "Account/model aggregate; corroborates provider activity, application audit links individual cases.",
+  "retrieved_at": "2026-11-03 16:59:08.075117+00:00",
+  "series": [
+    {
+      "metric": "Invocations",
+      "statistic": "Sum",
+      "data": [
+        {
+          "Timestamp": "2026-11-03 22:28:00+05:30",
+          "Sum": 5.0,
+          "Unit": "Count"
+        }
+      ]
+    },
+    {
+      "metric": "InputTokenCount",
+      "statistic": "Sum",
+      "data": [
+        {
+          "Timestamp": "2026-11-03 22:28:00+05:30",
+          "Sum": 12436.0,
+          "Unit": "Count"
+        }
+      ]
+    },
+    {
+      "metric": "OutputTokenCount",
+      "statistic": "Sum",
+      "data": [
+        {
+          "Timestamp": "2026-11-03 22:28:00+05:30",
+          "Sum": 530.0,
+          "Unit": "Count"
+        }
+      ]
+    },
+    {
+      "metric": "InvocationLatency",
+      "statistic": "Average",
+      "data": [
+        {
+          "Timestamp": "2026-11-03 22:28:00+05:30",
+          "Average": 1476.4,
+          "Unit": "Milliseconds"
+        }
+      ]
+    },
+    {
+      "metric": "InvocationThrottles",
+      "statistic": "Sum",
+      "data": []
+    }
+  ]
+}

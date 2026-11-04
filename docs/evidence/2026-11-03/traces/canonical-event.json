@@ -1,0 +1,51 @@
+{
+  "event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+  "schema_version": "1.0",
+  "producer": "KEYCLOAK",
+  "event_type": "LOGIN_SUCCESS",
+  "event_time": "2026-11-03 16:58:08.386498+00:00",
+  "ingested_at": "2026-11-03 16:58:08.406731+00:00",
+  "environment": "prod",
+  "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2",
+  "payload": {
+    "actor": {
+      "id": "evidence-demo-admin",
+      "ip": null,
+      "type": "USER",
+      "roles": [
+        "registry-admin"
+      ],
+      "namespace": null
+    },
+    "action": "login_success",
+    "labels": {
+      "adapter": "keycloak",
+      "synthetic": "true",
+      "capture_date": "2026-11-03"
+    },
+    "outcome": "SUCCESS",
+    "subject": {
+      "id": "model-registry",
+      "type": "CLIENT",
+      "namespace": null,
+      "model_name": null,
+      "model_version": null,
+      "data_classification": null
+    },
+    "event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+    "producer": "KEYCLOAK",
+    "trace_id": null,
+    "attributes": {
+      "mfa_used": false,
+      "tenant_id": "synthetic-demo",
+      "privileged_identity": true
+    },
+    "event_time": "2026-11-03T16:58:08.386498Z",
+    "event_type": "LOGIN_SUCCESS",
+    "environment": "prod",
+    "ingested_at": "2026-11-03T16:58:08.406731Z",
+    "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2",
+    "schema_version": "1.0"
+  },
+  "persisted_at": "2026-11-03 16:58:08.412057+00:00"
+}

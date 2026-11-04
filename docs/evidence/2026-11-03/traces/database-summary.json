@@ -1,0 +1,221 @@
+{
+  "captured_at": "2026-11-03 16:59:47.957194+00:00",
+  "producer_counts": [
+    {
+      "producer": "KEYCLOAK",
+      "events": 25
+    },
+    {
+      "producer": "KUBERNETES",
+      "events": 12
+    },
+    {
+      "producer": "LLM_GATEWAY",
+      "events": 12
+    },
+    {
+      "producer": "MODEL_REGISTRY",
+      "events": 9
+    },
+    {
+      "producer": "PIPELINE",
+      "events": 15
+    }
+  ],
+  "rule_counts": [
+    {
+      "rule_id": "GOV-001",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-002",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-003",
+      "findings": 4
+    },
+    {
+      "rule_id": "GOV-004",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-005",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-006",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-007",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-008",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-009",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-010",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-011",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-012",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-013",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-014",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-015",
+      "findings": 3
+    },
+    {
+      "rule_id": "GOV-016",
+      "findings": 3
+    }
+  ],
+  "model_status": [
+    {
+      "model_status": "ready",
+      "findings": 18
+    },
+    {
+      "model_status": "warming:1/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:10/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:11/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:12/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:13/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:14/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:15/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:16/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:17/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:18/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:19/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:2/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:20/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:21/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:22/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:23/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:24/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:25/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:26/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:27/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:28/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:29/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:3/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:30/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:31/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:4/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:5/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:6/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:7/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:8/32",
+      "findings": 1
+    },
+    {
+      "model_status": "warming:9/32",
+      "findings": 1
+    }
+  ]
+}

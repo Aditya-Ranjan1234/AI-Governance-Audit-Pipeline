@@ -1,0 +1,65 @@
+{
+  "captured_at": "2026-11-03 16:59:47.469388+00:00",
+  "adapters": [
+    {
+      "service": "Keycloak",
+      "port": 8101,
+      "healthz": {
+        "status": "ok",
+        "producer": "KEYCLOAK"
+      },
+      "readyz": {
+        "ready": true
+      },
+      "metrics": "governance_adapter_events_total{producer=\"KEYCLOAK\",result=\"accepted\"} 25\ngovernance_adapter_events_total{producer=\"KEYCLOAK\",result=\"rejected\"} 0\n"
+    },
+    {
+      "service": "Kubernetes audit",
+      "port": 8102,
+      "healthz": {
+        "status": "ok",
+        "producer": "KUBERNETES"
+      },
+      "readyz": {
+        "ready": true
+      },
+      "metrics": "governance_adapter_events_total{producer=\"KUBERNETES\",result=\"accepted\"} 12\ngovernance_adapter_events_total{producer=\"KUBERNETES\",result=\"rejected\"} 0\n"
+    },
+    {
+      "service": "Airflow/OpenLineage",
+      "port": 8103,
+      "healthz": {
+        "status": "ok",
+        "producer": "PIPELINE"
+      },
+      "readyz": {
+        "ready": true
+      },
+      "metrics": "governance_adapter_events_total{producer=\"PIPELINE\",result=\"accepted\"} 15\ngovernance_adapter_events_total{producer=\"PIPELINE\",result=\"rejected\"} 0\n"
+    },
+    {
+      "service": "Model registry",
+      "port": 8104,
+      "healthz": {
+        "status": "ok",
+        "producer": "MODEL_REGISTRY"
+      },
+      "readyz": {
+        "ready": true
+      },
+      "metrics": "governance_adapter_events_total{producer=\"MODEL_REGISTRY\",result=\"accepted\"} 9\ngovernance_adapter_events_total{producer=\"MODEL_REGISTRY\",result=\"rejected\"} 0\n"
+    },
+    {
+      "service": "LLM gateway",
+      "port": 8105,
+      "healthz": {
+        "status": "ok",
+        "producer": "LLM_GATEWAY"
+      },
+      "readyz": {
+        "ready": true
+      },
+      "metrics": "governance_adapter_events_total{producer=\"LLM_GATEWAY\",result=\"accepted\"} 12\ngovernance_adapter_events_total{producer=\"LLM_GATEWAY\",result=\"rejected\"} 0\n"
+    }
+  ]
+}

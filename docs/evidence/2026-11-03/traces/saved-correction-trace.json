@@ -1,0 +1,3710 @@
+{
+  "source": "Recorded live Bedrock review run, 2 November 2026; retained original model outputs",
+  "source_file": "docs/two-agent-results-2026-11-02.json",
+  "source_file_sha256": "f7c49f3c6d1ce5dd007965f95bb6d573ed4e73a318bd8055a228b42e31152f35",
+  "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc",
+  "original": {
+    "run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc",
+    "report": {
+      "summary": {
+        "text": "The finding reports an unapproved privileged role grant. The source event shows a ROLE_GRANT with privileged_role=true and change_approved=false. A preceding LOGIN_SUCCESS shows the same actor used a privileged identity without MFA. Related events include a CLUSTER_ROLE_BINDING with privileged=false and a POD_CREATE with privileged=true and image_approved=true.",
+        "evidence_refs": [
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event:c962f16f-e796-5bee-a30a-c5f602f7e747"
+        ]
+      },
+      "timeline": [
+        {
+          "event_ref": "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event_time": "2026-11-01T17:35:07Z",
+          "description": "Privileged login without MFA by the same actor"
+        },
+        {
+          "event_ref": "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event_time": "2026-11-01T17:35:06Z",
+          "description": "Unapproved privileged role grant"
+        },
+        {
+          "event_ref": "event:c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "event_time": "2026-11-01T17:35:10Z",
+          "description": "Privileged pod creation with approved image"
+        }
+      ],
+      "assessment": "evidence_review_complete",
+      "observations": [
+        {
+          "text": "The role grant was performed without change approval as indicated by change_approved=false",
+          "evidence_refs": [
+            "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7"
+          ]
+        },
+        {
+          "text": "The actor had a privileged identity but did not use MFA for the login preceding the role grant",
+          "evidence_refs": [
+            "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994"
+          ]
+        },
+        {
+          "text": "A privileged pod was created shortly after the role grant with an approved image",
+          "evidence_refs": [
+            "event:c962f16f-e796-5bee-a30a-c5f602f7e747"
+          ]
+        }
+      ],
+      "missing_evidence": [
+        "No evidence of change approval process existence",
+        "No evidence of remediation actions taken"
+      ],
+      "recommended_next_steps": [
+        "Require MFA for privileged logins",
+        "Implement role change approval workflow",
+        "Audit all privileged role grants"
+      ]
+    },
+    "evidence": {
+      "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "drift_evaluation",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-faf639b2-3c64-4fa1-8a55-02aa58fa9830",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+        "producer": "PIPELINE",
+        "attributes": {
+          "threshold": 0.2,
+          "metric_value": 0.35,
+          "remediation_status": "NOT_STARTED"
+        },
+        "event_time": "2026-11-01T17:35:13Z",
+        "event_type": "DRIFT_EVALUATION",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:35.937990Z",
+        "correlation_id": "evaluation-faf639b2-3c64-4fa1-8a55-02aa58fa9830"
+      },
+      "event:26a10da5-25b1-5249-a7eb-fa058eaa037e": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "login_success",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-b8a8be23-fe67-474b-8cfb-6c15c47e96f1",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "26a10da5-25b1-5249-a7eb-fa058eaa037e",
+        "producer": "KEYCLOAK",
+        "attributes": {
+          "mfa_used": true,
+          "privileged_identity": true
+        },
+        "event_time": "2026-11-01T17:35:20Z",
+        "event_type": "LOGIN_SUCCESS",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:37.770826Z",
+        "correlation_id": "evaluation-b8a8be23-fe67-474b-8cfb-6c15c47e96f1"
+      },
+      "event:2d7099d2-ac23-5598-97db-de885b622dbe": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "create",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "2d7099d2-ac23-5598-97db-de885b622dbe",
+        "producer": "KUBERNETES",
+        "attributes": {
+          "privileged": false,
+          "cluster_role": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+          "image_approved": false,
+          "change_approved": false,
+          "cross_namespace": true
+        },
+        "event_time": "2026-11-01T17:35:09Z",
+        "event_type": "SECRET_ACCESS",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:34.916585Z",
+        "correlation_id": "evaluation-47700619-0b10-4b58-ad99-645ebbe5643f"
+      },
+      "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "schema_change",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-e018a994-e6a9-43d6-b20d-8d041758da66",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+        "producer": "PIPELINE",
+        "attributes": {
+          "version_bumped": false
+        },
+        "event_time": "2026-11-01T17:35:12Z",
+        "event_type": "SCHEMA_CHANGE",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:35.684117Z",
+        "correlation_id": "evaluation-e018a994-e6a9-43d6-b20d-8d041758da66"
+      },
+      "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-657b5f07-7039-4a70-aa3a-d74eaf5c4063",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": true,
+          "model_approved": true,
+          "pii_handling_allowed": false,
+          "prompt_injection_score": 0.1
+        },
+        "event_time": "2026-11-01T17:35:17Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:36.984963Z",
+        "correlation_id": "evaluation-657b5f07-7039-4a70-aa3a-d74eaf5c4063"
+      },
+      "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "login_success",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-d19d267e-0046-4cc8-a457-bfc35bb25b5d",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+        "producer": "KEYCLOAK",
+        "attributes": {
+          "mfa_used": false,
+          "privileged_identity": true
+        },
+        "event_time": "2026-11-01T17:35:07Z",
+        "event_type": "LOGIN_SUCCESS",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:34.404339Z",
+        "correlation_id": "evaluation-d19d267e-0046-4cc8-a457-bfc35bb25b5d"
+      },
+      "event:355dbc47-b126-53fa-9e72-af7763df07f8": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "schema_change",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "355dbc47-b126-53fa-9e72-af7763df07f8",
+        "producer": "PIPELINE",
+        "attributes": {
+          "version_bumped": true
+        },
+        "event_time": "2026-11-01T17:35:22Z",
+        "event_type": "SCHEMA_CHANGE",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:38.284111Z",
+        "correlation_id": "evaluation-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad"
+      },
+      "event:378a8f4e-1423-5f28-81d6-9d6cb9414391": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-2b537d28-f7d9-473a-a624-6c6aa6dbeabe",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "378a8f4e-1423-5f28-81d6-9d6cb9414391",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": true,
+          "prompt_injection_score": 0.02
+        },
+        "event_time": "2026-11-01T17:30:24Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:31:43.348486Z",
+        "correlation_id": "evaluation-2b537d28-f7d9-473a-a624-6c6aa6dbeabe"
+      },
+      "event:44c1bb09-f117-54f4-b8b3-6bc41972625f": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-b73678a1-2f14-4804-bdfc-c83beb1511f0",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "44c1bb09-f117-54f4-b8b3-6bc41972625f",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": true,
+          "prompt_injection_score": 0.02
+        },
+        "event_time": "2026-11-01T17:30:24Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:31:43.322952Z",
+        "correlation_id": "evaluation-b73678a1-2f14-4804-bdfc-c83beb1511f0"
+      },
+      "event:5707ce85-4f16-582e-9171-4a58444c327d": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "dataset_read",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-954850db-dca7-4bd4-84f6-ec935f437696",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "5707ce85-4f16-582e-9171-4a58444c327d",
+        "producer": "PIPELINE",
+        "attributes": {
+          "dataset_owner": ""
+        },
+        "event_time": "2026-11-01T17:35:11Z",
+        "event_type": "DATASET_READ",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:35.428794Z",
+        "correlation_id": "evaluation-954850db-dca7-4bd4-84f6-ec935f437696"
+      },
+      "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "role_grant",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-cec37eee-435a-444e-8993-520c6ec1cfeb",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+        "producer": "KEYCLOAK",
+        "attributes": {
+          "change_approved": false,
+          "privileged_role": true
+        },
+        "event_time": "2026-11-01T17:35:06Z",
+        "event_type": "ROLE_GRANT",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:34.140969Z",
+        "correlation_id": "evaluation-cec37eee-435a-444e-8993-520c6ec1cfeb"
+      },
+      "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-e0e62ab4-a7db-44ac-addf-96a76349d5d3",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": false,
+          "prompt_injection_score": 0.1
+        },
+        "event_time": "2026-11-01T17:35:18Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:37.254275Z",
+        "correlation_id": "evaluation-e0e62ab4-a7db-44ac-addf-96a76349d5d3"
+      },
+      "event:752c735c-fbcc-510b-9935-fb72f1ea737a": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "artifact_registered",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "credit-risk:bd95683d-1",
+          "type": "MODEL",
+          "namespace": null,
+          "model_name": "credit-risk",
+          "model_version": "bd95683d-1"
+        },
+        "event_id": "752c735c-fbcc-510b-9935-fb72f1ea737a",
+        "producer": "MODEL_REGISTRY",
+        "attributes": {
+          "sha256": "",
+          "signature_verified": false
+        },
+        "event_time": "2026-11-01T17:35:16Z",
+        "event_type": "ARTIFACT_REGISTERED",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:36.723286Z",
+        "correlation_id": "evaluation-abe1764b-a1b9-4bc6-8f25-7f5f305e7a22"
+      },
+      "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "model_promoted",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "credit-risk:bd95683d-1",
+          "type": "MODEL",
+          "namespace": null,
+          "model_name": "credit-risk",
+          "model_version": "bd95683d-1"
+        },
+        "event_id": "a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+        "producer": "MODEL_REGISTRY",
+        "attributes": {},
+        "event_time": "2026-11-01T17:35:15Z",
+        "event_type": "MODEL_PROMOTED",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:36.459774Z",
+        "correlation_id": "evaluation-fd18f05a-20ea-4e02-90d4-147b2887f29d"
+      },
+      "event:b5a0237b-e9d8-55d9-98de-132f602fa949": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "create",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "b5a0237b-e9d8-55d9-98de-132f602fa949",
+        "producer": "KUBERNETES",
+        "attributes": {
+          "privileged": false,
+          "cluster_role": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+          "image_approved": true,
+          "cross_namespace": false
+        },
+        "event_time": "2026-11-01T17:35:21Z",
+        "event_type": "POD_CREATE",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:38.028843Z",
+        "correlation_id": "evaluation-68dde8d7-499d-48c1-860d-b104282530af"
+      },
+      "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "bias_evaluation",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+        "producer": "PIPELINE",
+        "attributes": {
+          "threshold": 0.1,
+          "metric_value": 0.19,
+          "approved_exception": false
+        },
+        "event_time": "2026-11-01T17:35:14Z",
+        "event_type": "BIAS_EVALUATION",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:36.198679Z",
+        "correlation_id": "evaluation-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7"
+      },
+      "event:c962f16f-e796-5bee-a30a-c5f602f7e747": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "create",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "c962f16f-e796-5bee-a30a-c5f602f7e747",
+        "producer": "KUBERNETES",
+        "attributes": {
+          "privileged": true,
+          "cluster_role": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+          "image_approved": true,
+          "cross_namespace": false
+        },
+        "event_time": "2026-11-01T17:35:10Z",
+        "event_type": "POD_CREATE",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:35.172752Z",
+        "correlation_id": "evaluation-86362ac1-38e0-450e-a194-e50bd7e8c8ae"
+      },
+      "event:ce1cd878-6e03-5b0c-a387-9fcda6717566": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-bd9649f2-d218-4a82-9035-cf91c38e0cb6",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "ce1cd878-6e03-5b0c-a387-9fcda6717566",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": true,
+          "prompt_injection_score": 0.02
+        },
+        "event_time": "2026-11-01T17:35:24Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:38.800080Z",
+        "correlation_id": "evaluation-bd9649f2-d218-4a82-9035-cf91c38e0cb6"
+      },
+      "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-d6365618-6a83-49e7-85ce-8515da3876bf",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": true,
+          "prompt_injection_score": 0.96
+        },
+        "event_time": "2026-11-01T17:35:19Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:37.513442Z",
+        "correlation_id": "evaluation-d6365618-6a83-49e7-85ce-8515da3876bf"
+      },
+      "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "create",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-10b69dae-c3ae-4610-9781-27bba023bd2c",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+        "producer": "KUBERNETES",
+        "attributes": {
+          "privileged": false,
+          "cluster_role": "cluster-admin",
+          "image_approved": false,
+          "change_approved": false,
+          "cross_namespace": false
+        },
+        "event_time": "2026-11-01T17:35:08Z",
+        "event_type": "CLUSTER_ROLE_BINDING",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:34.660830Z",
+        "correlation_id": "evaluation-10b69dae-c3ae-4610-9781-27bba023bd2c"
+      },
+      "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "artifact_registered",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "credit-risk:bd95683d-1",
+          "type": "MODEL",
+          "namespace": null,
+          "model_name": "credit-risk",
+          "model_version": "bd95683d-1"
+        },
+        "event_id": "f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+        "producer": "MODEL_REGISTRY",
+        "attributes": {
+          "sha256": "abc123",
+          "signature_verified": true
+        },
+        "event_time": "2026-11-01T17:35:23Z",
+        "event_type": "ARTIFACT_REGISTERED",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:38.543301Z",
+        "correlation_id": "evaluation-c6ccf615-3c3b-4385-b39d-ae61ea0358b4"
+      },
+      "finding:29417473-9345-3aa2-a5c1-7a4336036f4c": {
+        "title": "Unapproved privileged role grant",
+        "rule_id": "GOV-002",
+        "producer": "KEYCLOAK",
+        "finding_id": "29417473-9345-3aa2-a5c1-7a4336036f4c",
+        "detected_at": "2026-11-01T17:37:19.179417Z",
+        "baseline_risk": 20.0,
+        "severity_label": "critical",
+        "source_event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+        "recommended_risk": 44.27,
+        "source_event_time": "2026-11-01T17:35:06Z"
+      },
+      "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2": {
+        "id": "GOV-002",
+        "title": "Unapproved privileged role grant",
+        "severity": 5,
+        "frameworks": {
+          "GDPR": [
+            "Article-32"
+          ],
+          "EU_AI_ACT": [
+            "Article-9",
+            "Article-26"
+          ],
+          "NIST_AI_RMF": [
+            "GOVERN-2.3",
+            "MANAGE-2.4"
+          ],
+          "ISO_IEC_42001": [
+            5.3,
+            "A.3.2"
+          ],
+          "NIST_SP_800_53": [
+            "AC-2",
+            "AC-6"
+          ]
+        },
+        "description": "An administrative role was granted without recorded change approval."
+      }
+    }
+  },
+  "reviews": [
+    {
+      "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc",
+      "revision_run_id": null,
+      "run_id": "bd3ba6dc-c1cf-4f71-ac93-c7eb4e155c0b",
+      "job_id": "79a413b4-5496-4968-8f1f-7e7b459304c6",
+      "attempt": 1,
+      "status": "succeeded",
+      "payload": {
+        "review": {
+          "issues": [
+            {
+              "code": "chronology",
+              "claim_path": "/timeline/0/description",
+              "explanation": "The timeline incorrectly states the privileged login without MFA precedes the role grant. Evidence shows event:32a1114e-7f46-5f72-9fe2-714c5e6ba994 (LOGIN_SUCCESS) occurred at 2026-11-01T17:35:07Z, one second after event:5b6be220-0ed5-53aa-a14e-079d4c903ef7 (ROLE_GRANT) at 2026-11-01T17:35:06Z. The prose should reflect the correct order.",
+              "evidence_refs": [
+                "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+                "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994"
+              ],
+              "requested_correction": "Correct the timeline description to state: 'Privileged role grant occurred, followed by a privileged login without MFA by the same actor'"
+            },
+            {
+              "code": "unsupported_claim",
+              "claim_path": "/observations/1/text",
+              "explanation": "The observation claims the login 'preceding the role grant' but evidence shows it occurred after. The report also asserts a shared session without evidence of session continuity.",
+              "evidence_refs": [
+                "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+                "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994"
+              ],
+              "requested_correction": "Revise to: 'The actor had a privileged identity but did not use MFA for a login that occurred after the role grant'"
+            },
+            {
+              "code": "chronology",
+              "claim_path": "/summary/text",
+              "explanation": "The summary incorrectly states 'A preceding LOGIN_SUCCESS shows the same actor used a privileged identity without MFA'. The login was not preceding but subsequent to the role grant.",
+              "evidence_refs": [
+                "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+                "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994"
+              ],
+              "requested_correction": "Correct to: 'A subsequent LOGIN_SUCCESS shows the same actor used a privileged identity without MFA'"
+            }
+          ],
+          "summary": "The report contains a chronological error in the timeline description where the privileged login without MFA is incorrectly stated to precede the role grant. Evidence shows the login occurred one second after the role grant (17:35:07 vs 17:35:06). The report also incorrectly asserts a shared session between these events without evidence. The remaining observations and summary are supported by evidence.",
+          "verdict": "revision_required"
+        },
+        "effective_verdict": "revision_required",
+        "deterministic_issues": [
+          {
+            "code": "chronology",
+            "claim_path": "/observations/1/text",
+            "explanation": "The cited login timestamp is later than the source role-grant timestamp.",
+            "evidence_refs": [
+              "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+              "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994"
+            ],
+            "requested_correction": "Correct the prose order using the exact event timestamps. Do not infer a shared session."
+          }
+        ],
+        "revision_limit_reached": false
+      },
+      "evidence": {
+        "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "drift_evaluation",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-faf639b2-3c64-4fa1-8a55-02aa58fa9830",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+          "producer": "PIPELINE",
+          "attributes": {
+            "threshold": 0.2,
+            "metric_value": 0.35,
+            "remediation_status": "NOT_STARTED"
+          },
+          "event_time": "2026-11-01T17:35:13Z",
+          "event_type": "DRIFT_EVALUATION",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.937990Z",
+          "correlation_id": "evaluation-faf639b2-3c64-4fa1-8a55-02aa58fa9830"
+        },
+        "event:26a10da5-25b1-5249-a7eb-fa058eaa037e": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "login_success",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-b8a8be23-fe67-474b-8cfb-6c15c47e96f1",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "26a10da5-25b1-5249-a7eb-fa058eaa037e",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "mfa_used": true,
+            "privileged_identity": true
+          },
+          "event_time": "2026-11-01T17:35:20Z",
+          "event_type": "LOGIN_SUCCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:37.770826Z",
+          "correlation_id": "evaluation-b8a8be23-fe67-474b-8cfb-6c15c47e96f1"
+        },
+        "event:2d7099d2-ac23-5598-97db-de885b622dbe": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "2d7099d2-ac23-5598-97db-de885b622dbe",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": false,
+            "cluster_role": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+            "image_approved": false,
+            "change_approved": false,
+            "cross_namespace": true
+          },
+          "event_time": "2026-11-01T17:35:09Z",
+          "event_type": "SECRET_ACCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.916585Z",
+          "correlation_id": "evaluation-47700619-0b10-4b58-ad99-645ebbe5643f"
+        },
+        "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "schema_change",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-e018a994-e6a9-43d6-b20d-8d041758da66",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+          "producer": "PIPELINE",
+          "attributes": {
+            "version_bumped": false
+          },
+          "event_time": "2026-11-01T17:35:12Z",
+          "event_type": "SCHEMA_CHANGE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.684117Z",
+          "correlation_id": "evaluation-e018a994-e6a9-43d6-b20d-8d041758da66"
+        },
+        "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-657b5f07-7039-4a70-aa3a-d74eaf5c4063",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": true,
+            "model_approved": true,
+            "pii_handling_allowed": false,
+            "prompt_injection_score": 0.1
+          },
+          "event_time": "2026-11-01T17:35:17Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.984963Z",
+          "correlation_id": "evaluation-657b5f07-7039-4a70-aa3a-d74eaf5c4063"
+        },
+        "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "login_success",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-d19d267e-0046-4cc8-a457-bfc35bb25b5d",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "mfa_used": false,
+            "privileged_identity": true
+          },
+          "event_time": "2026-11-01T17:35:07Z",
+          "event_type": "LOGIN_SUCCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.404339Z",
+          "correlation_id": "evaluation-d19d267e-0046-4cc8-a457-bfc35bb25b5d"
+        },
+        "event:355dbc47-b126-53fa-9e72-af7763df07f8": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "schema_change",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "355dbc47-b126-53fa-9e72-af7763df07f8",
+          "producer": "PIPELINE",
+          "attributes": {
+            "version_bumped": true
+          },
+          "event_time": "2026-11-01T17:35:22Z",
+          "event_type": "SCHEMA_CHANGE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.284111Z",
+          "correlation_id": "evaluation-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad"
+        },
+        "event:378a8f4e-1423-5f28-81d6-9d6cb9414391": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-2b537d28-f7d9-473a-a624-6c6aa6dbeabe",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "378a8f4e-1423-5f28-81d6-9d6cb9414391",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.02
+          },
+          "event_time": "2026-11-01T17:30:24Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:31:43.348486Z",
+          "correlation_id": "evaluation-2b537d28-f7d9-473a-a624-6c6aa6dbeabe"
+        },
+        "event:44c1bb09-f117-54f4-b8b3-6bc41972625f": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-b73678a1-2f14-4804-bdfc-c83beb1511f0",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "44c1bb09-f117-54f4-b8b3-6bc41972625f",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.02
+          },
+          "event_time": "2026-11-01T17:30:24Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:31:43.322952Z",
+          "correlation_id": "evaluation-b73678a1-2f14-4804-bdfc-c83beb1511f0"
+        },
+        "event:5707ce85-4f16-582e-9171-4a58444c327d": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "dataset_read",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-954850db-dca7-4bd4-84f6-ec935f437696",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "5707ce85-4f16-582e-9171-4a58444c327d",
+          "producer": "PIPELINE",
+          "attributes": {
+            "dataset_owner": ""
+          },
+          "event_time": "2026-11-01T17:35:11Z",
+          "event_type": "DATASET_READ",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.428794Z",
+          "correlation_id": "evaluation-954850db-dca7-4bd4-84f6-ec935f437696"
+        },
+        "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "role_grant",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-cec37eee-435a-444e-8993-520c6ec1cfeb",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "change_approved": false,
+            "privileged_role": true
+          },
+          "event_time": "2026-11-01T17:35:06Z",
+          "event_type": "ROLE_GRANT",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.140969Z",
+          "correlation_id": "evaluation-cec37eee-435a-444e-8993-520c6ec1cfeb"
+        },
+        "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-e0e62ab4-a7db-44ac-addf-96a76349d5d3",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": false,
+            "prompt_injection_score": 0.1
+          },
+          "event_time": "2026-11-01T17:35:18Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:37.254275Z",
+          "correlation_id": "evaluation-e0e62ab4-a7db-44ac-addf-96a76349d5d3"
+        },
+        "event:752c735c-fbcc-510b-9935-fb72f1ea737a": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "artifact_registered",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "credit-risk:bd95683d-1",
+            "type": "MODEL",
+            "namespace": null,
+            "model_name": "credit-risk",
+            "model_version": "bd95683d-1"
+          },
+          "event_id": "752c735c-fbcc-510b-9935-fb72f1ea737a",
+          "producer": "MODEL_REGISTRY",
+          "attributes": {
+            "sha256": "",
+            "signature_verified": false
+          },
+          "event_time": "2026-11-01T17:35:16Z",
+          "event_type": "ARTIFACT_REGISTERED",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.723286Z",
+          "correlation_id": "evaluation-abe1764b-a1b9-4bc6-8f25-7f5f305e7a22"
+        },
+        "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "model_promoted",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "credit-risk:bd95683d-1",
+            "type": "MODEL",
+            "namespace": null,
+            "model_name": "credit-risk",
+            "model_version": "bd95683d-1"
+          },
+          "event_id": "a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+          "producer": "MODEL_REGISTRY",
+          "attributes": {},
+          "event_time": "2026-11-01T17:35:15Z",
+          "event_type": "MODEL_PROMOTED",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.459774Z",
+          "correlation_id": "evaluation-fd18f05a-20ea-4e02-90d4-147b2887f29d"
+        },
+        "event:b5a0237b-e9d8-55d9-98de-132f602fa949": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "b5a0237b-e9d8-55d9-98de-132f602fa949",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": false,
+            "cluster_role": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+            "image_approved": true,
+            "cross_namespace": false
+          },
+          "event_time": "2026-11-01T17:35:21Z",
+          "event_type": "POD_CREATE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.028843Z",
+          "correlation_id": "evaluation-68dde8d7-499d-48c1-860d-b104282530af"
+        },
+        "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "bias_evaluation",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+          "producer": "PIPELINE",
+          "attributes": {
+            "threshold": 0.1,
+            "metric_value": 0.19,
+            "approved_exception": false
+          },
+          "event_time": "2026-11-01T17:35:14Z",
+          "event_type": "BIAS_EVALUATION",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.198679Z",
+          "correlation_id": "evaluation-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7"
+        },
+        "event:c962f16f-e796-5bee-a30a-c5f602f7e747": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": true,
+            "cluster_role": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+            "image_approved": true,
+            "cross_namespace": false
+          },
+          "event_time": "2026-11-01T17:35:10Z",
+          "event_type": "POD_CREATE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.172752Z",
+          "correlation_id": "evaluation-86362ac1-38e0-450e-a194-e50bd7e8c8ae"
+        },
+        "event:ce1cd878-6e03-5b0c-a387-9fcda6717566": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-bd9649f2-d218-4a82-9035-cf91c38e0cb6",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "ce1cd878-6e03-5b0c-a387-9fcda6717566",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.02
+          },
+          "event_time": "2026-11-01T17:35:24Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.800080Z",
+          "correlation_id": "evaluation-bd9649f2-d218-4a82-9035-cf91c38e0cb6"
+        },
+        "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-d6365618-6a83-49e7-85ce-8515da3876bf",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.96
+          },
+          "event_time": "2026-11-01T17:35:19Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:37.513442Z",
+          "correlation_id": "evaluation-d6365618-6a83-49e7-85ce-8515da3876bf"
+        },
+        "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-10b69dae-c3ae-4610-9781-27bba023bd2c",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": false,
+            "cluster_role": "cluster-admin",
+            "image_approved": false,
+            "change_approved": false,
+            "cross_namespace": false
+          },
+          "event_time": "2026-11-01T17:35:08Z",
+          "event_type": "CLUSTER_ROLE_BINDING",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.660830Z",
+          "correlation_id": "evaluation-10b69dae-c3ae-4610-9781-27bba023bd2c"
+        },
+        "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "artifact_registered",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "credit-risk:bd95683d-1",
+            "type": "MODEL",
+            "namespace": null,
+            "model_name": "credit-risk",
+            "model_version": "bd95683d-1"
+          },
+          "event_id": "f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+          "producer": "MODEL_REGISTRY",
+          "attributes": {
+            "sha256": "abc123",
+            "signature_verified": true
+          },
+          "event_time": "2026-11-01T17:35:23Z",
+          "event_type": "ARTIFACT_REGISTERED",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.543301Z",
+          "correlation_id": "evaluation-c6ccf615-3c3b-4385-b39d-ae61ea0358b4"
+        },
+        "finding:29417473-9345-3aa2-a5c1-7a4336036f4c": {
+          "title": "Unapproved privileged role grant",
+          "rule_id": "GOV-002",
+          "producer": "KEYCLOAK",
+          "finding_id": "29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "detected_at": "2026-11-01T17:37:19.179417Z",
+          "baseline_risk": 20.0,
+          "severity_label": "critical",
+          "source_event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "recommended_risk": 44.27,
+          "source_event_time": "2026-11-01T17:35:06Z"
+        },
+        "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2": {
+          "id": "GOV-002",
+          "title": "Unapproved privileged role grant",
+          "severity": 5,
+          "frameworks": {
+            "GDPR": [
+              "Article-32"
+            ],
+            "EU_AI_ACT": [
+              "Article-9",
+              "Article-26"
+            ],
+            "NIST_AI_RMF": [
+              "GOVERN-2.3",
+              "MANAGE-2.4"
+            ],
+            "ISO_IEC_42001": [
+              5.3,
+              "A.3.2"
+            ],
+            "NIST_SP_800_53": [
+              "AC-2",
+              "AC-6"
+            ]
+          },
+          "description": "An administrative role was granted without recorded change approval."
+        }
+      },
+      "error_code": null,
+      "finished_at": "2026-11-02 04:45:29.822713+00:00"
+    },
+    {
+      "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc",
+      "revision_run_id": "5e36a07f-749a-4f97-8681-e82c9ff429a3",
+      "run_id": "b8aa08d3-f9bb-4c1b-98f7-1320e27587e3",
+      "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+      "attempt": 1,
+      "status": "succeeded",
+      "payload": {
+        "review": {
+          "issues": [
+            {
+              "code": "invalid_citation",
+              "claim_path": "/summary/text",
+              "explanation": "The summary incorrectly references a CLUSTER_ROLE_BINDING with privileged=false as related evidence. The actual CLUSTER_ROLE_BINDING event in the evidence (event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3) occurred before the role grant (event_time 2026-11-01T17:35:08Z vs 2026-11-01T17:35:06Z) and is not directly related to the ROLE_GRANT event. The report should only reference events that are temporally and contextually related to the finding.",
+              "evidence_refs": [
+                "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+                "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7"
+              ],
+              "requested_correction": "Remove the reference to CLUSTER_ROLE_BINDING with privileged=false from the summary as it is not directly related to the unapproved role grant. The related events should only include the LOGIN_SUCCESS and POD_CREATE that occur after the role grant."
+            },
+            {
+              "code": "unsupported_claim",
+              "claim_path": "/observations/2/text",
+              "explanation": "The observation claims 'A privileged pod was created shortly after the role grant with an approved image' but the evidence shows the POD_CREATE event (c962f16f-e796-5bee-a30a-c5f602f7e747) had privileged=true and image_approved=true, which supports the observation. However, the observation is part of the report's claims and should be accurate. The evidence supports this observation, so no correction is needed for this specific claim, but the summary's incorrect reference to CLUSTER_ROLE_BINDING remains an issue.",
+              "evidence_refs": [
+                "event:c962f16f-e796-5bee-a30a-c5f602f7e747"
+              ],
+              "requested_correction": "No correction needed for this observation as it is supported by the evidence. The issue is with the summary's incorrect reference to CLUSTER_ROLE_BINDING."
+            }
+          ],
+          "summary": "The report accurately describes an unapproved privileged role grant based on the ROLE_GRANT event with change_approved=false. The subsequent LOGIN_SUCCESS event correctly notes the same actor logged in with a privileged identity without MFA one second after the role grant. However, the report incorrectly references a CLUSTER_ROLE_BINDING with privileged=false as related evidence when the actual CLUSTER_ROLE_BINDING event in evidence (event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3) occurred before the role grant and had privileged=false, but is not directly related to the role grant event. The POD_CREATE event cited occurred after the role grant and shows privileged=true with image_approved=true, supporting the observation of privileged activity following the unapproved grant.",
+          "verdict": "revision_required"
+        },
+        "effective_verdict": "needs_human_review",
+        "deterministic_issues": [],
+        "revision_limit_reached": true
+      },
+      "evidence": {
+        "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "drift_evaluation",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-faf639b2-3c64-4fa1-8a55-02aa58fa9830",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+          "producer": "PIPELINE",
+          "attributes": {
+            "threshold": 0.2,
+            "metric_value": 0.35,
+            "remediation_status": "NOT_STARTED"
+          },
+          "event_time": "2026-11-01T17:35:13Z",
+          "event_type": "DRIFT_EVALUATION",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.937990Z",
+          "correlation_id": "evaluation-faf639b2-3c64-4fa1-8a55-02aa58fa9830"
+        },
+        "event:26a10da5-25b1-5249-a7eb-fa058eaa037e": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "login_success",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-b8a8be23-fe67-474b-8cfb-6c15c47e96f1",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "26a10da5-25b1-5249-a7eb-fa058eaa037e",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "mfa_used": true,
+            "privileged_identity": true
+          },
+          "event_time": "2026-11-01T17:35:20Z",
+          "event_type": "LOGIN_SUCCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:37.770826Z",
+          "correlation_id": "evaluation-b8a8be23-fe67-474b-8cfb-6c15c47e96f1"
+        },
+        "event:2d7099d2-ac23-5598-97db-de885b622dbe": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "2d7099d2-ac23-5598-97db-de885b622dbe",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": false,
+            "cluster_role": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+            "image_approved": false,
+            "change_approved": false,
+            "cross_namespace": true
+          },
+          "event_time": "2026-11-01T17:35:09Z",
+          "event_type": "SECRET_ACCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.916585Z",
+          "correlation_id": "evaluation-47700619-0b10-4b58-ad99-645ebbe5643f"
+        },
+        "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "schema_change",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-e018a994-e6a9-43d6-b20d-8d041758da66",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+          "producer": "PIPELINE",
+          "attributes": {
+            "version_bumped": false
+          },
+          "event_time": "2026-11-01T17:35:12Z",
+          "event_type": "SCHEMA_CHANGE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.684117Z",
+          "correlation_id": "evaluation-e018a994-e6a9-43d6-b20d-8d041758da66"
+        },
+        "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-657b5f07-7039-4a70-aa3a-d74eaf5c4063",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": true,
+            "model_approved": true,
+            "pii_handling_allowed": false,
+            "prompt_injection_score": 0.1
+          },
+          "event_time": "2026-11-01T17:35:17Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.984963Z",
+          "correlation_id": "evaluation-657b5f07-7039-4a70-aa3a-d74eaf5c4063"
+        },
+        "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "login_success",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-d19d267e-0046-4cc8-a457-bfc35bb25b5d",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "mfa_used": false,
+            "privileged_identity": true
+          },
+          "event_time": "2026-11-01T17:35:07Z",
+          "event_type": "LOGIN_SUCCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.404339Z",
+          "correlation_id": "evaluation-d19d267e-0046-4cc8-a457-bfc35bb25b5d"
+        },
+        "event:355dbc47-b126-53fa-9e72-af7763df07f8": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "schema_change",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "355dbc47-b126-53fa-9e72-af7763df07f8",
+          "producer": "PIPELINE",
+          "attributes": {
+            "version_bumped": true
+          },
+          "event_time": "2026-11-01T17:35:22Z",
+          "event_type": "SCHEMA_CHANGE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.284111Z",
+          "correlation_id": "evaluation-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad"
+        },
+        "event:378a8f4e-1423-5f28-81d6-9d6cb9414391": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-2b537d28-f7d9-473a-a624-6c6aa6dbeabe",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "378a8f4e-1423-5f28-81d6-9d6cb9414391",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.02
+          },
+          "event_time": "2026-11-01T17:30:24Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:31:43.348486Z",
+          "correlation_id": "evaluation-2b537d28-f7d9-473a-a624-6c6aa6dbeabe"
+        },
+        "event:44c1bb09-f117-54f4-b8b3-6bc41972625f": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-b73678a1-2f14-4804-bdfc-c83beb1511f0",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "44c1bb09-f117-54f4-b8b3-6bc41972625f",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.02
+          },
+          "event_time": "2026-11-01T17:30:24Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:31:43.322952Z",
+          "correlation_id": "evaluation-b73678a1-2f14-4804-bdfc-c83beb1511f0"
+        },
+        "event:5707ce85-4f16-582e-9171-4a58444c327d": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "dataset_read",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-954850db-dca7-4bd4-84f6-ec935f437696",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "5707ce85-4f16-582e-9171-4a58444c327d",
+          "producer": "PIPELINE",
+          "attributes": {
+            "dataset_owner": ""
+          },
+          "event_time": "2026-11-01T17:35:11Z",
+          "event_type": "DATASET_READ",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.428794Z",
+          "correlation_id": "evaluation-954850db-dca7-4bd4-84f6-ec935f437696"
+        },
+        "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "role_grant",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-cec37eee-435a-444e-8993-520c6ec1cfeb",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "change_approved": false,
+            "privileged_role": true
+          },
+          "event_time": "2026-11-01T17:35:06Z",
+          "event_type": "ROLE_GRANT",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.140969Z",
+          "correlation_id": "evaluation-cec37eee-435a-444e-8993-520c6ec1cfeb"
+        },
+        "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-e0e62ab4-a7db-44ac-addf-96a76349d5d3",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": false,
+            "prompt_injection_score": 0.1
+          },
+          "event_time": "2026-11-01T17:35:18Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:37.254275Z",
+          "correlation_id": "evaluation-e0e62ab4-a7db-44ac-addf-96a76349d5d3"
+        },
+        "event:752c735c-fbcc-510b-9935-fb72f1ea737a": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "artifact_registered",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "credit-risk:bd95683d-1",
+            "type": "MODEL",
+            "namespace": null,
+            "model_name": "credit-risk",
+            "model_version": "bd95683d-1"
+          },
+          "event_id": "752c735c-fbcc-510b-9935-fb72f1ea737a",
+          "producer": "MODEL_REGISTRY",
+          "attributes": {
+            "sha256": "",
+            "signature_verified": false
+          },
+          "event_time": "2026-11-01T17:35:16Z",
+          "event_type": "ARTIFACT_REGISTERED",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.723286Z",
+          "correlation_id": "evaluation-abe1764b-a1b9-4bc6-8f25-7f5f305e7a22"
+        },
+        "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "model_promoted",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "credit-risk:bd95683d-1",
+            "type": "MODEL",
+            "namespace": null,
+            "model_name": "credit-risk",
+            "model_version": "bd95683d-1"
+          },
+          "event_id": "a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+          "producer": "MODEL_REGISTRY",
+          "attributes": {},
+          "event_time": "2026-11-01T17:35:15Z",
+          "event_type": "MODEL_PROMOTED",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.459774Z",
+          "correlation_id": "evaluation-fd18f05a-20ea-4e02-90d4-147b2887f29d"
+        },
+        "event:b5a0237b-e9d8-55d9-98de-132f602fa949": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "b5a0237b-e9d8-55d9-98de-132f602fa949",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": false,
+            "cluster_role": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+            "image_approved": true,
+            "cross_namespace": false
+          },
+          "event_time": "2026-11-01T17:35:21Z",
+          "event_type": "POD_CREATE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.028843Z",
+          "correlation_id": "evaluation-68dde8d7-499d-48c1-860d-b104282530af"
+        },
+        "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "bias_evaluation",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+          "producer": "PIPELINE",
+          "attributes": {
+            "threshold": 0.1,
+            "metric_value": 0.19,
+            "approved_exception": false
+          },
+          "event_time": "2026-11-01T17:35:14Z",
+          "event_type": "BIAS_EVALUATION",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.198679Z",
+          "correlation_id": "evaluation-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7"
+        },
+        "event:c962f16f-e796-5bee-a30a-c5f602f7e747": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": true,
+            "cluster_role": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+            "image_approved": true,
+            "cross_namespace": false
+          },
+          "event_time": "2026-11-01T17:35:10Z",
+          "event_type": "POD_CREATE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.172752Z",
+          "correlation_id": "evaluation-86362ac1-38e0-450e-a194-e50bd7e8c8ae"
+        },
+        "event:ce1cd878-6e03-5b0c-a387-9fcda6717566": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-bd9649f2-d218-4a82-9035-cf91c38e0cb6",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "ce1cd878-6e03-5b0c-a387-9fcda6717566",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.02
+          },
+          "event_time": "2026-11-01T17:35:24Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.800080Z",
+          "correlation_id": "evaluation-bd9649f2-d218-4a82-9035-cf91c38e0cb6"
+        },
+        "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-d6365618-6a83-49e7-85ce-8515da3876bf",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.96
+          },
+          "event_time": "2026-11-01T17:35:19Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:37.513442Z",
+          "correlation_id": "evaluation-d6365618-6a83-49e7-85ce-8515da3876bf"
+        },
+        "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-10b69dae-c3ae-4610-9781-27bba023bd2c",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": false,
+            "cluster_role": "cluster-admin",
+            "image_approved": false,
+            "change_approved": false,
+            "cross_namespace": false
+          },
+          "event_time": "2026-11-01T17:35:08Z",
+          "event_type": "CLUSTER_ROLE_BINDING",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.660830Z",
+          "correlation_id": "evaluation-10b69dae-c3ae-4610-9781-27bba023bd2c"
+        },
+        "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "artifact_registered",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "credit-risk:bd95683d-1",
+            "type": "MODEL",
+            "namespace": null,
+            "model_name": "credit-risk",
+            "model_version": "bd95683d-1"
+          },
+          "event_id": "f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+          "producer": "MODEL_REGISTRY",
+          "attributes": {
+            "sha256": "abc123",
+            "signature_verified": true
+          },
+          "event_time": "2026-11-01T17:35:23Z",
+          "event_type": "ARTIFACT_REGISTERED",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.543301Z",
+          "correlation_id": "evaluation-c6ccf615-3c3b-4385-b39d-ae61ea0358b4"
+        },
+        "finding:29417473-9345-3aa2-a5c1-7a4336036f4c": {
+          "title": "Unapproved privileged role grant",
+          "rule_id": "GOV-002",
+          "producer": "KEYCLOAK",
+          "finding_id": "29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "detected_at": "2026-11-01T17:37:19.179417Z",
+          "baseline_risk": 20.0,
+          "severity_label": "critical",
+          "source_event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "recommended_risk": 44.27,
+          "source_event_time": "2026-11-01T17:35:06Z"
+        },
+        "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2": {
+          "id": "GOV-002",
+          "title": "Unapproved privileged role grant",
+          "severity": 5,
+          "frameworks": {
+            "GDPR": [
+              "Article-32"
+            ],
+            "EU_AI_ACT": [
+              "Article-9",
+              "Article-26"
+            ],
+            "NIST_AI_RMF": [
+              "GOVERN-2.3",
+              "MANAGE-2.4"
+            ],
+            "ISO_IEC_42001": [
+              5.3,
+              "A.3.2"
+            ],
+            "NIST_SP_800_53": [
+              "AC-2",
+              "AC-6"
+            ]
+          },
+          "description": "An administrative role was granted without recorded change approval."
+        }
+      },
+      "error_code": null,
+      "finished_at": "2026-11-02 04:50:19.737384+00:00"
+    }
+  ],
+  "revisions": [
+    {
+      "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc",
+      "review_run_id": "bd3ba6dc-c1cf-4f71-ac93-c7eb4e155c0b",
+      "run_id": "5e36a07f-749a-4f97-8681-e82c9ff429a3",
+      "job_id": "406f1c9e-e87c-4096-a730-24c6d1de8961",
+      "attempt": 1,
+      "status": "succeeded",
+      "payload": {
+        "summary": {
+          "text": "The finding reports an unapproved privileged role grant. The source event shows a ROLE_GRANT with privileged_role=true and change_approved=false. A subsequent LOGIN_SUCCESS shows the same actor used a privileged identity without MFA, occurring one second after the role grant. Related events include a CLUSTER_ROLE_BINDING with privileged=false and a POD_CREATE with privileged=true and image_approved=true.",
+          "evidence_refs": [
+            "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+            "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+            "event:c962f16f-e796-5bee-a30a-c5f602f7e747"
+          ]
+        },
+        "timeline": [
+          {
+            "event_ref": "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+            "event_time": "2026-11-01T17:35:06Z",
+            "description": "Unapproved privileged role grant"
+          },
+          {
+            "event_ref": "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+            "event_time": "2026-11-01T17:35:07Z",
+            "description": "Privileged login without MFA by the same actor"
+          },
+          {
+            "event_ref": "event:c962f16f-e796-5bee-a30a-c5f602f7e747",
+            "event_time": "2026-11-01T17:35:10Z",
+            "description": "Privileged pod creation with approved image"
+          }
+        ],
+        "assessment": "evidence_review_complete",
+        "observations": [
+          {
+            "text": "The role grant was performed without change approval as indicated by change_approved=false",
+            "evidence_refs": [
+              "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7"
+            ]
+          },
+          {
+            "text": "The actor had a privileged identity but did not use MFA for a login that occurred after the role grant",
+            "evidence_refs": [
+              "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994"
+            ]
+          },
+          {
+            "text": "A privileged pod was created shortly after the role grant with an approved image",
+            "evidence_refs": [
+              "event:c962f16f-e796-5bee-a30a-c5f602f7e747"
+            ]
+          }
+        ],
+        "missing_evidence": [
+          "No evidence of change approval process existence",
+          "No evidence of remediation actions taken"
+        ],
+        "recommended_next_steps": [
+          "Require MFA for privileged logins",
+          "Implement role change approval workflow",
+          "Audit all privileged role grants"
+        ]
+      },
+      "evidence": {
+        "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "drift_evaluation",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-faf639b2-3c64-4fa1-8a55-02aa58fa9830",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+          "producer": "PIPELINE",
+          "attributes": {
+            "threshold": 0.2,
+            "metric_value": 0.35,
+            "remediation_status": "NOT_STARTED"
+          },
+          "event_time": "2026-11-01T17:35:13Z",
+          "event_type": "DRIFT_EVALUATION",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.937990Z",
+          "correlation_id": "evaluation-faf639b2-3c64-4fa1-8a55-02aa58fa9830"
+        },
+        "event:26a10da5-25b1-5249-a7eb-fa058eaa037e": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "login_success",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-b8a8be23-fe67-474b-8cfb-6c15c47e96f1",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "26a10da5-25b1-5249-a7eb-fa058eaa037e",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "mfa_used": true,
+            "privileged_identity": true
+          },
+          "event_time": "2026-11-01T17:35:20Z",
+          "event_type": "LOGIN_SUCCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:37.770826Z",
+          "correlation_id": "evaluation-b8a8be23-fe67-474b-8cfb-6c15c47e96f1"
+        },
+        "event:2d7099d2-ac23-5598-97db-de885b622dbe": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "2d7099d2-ac23-5598-97db-de885b622dbe",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": false,
+            "cluster_role": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+            "image_approved": false,
+            "change_approved": false,
+            "cross_namespace": true
+          },
+          "event_time": "2026-11-01T17:35:09Z",
+          "event_type": "SECRET_ACCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.916585Z",
+          "correlation_id": "evaluation-47700619-0b10-4b58-ad99-645ebbe5643f"
+        },
+        "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "schema_change",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-e018a994-e6a9-43d6-b20d-8d041758da66",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+          "producer": "PIPELINE",
+          "attributes": {
+            "version_bumped": false
+          },
+          "event_time": "2026-11-01T17:35:12Z",
+          "event_type": "SCHEMA_CHANGE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.684117Z",
+          "correlation_id": "evaluation-e018a994-e6a9-43d6-b20d-8d041758da66"
+        },
+        "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-657b5f07-7039-4a70-aa3a-d74eaf5c4063",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": true,
+            "model_approved": true,
+            "pii_handling_allowed": false,
+            "prompt_injection_score": 0.1
+          },
+          "event_time": "2026-11-01T17:35:17Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.984963Z",
+          "correlation_id": "evaluation-657b5f07-7039-4a70-aa3a-d74eaf5c4063"
+        },
+        "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "login_success",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-d19d267e-0046-4cc8-a457-bfc35bb25b5d",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "mfa_used": false,
+            "privileged_identity": true
+          },
+          "event_time": "2026-11-01T17:35:07Z",
+          "event_type": "LOGIN_SUCCESS",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.404339Z",
+          "correlation_id": "evaluation-d19d267e-0046-4cc8-a457-bfc35bb25b5d"
+        },
+        "event:355dbc47-b126-53fa-9e72-af7763df07f8": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "schema_change",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "355dbc47-b126-53fa-9e72-af7763df07f8",
+          "producer": "PIPELINE",
+          "attributes": {
+            "version_bumped": true
+          },
+          "event_time": "2026-11-01T17:35:22Z",
+          "event_type": "SCHEMA_CHANGE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.284111Z",
+          "correlation_id": "evaluation-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad"
+        },
+        "event:378a8f4e-1423-5f28-81d6-9d6cb9414391": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-2b537d28-f7d9-473a-a624-6c6aa6dbeabe",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "378a8f4e-1423-5f28-81d6-9d6cb9414391",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.02
+          },
+          "event_time": "2026-11-01T17:30:24Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:31:43.348486Z",
+          "correlation_id": "evaluation-2b537d28-f7d9-473a-a624-6c6aa6dbeabe"
+        },
+        "event:44c1bb09-f117-54f4-b8b3-6bc41972625f": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-b73678a1-2f14-4804-bdfc-c83beb1511f0",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "44c1bb09-f117-54f4-b8b3-6bc41972625f",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.02
+          },
+          "event_time": "2026-11-01T17:30:24Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:31:43.322952Z",
+          "correlation_id": "evaluation-b73678a1-2f14-4804-bdfc-c83beb1511f0"
+        },
+        "event:5707ce85-4f16-582e-9171-4a58444c327d": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "dataset_read",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-954850db-dca7-4bd4-84f6-ec935f437696",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "5707ce85-4f16-582e-9171-4a58444c327d",
+          "producer": "PIPELINE",
+          "attributes": {
+            "dataset_owner": ""
+          },
+          "event_time": "2026-11-01T17:35:11Z",
+          "event_type": "DATASET_READ",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.428794Z",
+          "correlation_id": "evaluation-954850db-dca7-4bd4-84f6-ec935f437696"
+        },
+        "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "role_grant",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-cec37eee-435a-444e-8993-520c6ec1cfeb",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "producer": "KEYCLOAK",
+          "attributes": {
+            "change_approved": false,
+            "privileged_role": true
+          },
+          "event_time": "2026-11-01T17:35:06Z",
+          "event_type": "ROLE_GRANT",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.140969Z",
+          "correlation_id": "evaluation-cec37eee-435a-444e-8993-520c6ec1cfeb"
+        },
+        "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-e0e62ab4-a7db-44ac-addf-96a76349d5d3",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": false,
+            "prompt_injection_score": 0.1
+          },
+          "event_time": "2026-11-01T17:35:18Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:37.254275Z",
+          "correlation_id": "evaluation-e0e62ab4-a7db-44ac-addf-96a76349d5d3"
+        },
+        "event:752c735c-fbcc-510b-9935-fb72f1ea737a": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "artifact_registered",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "credit-risk:bd95683d-1",
+            "type": "MODEL",
+            "namespace": null,
+            "model_name": "credit-risk",
+            "model_version": "bd95683d-1"
+          },
+          "event_id": "752c735c-fbcc-510b-9935-fb72f1ea737a",
+          "producer": "MODEL_REGISTRY",
+          "attributes": {
+            "sha256": "",
+            "signature_verified": false
+          },
+          "event_time": "2026-11-01T17:35:16Z",
+          "event_type": "ARTIFACT_REGISTERED",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.723286Z",
+          "correlation_id": "evaluation-abe1764b-a1b9-4bc6-8f25-7f5f305e7a22"
+        },
+        "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "model_promoted",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "credit-risk:bd95683d-1",
+            "type": "MODEL",
+            "namespace": null,
+            "model_name": "credit-risk",
+            "model_version": "bd95683d-1"
+          },
+          "event_id": "a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+          "producer": "MODEL_REGISTRY",
+          "attributes": {},
+          "event_time": "2026-11-01T17:35:15Z",
+          "event_type": "MODEL_PROMOTED",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.459774Z",
+          "correlation_id": "evaluation-fd18f05a-20ea-4e02-90d4-147b2887f29d"
+        },
+        "event:b5a0237b-e9d8-55d9-98de-132f602fa949": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "b5a0237b-e9d8-55d9-98de-132f602fa949",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": false,
+            "cluster_role": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+            "image_approved": true,
+            "cross_namespace": false
+          },
+          "event_time": "2026-11-01T17:35:21Z",
+          "event_type": "POD_CREATE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.028843Z",
+          "correlation_id": "evaluation-68dde8d7-499d-48c1-860d-b104282530af"
+        },
+        "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "bias_evaluation",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+          "producer": "PIPELINE",
+          "attributes": {
+            "threshold": 0.1,
+            "metric_value": 0.19,
+            "approved_exception": false
+          },
+          "event_time": "2026-11-01T17:35:14Z",
+          "event_type": "BIAS_EVALUATION",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:36.198679Z",
+          "correlation_id": "evaluation-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7"
+        },
+        "event:c962f16f-e796-5bee-a30a-c5f602f7e747": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": true,
+            "cluster_role": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+            "image_approved": true,
+            "cross_namespace": false
+          },
+          "event_time": "2026-11-01T17:35:10Z",
+          "event_type": "POD_CREATE",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:35.172752Z",
+          "correlation_id": "evaluation-86362ac1-38e0-450e-a194-e50bd7e8c8ae"
+        },
+        "event:ce1cd878-6e03-5b0c-a387-9fcda6717566": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-bd9649f2-d218-4a82-9035-cf91c38e0cb6",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "ce1cd878-6e03-5b0c-a387-9fcda6717566",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.02
+          },
+          "event_time": "2026-11-01T17:35:24Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.800080Z",
+          "correlation_id": "evaluation-bd9649f2-d218-4a82-9035-cf91c38e0cb6"
+        },
+        "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "prompt_request",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-d6365618-6a83-49e7-85ce-8515da3876bf",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+          "producer": "LLM_GATEWAY",
+          "attributes": {
+            "pii_detected": false,
+            "model_approved": true,
+            "prompt_injection_score": 0.96
+          },
+          "event_time": "2026-11-01T17:35:19Z",
+          "event_type": "PROMPT_REQUEST",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:37.513442Z",
+          "correlation_id": "evaluation-d6365618-6a83-49e7-85ce-8515da3876bf"
+        },
+        "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "create",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "fixture-10b69dae-c3ae-4610-9781-27bba023bd2c",
+            "type": "RESOURCE",
+            "namespace": null,
+            "model_name": null,
+            "model_version": null
+          },
+          "event_id": "efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+          "producer": "KUBERNETES",
+          "attributes": {
+            "privileged": false,
+            "cluster_role": "cluster-admin",
+            "image_approved": false,
+            "change_approved": false,
+            "cross_namespace": false
+          },
+          "event_time": "2026-11-01T17:35:08Z",
+          "event_type": "CLUSTER_ROLE_BINDING",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:34.660830Z",
+          "correlation_id": "evaluation-10b69dae-c3ae-4610-9781-27bba023bd2c"
+        },
+        "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f": {
+          "actor": {
+            "id": "evaluation-user"
+          },
+          "action": "artifact_registered",
+          "outcome": "SUCCESS",
+          "subject": {
+            "id": "credit-risk:bd95683d-1",
+            "type": "MODEL",
+            "namespace": null,
+            "model_name": "credit-risk",
+            "model_version": "bd95683d-1"
+          },
+          "event_id": "f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+          "producer": "MODEL_REGISTRY",
+          "attributes": {
+            "sha256": "abc123",
+            "signature_verified": true
+          },
+          "event_time": "2026-11-01T17:35:23Z",
+          "event_type": "ARTIFACT_REGISTERED",
+          "environment": "prod",
+          "ingested_at": "2026-11-01T17:36:38.543301Z",
+          "correlation_id": "evaluation-c6ccf615-3c3b-4385-b39d-ae61ea0358b4"
+        },
+        "finding:29417473-9345-3aa2-a5c1-7a4336036f4c": {
+          "title": "Unapproved privileged role grant",
+          "rule_id": "GOV-002",
+          "producer": "KEYCLOAK",
+          "finding_id": "29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "detected_at": "2026-11-01T17:37:19.179417Z",
+          "baseline_risk": 20.0,
+          "severity_label": "critical",
+          "source_event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "recommended_risk": 44.27,
+          "source_event_time": "2026-11-01T17:35:06Z"
+        },
+        "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2": {
+          "id": "GOV-002",
+          "title": "Unapproved privileged role grant",
+          "severity": 5,
+          "frameworks": {
+            "GDPR": [
+              "Article-32"
+            ],
+            "EU_AI_ACT": [
+              "Article-9",
+              "Article-26"
+            ],
+            "NIST_AI_RMF": [
+              "GOVERN-2.3",
+              "MANAGE-2.4"
+            ],
+            "ISO_IEC_42001": [
+              5.3,
+              "A.3.2"
+            ],
+            "NIST_SP_800_53": [
+              "AC-2",
+              "AC-6"
+            ]
+          },
+          "description": "An administrative role was granted without recorded change approval."
+        }
+      },
+      "error_code": null,
+      "finished_at": "2026-11-02 04:45:48.647896+00:00"
+    }
+  ],
+  "result": {
+    "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc",
+    "revision_run_id": "5e36a07f-749a-4f97-8681-e82c9ff429a3",
+    "worker_version": "evidence-reviewer-v1.1",
+    "model_id": "us.amazon.nova-2-lite-v1:0",
+    "revision_model_id": "us.amazon.nova-2-lite-v1:0",
+    "finding_id": "29417473-9345-3aa2-a5c1-7a4336036f4c",
+    "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+    "review_run_id": "b8aa08d3-f9bb-4c1b-98f7-1320e27587e3",
+    "verdict": "needs_human_review",
+    "review": {
+      "review": {
+        "issues": [
+          {
+            "code": "invalid_citation",
+            "claim_path": "/summary/text",
+            "explanation": "The summary incorrectly references a CLUSTER_ROLE_BINDING with privileged=false as related evidence. The actual CLUSTER_ROLE_BINDING event in the evidence (event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3) occurred before the role grant (event_time 2026-11-01T17:35:08Z vs 2026-11-01T17:35:06Z) and is not directly related to the ROLE_GRANT event. The report should only reference events that are temporally and contextually related to the finding.",
+            "evidence_refs": [
+              "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+              "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7"
+            ],
+            "requested_correction": "Remove the reference to CLUSTER_ROLE_BINDING with privileged=false from the summary as it is not directly related to the unapproved role grant. The related events should only include the LOGIN_SUCCESS and POD_CREATE that occur after the role grant."
+          },
+          {
+            "code": "unsupported_claim",
+            "claim_path": "/observations/2/text",
+            "explanation": "The observation claims 'A privileged pod was created shortly after the role grant with an approved image' but the evidence shows the POD_CREATE event (c962f16f-e796-5bee-a30a-c5f602f7e747) had privileged=true and image_approved=true, which supports the observation. However, the observation is part of the report's claims and should be accurate. The evidence supports this observation, so no correction is needed for this specific claim, but the summary's incorrect reference to CLUSTER_ROLE_BINDING remains an issue.",
+            "evidence_refs": [
+              "event:c962f16f-e796-5bee-a30a-c5f602f7e747"
+            ],
+            "requested_correction": "No correction needed for this observation as it is supported by the evidence. The issue is with the summary's incorrect reference to CLUSTER_ROLE_BINDING."
+          }
+        ],
+        "summary": "The report accurately describes an unapproved privileged role grant based on the ROLE_GRANT event with change_approved=false. The subsequent LOGIN_SUCCESS event correctly notes the same actor logged in with a privileged identity without MFA one second after the role grant. However, the report incorrectly references a CLUSTER_ROLE_BINDING with privileged=false as related evidence when the actual CLUSTER_ROLE_BINDING event in evidence (event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3) occurred before the role grant and had privileged=false, but is not directly related to the role grant event. The POD_CREATE event cited occurred after the role grant and shows privileged=true with image_approved=true, supporting the observation of privileged activity following the unapproved grant.",
+        "verdict": "revision_required"
+      },
+      "effective_verdict": "needs_human_review",
+      "deterministic_issues": [],
+      "revision_limit_reached": true
+    },
+    "report": {
+      "summary": {
+        "text": "The finding reports an unapproved privileged role grant. The source event shows a ROLE_GRANT with privileged_role=true and change_approved=false. A subsequent LOGIN_SUCCESS shows the same actor used a privileged identity without MFA, occurring one second after the role grant. Related events include a CLUSTER_ROLE_BINDING with privileged=false and a POD_CREATE with privileged=true and image_approved=true.",
+        "evidence_refs": [
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event:c962f16f-e796-5bee-a30a-c5f602f7e747"
+        ]
+      },
+      "timeline": [
+        {
+          "event_ref": "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event_time": "2026-11-01T17:35:06Z",
+          "description": "Unapproved privileged role grant"
+        },
+        {
+          "event_ref": "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event_time": "2026-11-01T17:35:07Z",
+          "description": "Privileged login without MFA by the same actor"
+        },
+        {
+          "event_ref": "event:c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "event_time": "2026-11-01T17:35:10Z",
+          "description": "Privileged pod creation with approved image"
+        }
+      ],
+      "assessment": "evidence_review_complete",
+      "observations": [
+        {
+          "text": "The role grant was performed without change approval as indicated by change_approved=false",
+          "evidence_refs": [
+            "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7"
+          ]
+        },
+        {
+          "text": "The actor had a privileged identity but did not use MFA for a login that occurred after the role grant",
+          "evidence_refs": [
+            "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994"
+          ]
+        },
+        {
+          "text": "A privileged pod was created shortly after the role grant with an approved image",
+          "evidence_refs": [
+            "event:c962f16f-e796-5bee-a30a-c5f602f7e747"
+          ]
+        }
+      ],
+      "missing_evidence": [
+        "No evidence of change approval process existence",
+        "No evidence of remediation actions taken"
+      ],
+      "recommended_next_steps": [
+        "Require MFA for privileged logins",
+        "Implement role change approval workflow",
+        "Audit all privileged role grants"
+      ]
+    },
+    "evidence": {
+      "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "drift_evaluation",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-faf639b2-3c64-4fa1-8a55-02aa58fa9830",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+        "producer": "PIPELINE",
+        "attributes": {
+          "threshold": 0.2,
+          "metric_value": 0.35,
+          "remediation_status": "NOT_STARTED"
+        },
+        "event_time": "2026-11-01T17:35:13Z",
+        "event_type": "DRIFT_EVALUATION",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:35.937990Z",
+        "correlation_id": "evaluation-faf639b2-3c64-4fa1-8a55-02aa58fa9830"
+      },
+      "event:26a10da5-25b1-5249-a7eb-fa058eaa037e": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "login_success",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-b8a8be23-fe67-474b-8cfb-6c15c47e96f1",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "26a10da5-25b1-5249-a7eb-fa058eaa037e",
+        "producer": "KEYCLOAK",
+        "attributes": {
+          "mfa_used": true,
+          "privileged_identity": true
+        },
+        "event_time": "2026-11-01T17:35:20Z",
+        "event_type": "LOGIN_SUCCESS",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:37.770826Z",
+        "correlation_id": "evaluation-b8a8be23-fe67-474b-8cfb-6c15c47e96f1"
+      },
+      "event:2d7099d2-ac23-5598-97db-de885b622dbe": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "create",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "2d7099d2-ac23-5598-97db-de885b622dbe",
+        "producer": "KUBERNETES",
+        "attributes": {
+          "privileged": false,
+          "cluster_role": "fixture-47700619-0b10-4b58-ad99-645ebbe5643f",
+          "image_approved": false,
+          "change_approved": false,
+          "cross_namespace": true
+        },
+        "event_time": "2026-11-01T17:35:09Z",
+        "event_type": "SECRET_ACCESS",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:34.916585Z",
+        "correlation_id": "evaluation-47700619-0b10-4b58-ad99-645ebbe5643f"
+      },
+      "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "schema_change",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-e018a994-e6a9-43d6-b20d-8d041758da66",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+        "producer": "PIPELINE",
+        "attributes": {
+          "version_bumped": false
+        },
+        "event_time": "2026-11-01T17:35:12Z",
+        "event_type": "SCHEMA_CHANGE",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:35.684117Z",
+        "correlation_id": "evaluation-e018a994-e6a9-43d6-b20d-8d041758da66"
+      },
+      "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-657b5f07-7039-4a70-aa3a-d74eaf5c4063",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": true,
+          "model_approved": true,
+          "pii_handling_allowed": false,
+          "prompt_injection_score": 0.1
+        },
+        "event_time": "2026-11-01T17:35:17Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:36.984963Z",
+        "correlation_id": "evaluation-657b5f07-7039-4a70-aa3a-d74eaf5c4063"
+      },
+      "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "login_success",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-d19d267e-0046-4cc8-a457-bfc35bb25b5d",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+        "producer": "KEYCLOAK",
+        "attributes": {
+          "mfa_used": false,
+          "privileged_identity": true
+        },
+        "event_time": "2026-11-01T17:35:07Z",
+        "event_type": "LOGIN_SUCCESS",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:34.404339Z",
+        "correlation_id": "evaluation-d19d267e-0046-4cc8-a457-bfc35bb25b5d"
+      },
+      "event:355dbc47-b126-53fa-9e72-af7763df07f8": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "schema_change",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "355dbc47-b126-53fa-9e72-af7763df07f8",
+        "producer": "PIPELINE",
+        "attributes": {
+          "version_bumped": true
+        },
+        "event_time": "2026-11-01T17:35:22Z",
+        "event_type": "SCHEMA_CHANGE",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:38.284111Z",
+        "correlation_id": "evaluation-db2c38b0-553c-4194-8ed9-a48c9fc7e2ad"
+      },
+      "event:378a8f4e-1423-5f28-81d6-9d6cb9414391": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-2b537d28-f7d9-473a-a624-6c6aa6dbeabe",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "378a8f4e-1423-5f28-81d6-9d6cb9414391",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": true,
+          "prompt_injection_score": 0.02
+        },
+        "event_time": "2026-11-01T17:30:24Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:31:43.348486Z",
+        "correlation_id": "evaluation-2b537d28-f7d9-473a-a624-6c6aa6dbeabe"
+      },
+      "event:44c1bb09-f117-54f4-b8b3-6bc41972625f": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-b73678a1-2f14-4804-bdfc-c83beb1511f0",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "44c1bb09-f117-54f4-b8b3-6bc41972625f",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": true,
+          "prompt_injection_score": 0.02
+        },
+        "event_time": "2026-11-01T17:30:24Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:31:43.322952Z",
+        "correlation_id": "evaluation-b73678a1-2f14-4804-bdfc-c83beb1511f0"
+      },
+      "event:5707ce85-4f16-582e-9171-4a58444c327d": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "dataset_read",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-954850db-dca7-4bd4-84f6-ec935f437696",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "5707ce85-4f16-582e-9171-4a58444c327d",
+        "producer": "PIPELINE",
+        "attributes": {
+          "dataset_owner": ""
+        },
+        "event_time": "2026-11-01T17:35:11Z",
+        "event_type": "DATASET_READ",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:35.428794Z",
+        "correlation_id": "evaluation-954850db-dca7-4bd4-84f6-ec935f437696"
+      },
+      "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "role_grant",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-cec37eee-435a-444e-8993-520c6ec1cfeb",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+        "producer": "KEYCLOAK",
+        "attributes": {
+          "change_approved": false,
+          "privileged_role": true
+        },
+        "event_time": "2026-11-01T17:35:06Z",
+        "event_type": "ROLE_GRANT",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:34.140969Z",
+        "correlation_id": "evaluation-cec37eee-435a-444e-8993-520c6ec1cfeb"
+      },
+      "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-e0e62ab4-a7db-44ac-addf-96a76349d5d3",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": false,
+          "prompt_injection_score": 0.1
+        },
+        "event_time": "2026-11-01T17:35:18Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:37.254275Z",
+        "correlation_id": "evaluation-e0e62ab4-a7db-44ac-addf-96a76349d5d3"
+      },
+      "event:752c735c-fbcc-510b-9935-fb72f1ea737a": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "artifact_registered",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "credit-risk:bd95683d-1",
+          "type": "MODEL",
+          "namespace": null,
+          "model_name": "credit-risk",
+          "model_version": "bd95683d-1"
+        },
+        "event_id": "752c735c-fbcc-510b-9935-fb72f1ea737a",
+        "producer": "MODEL_REGISTRY",
+        "attributes": {
+          "sha256": "",
+          "signature_verified": false
+        },
+        "event_time": "2026-11-01T17:35:16Z",
+        "event_type": "ARTIFACT_REGISTERED",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:36.723286Z",
+        "correlation_id": "evaluation-abe1764b-a1b9-4bc6-8f25-7f5f305e7a22"
+      },
+      "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "model_promoted",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "credit-risk:bd95683d-1",
+          "type": "MODEL",
+          "namespace": null,
+          "model_name": "credit-risk",
+          "model_version": "bd95683d-1"
+        },
+        "event_id": "a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+        "producer": "MODEL_REGISTRY",
+        "attributes": {},
+        "event_time": "2026-11-01T17:35:15Z",
+        "event_type": "MODEL_PROMOTED",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:36.459774Z",
+        "correlation_id": "evaluation-fd18f05a-20ea-4e02-90d4-147b2887f29d"
+      },
+      "event:b5a0237b-e9d8-55d9-98de-132f602fa949": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "create",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "b5a0237b-e9d8-55d9-98de-132f602fa949",
+        "producer": "KUBERNETES",
+        "attributes": {
+          "privileged": false,
+          "cluster_role": "fixture-68dde8d7-499d-48c1-860d-b104282530af",
+          "image_approved": true,
+          "cross_namespace": false
+        },
+        "event_time": "2026-11-01T17:35:21Z",
+        "event_type": "POD_CREATE",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:38.028843Z",
+        "correlation_id": "evaluation-68dde8d7-499d-48c1-860d-b104282530af"
+      },
+      "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "bias_evaluation",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+        "producer": "PIPELINE",
+        "attributes": {
+          "threshold": 0.1,
+          "metric_value": 0.19,
+          "approved_exception": false
+        },
+        "event_time": "2026-11-01T17:35:14Z",
+        "event_type": "BIAS_EVALUATION",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:36.198679Z",
+        "correlation_id": "evaluation-f89a7165-34e9-49a6-8ce8-1d7d5dafd1b7"
+      },
+      "event:c962f16f-e796-5bee-a30a-c5f602f7e747": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "create",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "c962f16f-e796-5bee-a30a-c5f602f7e747",
+        "producer": "KUBERNETES",
+        "attributes": {
+          "privileged": true,
+          "cluster_role": "fixture-86362ac1-38e0-450e-a194-e50bd7e8c8ae",
+          "image_approved": true,
+          "cross_namespace": false
+        },
+        "event_time": "2026-11-01T17:35:10Z",
+        "event_type": "POD_CREATE",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:35.172752Z",
+        "correlation_id": "evaluation-86362ac1-38e0-450e-a194-e50bd7e8c8ae"
+      },
+      "event:ce1cd878-6e03-5b0c-a387-9fcda6717566": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-bd9649f2-d218-4a82-9035-cf91c38e0cb6",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "ce1cd878-6e03-5b0c-a387-9fcda6717566",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": true,
+          "prompt_injection_score": 0.02
+        },
+        "event_time": "2026-11-01T17:35:24Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:38.800080Z",
+        "correlation_id": "evaluation-bd9649f2-d218-4a82-9035-cf91c38e0cb6"
+      },
+      "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "prompt_request",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-d6365618-6a83-49e7-85ce-8515da3876bf",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+        "producer": "LLM_GATEWAY",
+        "attributes": {
+          "pii_detected": false,
+          "model_approved": true,
+          "prompt_injection_score": 0.96
+        },
+        "event_time": "2026-11-01T17:35:19Z",
+        "event_type": "PROMPT_REQUEST",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:37.513442Z",
+        "correlation_id": "evaluation-d6365618-6a83-49e7-85ce-8515da3876bf"
+      },
+      "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "create",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "fixture-10b69dae-c3ae-4610-9781-27bba023bd2c",
+          "type": "RESOURCE",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null
+        },
+        "event_id": "efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+        "producer": "KUBERNETES",
+        "attributes": {
+          "privileged": false,
+          "cluster_role": "cluster-admin",
+          "image_approved": false,
+          "change_approved": false,
+          "cross_namespace": false
+        },
+        "event_time": "2026-11-01T17:35:08Z",
+        "event_type": "CLUSTER_ROLE_BINDING",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:34.660830Z",
+        "correlation_id": "evaluation-10b69dae-c3ae-4610-9781-27bba023bd2c"
+      },
+      "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f": {
+        "actor": {
+          "id": "evaluation-user"
+        },
+        "action": "artifact_registered",
+        "outcome": "SUCCESS",
+        "subject": {
+          "id": "credit-risk:bd95683d-1",
+          "type": "MODEL",
+          "namespace": null,
+          "model_name": "credit-risk",
+          "model_version": "bd95683d-1"
+        },
+        "event_id": "f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+        "producer": "MODEL_REGISTRY",
+        "attributes": {
+          "sha256": "abc123",
+          "signature_verified": true
+        },
+        "event_time": "2026-11-01T17:35:23Z",
+        "event_type": "ARTIFACT_REGISTERED",
+        "environment": "prod",
+        "ingested_at": "2026-11-01T17:36:38.543301Z",
+        "correlation_id": "evaluation-c6ccf615-3c3b-4385-b39d-ae61ea0358b4"
+      },
+      "finding:29417473-9345-3aa2-a5c1-7a4336036f4c": {
+        "title": "Unapproved privileged role grant",
+        "rule_id": "GOV-002",
+        "producer": "KEYCLOAK",
+        "finding_id": "29417473-9345-3aa2-a5c1-7a4336036f4c",
+        "detected_at": "2026-11-01T17:37:19.179417Z",
+        "baseline_risk": 20.0,
+        "severity_label": "critical",
+        "source_event_id": "5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+        "recommended_risk": 44.27,
+        "source_event_time": "2026-11-01T17:35:06Z"
+      },
+      "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2": {
+        "id": "GOV-002",
+        "title": "Unapproved privileged role grant",
+        "severity": 5,
+        "frameworks": {
+          "GDPR": [
+            "Article-32"
+          ],
+          "EU_AI_ACT": [
+            "Article-9",
+            "Article-26"
+          ],
+          "NIST_AI_RMF": [
+            "GOVERN-2.3",
+            "MANAGE-2.4"
+          ],
+          "ISO_IEC_42001": [
+            5.3,
+            "A.3.2"
+          ],
+          "NIST_SP_800_53": [
+            "AC-2",
+            "AC-6"
+          ]
+        },
+        "description": "An administrative role was granted without recorded change approval."
+      }
+    },
+    "finished_at": "2026-11-02 04:50:19.737384+00:00"
+  },
+  "audit": [
+    {
+      "agent": "reviewer",
+      "audit_id": "6b134f86-f748-4f69-8585-252c7632c90a",
+      "job_id": "79a413b4-5496-4968-8f1f-7e7b459304c6",
+      "attempt": 1,
+      "kind": "attempt_started",
+      "details": {
+        "kind": "attempt_started",
+        "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc"
+      },
+      "created_at": "2026-11-02 04:45:24.175294+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "b3a21302-aeae-43d2-85e1-72aefe8537df",
+      "job_id": "79a413b4-5496-4968-8f1f-7e7b459304c6",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 1,
+        "input_tokens": 2081,
+        "output_tokens": 25
+      },
+      "created_at": "2026-11-02 04:45:25.090115+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "bf01dd42-06d7-429e-8110-21c91cc66533",
+      "job_id": "79a413b4-5496-4968-8f1f-7e7b459304c6",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_report",
+        "evidence_refs": []
+      },
+      "created_at": "2026-11-02 04:45:25.104625+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "80e3ceea-7ae6-4e3d-8200-981b988d1067",
+      "job_id": "79a413b4-5496-4968-8f1f-7e7b459304c6",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_evidence",
+        "evidence_refs": [
+          "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+          "event:26a10da5-25b1-5249-a7eb-fa058eaa037e",
+          "event:2d7099d2-ac23-5598-97db-de885b622dbe",
+          "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+          "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+          "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event:355dbc47-b126-53fa-9e72-af7763df07f8",
+          "event:378a8f4e-1423-5f28-81d6-9d6cb9414391",
+          "event:44c1bb09-f117-54f4-b8b3-6bc41972625f",
+          "event:5707ce85-4f16-582e-9171-4a58444c327d",
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+          "event:752c735c-fbcc-510b-9935-fb72f1ea737a",
+          "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+          "event:b5a0237b-e9d8-55d9-98de-132f602fa949",
+          "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+          "event:c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "event:ce1cd878-6e03-5b0c-a387-9fcda6717566",
+          "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+          "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+          "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+          "finding:29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-02 04:45:25.116250+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "5a119a21-bc1b-49af-b1a0-01444e7f6947",
+      "job_id": "79a413b4-5496-4968-8f1f-7e7b459304c6",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 2,
+        "input_tokens": 8736,
+        "output_tokens": 636
+      },
+      "created_at": "2026-11-02 04:45:29.798617+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "df13d630-8af3-4fa4-af75-43ef5301dbd2",
+      "job_id": "79a413b4-5496-4968-8f1f-7e7b459304c6",
+      "attempt": 1,
+      "kind": "report_validated",
+      "details": {
+        "kind": "report_validated",
+        "step": 2,
+        "evidence_refs": [
+          "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+          "event:26a10da5-25b1-5249-a7eb-fa058eaa037e",
+          "event:2d7099d2-ac23-5598-97db-de885b622dbe",
+          "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+          "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+          "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event:355dbc47-b126-53fa-9e72-af7763df07f8",
+          "event:378a8f4e-1423-5f28-81d6-9d6cb9414391",
+          "event:44c1bb09-f117-54f4-b8b3-6bc41972625f",
+          "event:5707ce85-4f16-582e-9171-4a58444c327d",
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+          "event:752c735c-fbcc-510b-9935-fb72f1ea737a",
+          "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+          "event:b5a0237b-e9d8-55d9-98de-132f602fa949",
+          "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+          "event:c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "event:ce1cd878-6e03-5b0c-a387-9fcda6717566",
+          "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+          "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+          "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+          "finding:29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-02 04:45:29.812680+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "03adba26-04c5-439c-95cd-7083e8fe8688",
+      "job_id": "79a413b4-5496-4968-8f1f-7e7b459304c6",
+      "attempt": 1,
+      "kind": "task_finished",
+      "details": {
+        "kind": "task_finished",
+        "run_id": "bd3ba6dc-c1cf-4f71-ac93-c7eb4e155c0b",
+        "status": "succeeded",
+        "verdict": "revision_required",
+        "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc",
+        "revision_request_id": "406f1c9e-e87c-4096-a730-24c6d1de8961"
+      },
+      "created_at": "2026-11-02 04:45:29.822713+00:00"
+    },
+    {
+      "agent": "investigator",
+      "audit_id": "ec28c089-ed55-4015-97f2-2a0d4ffd4f4e",
+      "job_id": "406f1c9e-e87c-4096-a730-24c6d1de8961",
+      "attempt": 1,
+      "kind": "attempt_started",
+      "details": {
+        "kind": "attempt_started",
+        "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc"
+      },
+      "created_at": "2026-11-02 04:45:43.035812+00:00"
+    },
+    {
+      "agent": "investigator",
+      "audit_id": "6b530cab-f01b-4f88-b6a2-42a0865496f9",
+      "job_id": "406f1c9e-e87c-4096-a730-24c6d1de8961",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 1,
+        "input_tokens": 3570,
+        "output_tokens": 36
+      },
+      "created_at": "2026-11-02 04:45:43.793254+00:00"
+    },
+    {
+      "agent": "investigator",
+      "audit_id": "68e4e2ea-a6f1-4096-8947-9006ed131b56",
+      "job_id": "406f1c9e-e87c-4096-a730-24c6d1de8961",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_source_event",
+        "evidence_refs": [
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "finding:29417473-9345-3aa2-a5c1-7a4336036f4c"
+        ]
+      },
+      "created_at": "2026-11-02 04:45:43.804016+00:00"
+    },
+    {
+      "agent": "investigator",
+      "audit_id": "24c35e0c-e39a-4b4f-b024-1c96b4219c51",
+      "job_id": "406f1c9e-e87c-4096-a730-24c6d1de8961",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_rule",
+        "evidence_refs": [
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "finding:29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-02 04:45:43.811525+00:00"
+    },
+    {
+      "agent": "investigator",
+      "audit_id": "eeda9cba-e710-41b1-a491-9effd0db47f8",
+      "job_id": "406f1c9e-e87c-4096-a730-24c6d1de8961",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_related_events",
+        "evidence_refs": [
+          "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+          "event:26a10da5-25b1-5249-a7eb-fa058eaa037e",
+          "event:2d7099d2-ac23-5598-97db-de885b622dbe",
+          "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+          "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+          "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event:355dbc47-b126-53fa-9e72-af7763df07f8",
+          "event:378a8f4e-1423-5f28-81d6-9d6cb9414391",
+          "event:44c1bb09-f117-54f4-b8b3-6bc41972625f",
+          "event:5707ce85-4f16-582e-9171-4a58444c327d",
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+          "event:752c735c-fbcc-510b-9935-fb72f1ea737a",
+          "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+          "event:b5a0237b-e9d8-55d9-98de-132f602fa949",
+          "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+          "event:c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "event:ce1cd878-6e03-5b0c-a387-9fcda6717566",
+          "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+          "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+          "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+          "finding:29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-02 04:45:43.818870+00:00"
+    },
+    {
+      "agent": "investigator",
+      "audit_id": "1bc36d61-87f5-4d97-aba8-b0d14ac16e21",
+      "job_id": "406f1c9e-e87c-4096-a730-24c6d1de8961",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 2,
+        "input_tokens": 9330,
+        "output_tokens": 622
+      },
+      "created_at": "2026-11-02 04:45:48.621886+00:00"
+    },
+    {
+      "agent": "investigator",
+      "audit_id": "c0b2a33d-2e74-49ae-ac02-920e51a44a66",
+      "job_id": "406f1c9e-e87c-4096-a730-24c6d1de8961",
+      "attempt": 1,
+      "kind": "report_validated",
+      "details": {
+        "kind": "report_validated",
+        "step": 2,
+        "evidence_refs": [
+          "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+          "event:26a10da5-25b1-5249-a7eb-fa058eaa037e",
+          "event:2d7099d2-ac23-5598-97db-de885b622dbe",
+          "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+          "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+          "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event:355dbc47-b126-53fa-9e72-af7763df07f8",
+          "event:378a8f4e-1423-5f28-81d6-9d6cb9414391",
+          "event:44c1bb09-f117-54f4-b8b3-6bc41972625f",
+          "event:5707ce85-4f16-582e-9171-4a58444c327d",
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+          "event:752c735c-fbcc-510b-9935-fb72f1ea737a",
+          "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+          "event:b5a0237b-e9d8-55d9-98de-132f602fa949",
+          "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+          "event:c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "event:ce1cd878-6e03-5b0c-a387-9fcda6717566",
+          "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+          "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+          "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+          "finding:29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-02 04:45:48.637412+00:00"
+    },
+    {
+      "agent": "investigator",
+      "audit_id": "509a5297-eefe-4279-b222-d72b60ec8745",
+      "job_id": "406f1c9e-e87c-4096-a730-24c6d1de8961",
+      "attempt": 1,
+      "kind": "task_finished",
+      "details": {
+        "kind": "task_finished",
+        "run_id": "5e36a07f-749a-4f97-8681-e82c9ff429a3",
+        "status": "succeeded",
+        "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc"
+      },
+      "created_at": "2026-11-02 04:45:48.647896+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "9c54fb8c-91e4-439f-9898-34b7c57ea0ec",
+      "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+      "attempt": 1,
+      "kind": "attempt_started",
+      "details": {
+        "kind": "attempt_started",
+        "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc"
+      },
+      "created_at": "2026-11-02 04:50:13.281593+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "33e39de8-56db-4e5f-878d-34c7409d829d",
+      "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 1,
+        "input_tokens": 1989,
+        "output_tokens": 14
+      },
+      "created_at": "2026-11-02 04:50:14.243110+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "d434dd6a-3979-4a87-adc0-ba67a0f203a9",
+      "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 1,
+        "tool": "get_report",
+        "evidence_refs": []
+      },
+      "created_at": "2026-11-02 04:50:14.259237+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "7c4db49a-7a68-44f1-b64b-eec2dbd5d4cb",
+      "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 2,
+        "input_tokens": 2940,
+        "output_tokens": 15
+      },
+      "created_at": "2026-11-02 04:50:15.247324+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "57976143-51b7-47ce-b26f-875b6680b0bd",
+      "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+      "attempt": 1,
+      "kind": "tool_read",
+      "details": {
+        "kind": "tool_read",
+        "step": 2,
+        "tool": "get_evidence",
+        "evidence_refs": [
+          "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+          "event:26a10da5-25b1-5249-a7eb-fa058eaa037e",
+          "event:2d7099d2-ac23-5598-97db-de885b622dbe",
+          "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+          "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+          "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event:355dbc47-b126-53fa-9e72-af7763df07f8",
+          "event:378a8f4e-1423-5f28-81d6-9d6cb9414391",
+          "event:44c1bb09-f117-54f4-b8b3-6bc41972625f",
+          "event:5707ce85-4f16-582e-9171-4a58444c327d",
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+          "event:752c735c-fbcc-510b-9935-fb72f1ea737a",
+          "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+          "event:b5a0237b-e9d8-55d9-98de-132f602fa949",
+          "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+          "event:c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "event:ce1cd878-6e03-5b0c-a387-9fcda6717566",
+          "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+          "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+          "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+          "finding:29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-02 04:50:15.257534+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "44c02986-1c49-43d4-b910-7f6b8772bbc9",
+      "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+      "attempt": 1,
+      "kind": "model_response",
+      "details": {
+        "kind": "model_response",
+        "step": 3,
+        "input_tokens": 8706,
+        "output_tokens": 656
+      },
+      "created_at": "2026-11-02 04:50:19.711767+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "b0050897-12e6-43b6-b49b-67eb10a51cec",
+      "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+      "attempt": 1,
+      "kind": "report_validated",
+      "details": {
+        "kind": "report_validated",
+        "step": 3,
+        "evidence_refs": [
+          "event:0e68ecf6-d8f3-5ca5-bcf1-223ca877d762",
+          "event:26a10da5-25b1-5249-a7eb-fa058eaa037e",
+          "event:2d7099d2-ac23-5598-97db-de885b622dbe",
+          "event:2dbc71f8-d68b-5d39-b51d-3db1d5ad006e",
+          "event:310d1d9f-34ec-5b5e-931e-9a355ff9e442",
+          "event:32a1114e-7f46-5f72-9fe2-714c5e6ba994",
+          "event:355dbc47-b126-53fa-9e72-af7763df07f8",
+          "event:378a8f4e-1423-5f28-81d6-9d6cb9414391",
+          "event:44c1bb09-f117-54f4-b8b3-6bc41972625f",
+          "event:5707ce85-4f16-582e-9171-4a58444c327d",
+          "event:5b6be220-0ed5-53aa-a14e-079d4c903ef7",
+          "event:703d50e2-1dad-5eb7-81a1-5b84abf46a81",
+          "event:752c735c-fbcc-510b-9935-fb72f1ea737a",
+          "event:a41013c7-bb21-5c11-b85e-ee1fbb0b5c2b",
+          "event:b5a0237b-e9d8-55d9-98de-132f602fa949",
+          "event:c014b5fd-810c-5670-bf59-3fe26f7d5b83",
+          "event:c962f16f-e796-5bee-a30a-c5f602f7e747",
+          "event:ce1cd878-6e03-5b0c-a387-9fcda6717566",
+          "event:dfec9eff-80eb-54a6-b129-d0298c1c79a7",
+          "event:efb7f9e3-9f50-5383-acbb-ca1b9b8381e3",
+          "event:f88c80b5-7dd2-58ab-8fe3-3d680721865f",
+          "finding:29417473-9345-3aa2-a5c1-7a4336036f4c",
+          "rule:GOV-002:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      },
+      "created_at": "2026-11-02 04:50:19.727237+00:00"
+    },
+    {
+      "agent": "reviewer",
+      "audit_id": "05ca3e8d-6c2d-4fac-a61f-f032e8269e66",
+      "job_id": "54a90198-2650-4105-995b-3b0ea9a6a588",
+      "attempt": 1,
+      "kind": "task_finished",
+      "details": {
+        "kind": "task_finished",
+        "run_id": "b8aa08d3-f9bb-4c1b-98f7-1320e27587e3",
+        "status": "succeeded",
+        "verdict": "needs_human_review",
+        "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc"
+      },
+      "created_at": "2026-11-02 04:50:19.737384+00:00"
+    }
+  ],
+  "source_originals_preserved": true,
+  "inspection": [
+    {
+      "source_run_id": "cddcd97a-3c7c-4f27-a6ed-412d68dbb2bc",
+      "note": "A useful correction: the initial report reversed the 17:35:06Z ROLE_GRANT and 17:35:07Z LOGIN_SUCCESS. The saved revision correctly describes the login as subsequent, one second later."
+    }
+  ],
+  "interpretation": "Demonstrates cited correction, one revision, recheck and human escalation. The terminal outcome is needs_human_review, not a claim that every model statement is correct."
+}

@@ -1,0 +1,8 @@
+Captured at 2026-11-03T17:00:35.749231+00:00
+Command: pytest -q services/investigator-agent/tests
+Database: isolated governance_evidence_test
+Model: scripted responses and provider stubs for automated tests
+
+........................................................................ [ 86%]
+...........                                                              [100%]
+83 passed in 9.65s

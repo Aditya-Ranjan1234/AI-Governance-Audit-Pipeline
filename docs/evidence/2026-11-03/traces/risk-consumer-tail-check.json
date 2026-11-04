@@ -1,0 +1,24 @@
+{
+  "group": "governance-risk-scorer-v1",
+  "topic": "governance.findings.raw.v1",
+  "committed_offsets": {
+    "0": 12,
+    "1": 14,
+    "2": 13,
+    "3": 13,
+    "4": 12,
+    "5": 11
+  },
+  "log_end_offsets": {
+    "0": 13,
+    "1": 16,
+    "2": 15,
+    "3": 14,
+    "4": 13,
+    "5": 12
+  },
+  "partitions_at_eof": 6,
+  "unread_application_records": 0,
+  "records": [],
+  "interpretation": "Kafka log offsets include transaction/control records. Payload-level tail read reconciles whether application findings remain unread."
+}

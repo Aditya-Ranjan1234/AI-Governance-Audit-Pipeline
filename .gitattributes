@@ -1,0 +1,3 @@
+# Preserve captured evidence byte-for-byte so the SHA-256 manifest stays valid.
+docs/evidence/** -text
+docs/evidence/**/traces/*.csv whitespace=cr-at-eol

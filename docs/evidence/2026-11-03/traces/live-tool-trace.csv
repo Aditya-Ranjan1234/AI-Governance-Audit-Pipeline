@@ -1,0 +1,16 @@
+created_at,agent,kind,tool,step,input_tokens,output_tokens,job_id,attempt
+2026-11-03 16:58:10.867519+00:00,investigator,attempt_started,,,,,8bbb2403-a40c-4a88-9a96-88d63b8963d0,1
+2026-11-03 16:58:13.204423+00:00,investigator,model_response,,1,2129,36,8bbb2403-a40c-4a88-9a96-88d63b8963d0,1
+2026-11-03 16:58:13.248374+00:00,investigator,tool_read,get_source_event,1,,,8bbb2403-a40c-4a88-9a96-88d63b8963d0,1
+2026-11-03 16:58:13.263999+00:00,investigator,tool_read,get_rule,1,,,8bbb2403-a40c-4a88-9a96-88d63b8963d0,1
+2026-11-03 16:58:13.290252+00:00,investigator,tool_read,get_related_events,1,,,8bbb2403-a40c-4a88-9a96-88d63b8963d0,1
+2026-11-03 16:58:16.699669+00:00,investigator,model_response,,2,2668,373,8bbb2403-a40c-4a88-9a96-88d63b8963d0,1
+2026-11-03 16:58:16.712327+00:00,investigator,report_validated,,2,,,8bbb2403-a40c-4a88-9a96-88d63b8963d0,1
+2026-11-03 16:58:17.188201+00:00,reviewer,attempt_started,,,,,ef7d070a-624d-49b6-b065-3f76b3afe893,1
+2026-11-03 16:58:19.603174+00:00,reviewer,model_response,,1,1963,14,ef7d070a-624d-49b6-b065-3f76b3afe893,1
+2026-11-03 16:58:19.617727+00:00,reviewer,tool_read,get_report,1,,,ef7d070a-624d-49b6-b065-3f76b3afe893,1
+2026-11-03 16:58:20.472975+00:00,reviewer,model_response,,2,2512,15,ef7d070a-624d-49b6-b065-3f76b3afe893,1
+2026-11-03 16:58:20.487792+00:00,reviewer,tool_read,get_evidence,2,,,ef7d070a-624d-49b6-b065-3f76b3afe893,1
+2026-11-03 16:58:22.426735+00:00,reviewer,model_response,,3,3164,92,ef7d070a-624d-49b6-b065-3f76b3afe893,1
+2026-11-03 16:58:22.455900+00:00,reviewer,report_validated,,3,,,ef7d070a-624d-49b6-b065-3f76b3afe893,1
+2026-11-03 16:58:22.472676+00:00,reviewer,task_finished,,,,,ef7d070a-624d-49b6-b065-3f76b3afe893,1

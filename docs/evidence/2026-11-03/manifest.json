@@ -1,0 +1,187 @@
+{
+  "created_at": "2026-11-03T17:10:59.646543+00:00",
+  "source_commit": "82c9910c2bf1b2e382f9294d10556b619cc5f1f4",
+  "hash_algorithm": "SHA-256",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 9504,
+      "sha256": "3e67c051c9b039a62bce1c8fa338d9752bed4456dfa5c0cc7e9161cd25551948"
+    },
+    {
+      "path": "figures/01-pipeline-run.png",
+      "bytes": 186527,
+      "sha256": "84c05241cdb35f29ff2473779e4d232ba6add14b2533a0dee73ced6b8ece7e4a"
+    },
+    {
+      "path": "figures/02-producer-health.png",
+      "bytes": 165087,
+      "sha256": "e8d80028da28552cb5cf7a8af117e7e335405b32f8e65371fa7a3da77e47dacf"
+    },
+    {
+      "path": "figures/03-kafka-hop-trace.png",
+      "bytes": 191379,
+      "sha256": "1d41de8f57667d339647c7a43bfcbd3414f83cd39d87b58897005bef93e5defc"
+    },
+    {
+      "path": "figures/04-persisted-finding.png",
+      "bytes": 182260,
+      "sha256": "d7283181887e30bf22d4577ba948739aa7512e05625748b6315a50b70bf90ac3"
+    },
+    {
+      "path": "figures/05-agent-tool-trace.png",
+      "bytes": 229078,
+      "sha256": "ab0ee419c9649d73ddfaaa246e7c6f423c0828301474a24ff4f20a1bf7d382e6"
+    },
+    {
+      "path": "figures/06-reviewed-report.png",
+      "bytes": 243791,
+      "sha256": "722dc4f9a2ec33a9331ceb6286073b4fb46002953313f91a6acd22a4f8666abb"
+    },
+    {
+      "path": "figures/07-correction-and-recheck.png",
+      "bytes": 263600,
+      "sha256": "757c84b2ccff744b6ef641a3b860723b913385dd2ae67db14701dcd17a856502"
+    },
+    {
+      "path": "figures/08-tests-and-consumer-checks.png",
+      "bytes": 173416,
+      "sha256": "db50a8baec1e8ddde47ea7b3ab4881fc7b8e96bc57197ef15cf446d7913b6cab"
+    },
+    {
+      "path": "flow-evidence.html",
+      "bytes": 21906,
+      "sha256": "be579664aef3e3a35c9b95016c6fc87a9aa9a80b14b0d2efe76f92e1f8d951d5"
+    },
+    {
+      "path": "screenshots/09-aws-bedrock-invocations.png",
+      "bytes": 34377,
+      "sha256": "5e0c50b5e15fc938ed49dd0fd539da1d49863bacb93be0875a17bf9a14365e47"
+    },
+    {
+      "path": "screenshots/10-aws-bedrock-tokens.png",
+      "bytes": 37506,
+      "sha256": "ac3a9ed0901638310332c49d0c01dbb1e4dff6c20d4b5e95b906ccf7ce173b32"
+    },
+    {
+      "path": "screenshots/11-aws-bedrock-latency.png",
+      "bytes": 41588,
+      "sha256": "e7e5e4ba8ce4131aee68fee93933461158423e393c8d4d964ccfa00945feb149"
+    },
+    {
+      "path": "traces/09-aws-bedrock-invocations-query.json",
+      "bytes": 530,
+      "sha256": "627562125761279c0ce5f64b362f913b8310381a204c0744bd0090f50e032844"
+    },
+    {
+      "path": "traces/10-aws-bedrock-tokens-query.json",
+      "bytes": 742,
+      "sha256": "5e2b92c4464f0a3519af9ac28d6cc310997e8c10c53aeae50b56517229ebb79d"
+    },
+    {
+      "path": "traces/11-aws-bedrock-latency-query.json",
+      "bytes": 559,
+      "sha256": "5edab5bf245129ec13fd29792b16deef1c056131eadf0073a58f67cac1980941"
+    },
+    {
+      "path": "traces/adapter-acknowledgement.json",
+      "bytes": 184,
+      "sha256": "d901765643b6c1c6e38919ce9fec24c05fff2c38fa4e3c53d17dc8ed87442b4b"
+    },
+    {
+      "path": "traces/adapter-health.json",
+      "bytes": 1991,
+      "sha256": "b5d41f4b2d1f502dddb66f9831df199f0e1ffb21c6c1019ab1a3428f28e65338"
+    },
+    {
+      "path": "traces/automated-tests.txt",
+      "bytes": 387,
+      "sha256": "3851b6f5e2a3cb98c843cd4312dc005812eb7414da3129873aaf1e2d9915d580"
+    },
+    {
+      "path": "traces/aws-bedrock-live-metrics.json",
+      "bytes": 1326,
+      "sha256": "769e8c182e26d0cbb77bf1eef3b7a5d79953898be695d90f3b8c9f729315e103"
+    },
+    {
+      "path": "traces/canonical-event.json",
+      "bytes": 1450,
+      "sha256": "77838f6b6167bad439bbc068d4d00bd72c968ec8d32c157d2a869a20019f26eb"
+    },
+    {
+      "path": "traces/consumer-groups.txt",
+      "bytes": 27776,
+      "sha256": "f2159aa13c2ae4db464d49c79d608776920c4979ea37d082f1bedb06b7e157fd"
+    },
+    {
+      "path": "traces/database-summary.json",
+      "bytes": 3714,
+      "sha256": "d3473a91d349bde29d9c1e04360c53a8641c29ff5a1cf39ae2ad497a27e51a2e"
+    },
+    {
+      "path": "traces/demo-input.json",
+      "bytes": 630,
+      "sha256": "bbb6dbe8379c47af459d12b82cfbae83193b8adeb543e283fe4ebec49aaca1f9"
+    },
+    {
+      "path": "traces/evidence-validation.json",
+      "bytes": 6700,
+      "sha256": "16dd476d1a80165b23dcf002efd9fef7b2bef641ed24f72d68f3f7e4d3de7112"
+    },
+    {
+      "path": "traces/finding-scores.csv",
+      "bytes": 4511,
+      "sha256": "06bd483f802cfa7d8467904f6ace85a9cd4c2746cb4b353e80e338a1874c332b"
+    },
+    {
+      "path": "traces/investigation.json",
+      "bytes": 3842,
+      "sha256": "0830653e1bb409c4a941739e62b42da34d115878d5c43c744b6a00fa62aa76c9"
+    },
+    {
+      "path": "traces/kafka-hop-trace.json",
+      "bytes": 4660,
+      "sha256": "ea86445429098e053b50a3f36bdf1c26edd213a9d2eb83f7b14f411322a2b5f2"
+    },
+    {
+      "path": "traces/live-agent-trace.json",
+      "bytes": 20482,
+      "sha256": "f2923bd65b1234a4a164379e65f52cd1b8ff20c587d403c2bb4de2f49cf284a1"
+    },
+    {
+      "path": "traces/live-tool-trace.csv",
+      "bytes": 1705,
+      "sha256": "b3f3a05abefec563d78ea2ed104ad56c796f3d83bc1d97363c17aeb3666524c8"
+    },
+    {
+      "path": "traces/pipeline-results.json",
+      "bytes": 461,
+      "sha256": "58a8abbcb98c187e8d1003cdcd5756c6b5f1e3e86e876234b5343fab6db7091a"
+    },
+    {
+      "path": "traces/risk-consumer-tail-check.json",
+      "bytes": 531,
+      "sha256": "4ba8db880adc7df25219dc61ba57bea6c591460f5ebadb10d60fc7bf5b48ef88"
+    },
+    {
+      "path": "traces/runtime-state.json",
+      "bytes": 2070,
+      "sha256": "7b3bcdcf8218c0a92de126ce3c9b0d05306bb793e73d80046f66b8ebf47a4b54"
+    },
+    {
+      "path": "traces/saved-correction-trace.json",
+      "bytes": 139598,
+      "sha256": "e7cab90704c76a28d210bc6bc89ed250d5e239ffd0c4e1c59a9ca12bcef5a2de"
+    },
+    {
+      "path": "traces/scored-finding.json",
+      "bytes": 1199,
+      "sha256": "6c544ea4a49401ca127d69661692e22c8e16c942c30cd23275b6559f5aec7248"
+    },
+    {
+      "path": "traces/services.json",
+      "bytes": 2556,
+      "sha256": "1e4c7402a7e11433c3787cd4309fe1038e6f11ab6d92621d58ad5f769a73441f"
+    }
+  ]
+}

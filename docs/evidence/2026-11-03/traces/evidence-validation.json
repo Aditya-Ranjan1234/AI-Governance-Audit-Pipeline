@@ -1,0 +1,279 @@
+{
+  "validated_at": "2026-11-03T17:10:59.516373+00:00",
+  "source_commit": "82c9910c2bf1b2e382f9294d10556b619cc5f1f4",
+  "passed": true,
+  "checks": [
+    {
+      "check": "benchmark event and finding totals",
+      "passed": true,
+      "observed": {
+        "events": 72,
+        "findings": 48
+      }
+    },
+    {
+      "check": "benchmark exact expected matches",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "16 rules exercised three times, plus one GOV-003 demo",
+      "passed": true,
+      "observed": {
+        "GOV-001": 3,
+        "GOV-002": 3,
+        "GOV-003": 4,
+        "GOV-004": 3,
+        "GOV-005": 3,
+        "GOV-006": 3,
+        "GOV-007": 3,
+        "GOV-008": 3,
+        "GOV-009": 3,
+        "GOV-010": 3,
+        "GOV-011": 3,
+        "GOV-012": 3,
+        "GOV-013": 3,
+        "GOV-014": 3,
+        "GOV-015": 3,
+        "GOV-016": 3
+      }
+    },
+    {
+      "check": "database benchmark plus individual demo totals",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "HTTP acknowledgement and canonical event correlation",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "Kafka canonical payload equals persisted event payload",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "three-hop finding and source correlation",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "scored Kafka payload retained in PostgreSQL",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "recorded risk calculation",
+      "passed": true,
+      "observed": {
+        "baseline": 16.0,
+        "ml": 43.95,
+        "recommended": 43.95
+      }
+    },
+    {
+      "check": "investigation record and finding correlation",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "production report schema, evidence references and exact timeline timestamp validation",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "production review schema and citation validation",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "original and reviewer evidence snapshots preserved",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "fresh agent case completed without revision",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "review job links the original report and review audit",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "five model responses across two agents",
+      "passed": true,
+      "observed": {
+        "investigator": 2,
+        "reviewer": 3
+      }
+    },
+    {
+      "check": "investigator required reads precede validated submission",
+      "passed": true,
+      "observed": [
+        "get_related_events",
+        "get_rule",
+        "get_source_event"
+      ]
+    },
+    {
+      "check": "reviewer required reads precede validated submission",
+      "passed": true,
+      "observed": [
+        "get_evidence",
+        "get_report"
+      ]
+    },
+    {
+      "check": "InputTokenCount application and CloudWatch aggregate reconciliation",
+      "passed": true,
+      "observed": {
+        "application": 12436,
+        "cloudwatch": 12436.0
+      }
+    },
+    {
+      "check": "OutputTokenCount application and CloudWatch aggregate reconciliation",
+      "passed": true,
+      "observed": {
+        "application": 530,
+        "cloudwatch": 530.0
+      }
+    },
+    {
+      "check": "model response and CloudWatch invocation reconciliation",
+      "passed": true,
+      "observed": {
+        "calls": 5,
+        "input_tokens": 12436,
+        "output_tokens": 530
+      }
+    },
+    {
+      "check": "83 automated agent tests captured",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "risk consumer application payloads fully consumed",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "raw offset difference retained",
+      "passed": true,
+      "observed": 8
+    },
+    {
+      "check": "all five adapters healthy and ready",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "adapter counters match producer row counts",
+      "passed": true,
+      "observed": {
+        "KEYCLOAK": 25,
+        "KUBERNETES": 12,
+        "PIPELINE": 15,
+        "MODEL_REGISTRY": 9,
+        "LLM_GATEWAY": 12
+      }
+    },
+    {
+      "check": "saved correction source hash",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "saved correction preserves actual terminal outcome",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "11 PNGs at presentation dimensions",
+      "passed": true,
+      "observed": {
+        "figures/01-pipeline-run.png": [
+          1920,
+          1200
+        ],
+        "figures/02-producer-health.png": [
+          1920,
+          1200
+        ],
+        "figures/03-kafka-hop-trace.png": [
+          1920,
+          1200
+        ],
+        "figures/04-persisted-finding.png": [
+          1920,
+          1200
+        ],
+        "figures/05-agent-tool-trace.png": [
+          1920,
+          1200
+        ],
+        "figures/06-reviewed-report.png": [
+          1920,
+          1200
+        ],
+        "figures/07-correction-and-recheck.png": [
+          1920,
+          1200
+        ],
+        "figures/08-tests-and-consumer-checks.png": [
+          1920,
+          1200
+        ],
+        "screenshots/09-aws-bedrock-invocations.png": [
+          1600,
+          900
+        ],
+        "screenshots/10-aws-bedrock-tokens.png": [
+          1600,
+          900
+        ],
+        "screenshots/11-aws-bedrock-latency.png": [
+          1600,
+          900
+        ]
+      }
+    },
+    {
+      "check": "viewer IDs unique",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "viewer fragment links resolve",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "viewer local source and image paths resolve",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "viewer JavaScript syntax",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "viewer has no external script dependency",
+      "passed": true,
+      "observed": null
+    },
+    {
+      "check": "no credential patterns in deliverable text",
+      "passed": true,
+      "observed": null
+    }
+  ],
+  "render_verification": "All 11 PNGs visually inspected. HTML anchors, resources and JavaScript syntax checked statically. No browser render test: local-file browser policy blocked it.",
+  "scope": "Structural and cross-record integrity checks; does not establish general semantic accuracy of model prose."
+}

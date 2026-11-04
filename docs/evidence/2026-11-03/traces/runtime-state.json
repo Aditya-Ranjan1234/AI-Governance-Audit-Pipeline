@@ -1,0 +1,67 @@
+{
+  "captured_at": "2026-11-03T17:10:43.644887+00:00",
+  "compose_project": "philstock-e2e-evidence-20261103",
+  "state": "stopped_after_evidence_capture",
+  "services": [
+    {
+      "Names": "philstock-e2e-evidence-20261103-airflow-openlineage-adapter-1",
+      "State": "exited",
+      "Status": "Exited (0) 26 seconds ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-llm-gateway-adapter-1",
+      "State": "exited",
+      "Status": "Exited (0) 26 seconds ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-kubernetes-audit-adapter-1",
+      "State": "exited",
+      "Status": "Exited (0) 26 seconds ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-model-registry-adapter-1",
+      "State": "exited",
+      "Status": "Exited (0) 27 seconds ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-keycloak-adapter-1",
+      "State": "exited",
+      "Status": "Exited (0) 26 seconds ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-risk-scorer-1",
+      "State": "exited",
+      "Status": "Exited (0) 27 seconds ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-postgres-sink-1",
+      "State": "exited",
+      "Status": "Exited (0) 27 seconds ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-stream-processor-1",
+      "State": "exited",
+      "Status": "Exited (143) 25 seconds ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-topic-init-1",
+      "State": "exited",
+      "Status": "Exited (0) 13 minutes ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-postgres-1",
+      "State": "exited",
+      "Status": "Exited (0) 26 seconds ago"
+    },
+    {
+      "Names": "philstock-e2e-evidence-20261103-redpanda-1",
+      "State": "exited",
+      "Status": "Exited (0) 25 seconds ago"
+    }
+  ],
+  "preserved_volumes": [
+    "philstock-e2e-evidence-20261103_postgres-data"
+  ],
+  "database_backup": "Private local PostgreSQL custom-format backup retained; excluded from the evidence package.",
+  "aws_resources_changed": false
+}

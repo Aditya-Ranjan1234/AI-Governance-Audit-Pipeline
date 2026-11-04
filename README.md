@@ -2,7 +2,22 @@
 
 This repository is a runnable reference implementation of an event-to-framework compliance pipeline on AWS. Each of the five source systems has its own standalone adapter service, image, HTTP endpoint, deployment, scaling policy, IAM role, and Amazon MSK topic. A separate Kafka Streams service evaluates 16 controls with event-time windows and stateful joins. Independent risk-scoring and PostgreSQL-sink services complete the pipeline, and Tableau reads purpose-built database views.
 
-The project scope follows the supplied requirements. The attached setup guide was used for its MSK, EKS, RDS, and Tableau deployment pattern; its additional producers and unrelated framework list are intentionally outside this implementation.
+Two Amazon Bedrock-powered agents extend the pipeline: an Investigator explains findings using retrieved evidence, and an Evidence Reviewer checks the saved report and can request one revision. Their communication and audit history are persisted in PostgreSQL.
+
+## Reports, presentation and execution evidence
+
+| Resource | Contents |
+|---|---|
+| [SPA course report](docs/spa-course-report.md) | Software architecture, ingestion, stream processing, scoring, persistence and integration |
+| [Agentic AI course report](docs/agentic-ai-course-report.md) | Agent tools, evidence retrieval, durable communication, review, revision and stopping rules |
+| [Execution evidence and image captions](docs/evidence/2026-11-03/README.md) | Eleven images, JSON/CSV traces, test output and AWS CloudWatch metrics |
+| [Complete evidence package](docs/evidence/project-flow-evidence-2026-11-03.zip) | Downloadable images, traces and an offline HTML viewer |
+| [Agentic AI course presentation](docs/presentations/Agentic%20AI%20Governance%20-%20Course%20Presentation.pptx) | Editable PowerPoint presentation |
+| [Architecture diagram](docs/project-architecture-diagram.html) | Standalone HTML architecture reference |
+
+The 3 November 2026 functional run processed **72 synthetic events** and detected **48/48 expected findings** across all 16 rules. A separate event completed live investigation and review through five Bedrock calls. The agent test suite passed **83 tests**. The evidence index distinguishes the fresh run from a saved correction-and-escalation example and includes the underlying records. These are measured demonstration results, not a claim of general model accuracy.
+
+Markdown reports can be read directly on GitHub. To view an HTML page, download it and open it locally; extract the complete evidence ZIP before opening its `flow-evidence.html` so that images and trace links resolve.
 
 ## Architecture
 

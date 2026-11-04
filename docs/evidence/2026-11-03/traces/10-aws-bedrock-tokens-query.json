@@ -1,0 +1,41 @@
+{
+  "width": 1600,
+  "height": 900,
+  "metrics": [
+    [
+      "AWS/Bedrock",
+      "InputTokenCount",
+      "ModelId",
+      "us.amazon.nova-2-lite-v1:0",
+      {
+        "stat": "Sum",
+        "label": "Input tokens"
+      }
+    ],
+    [
+      "AWS/Bedrock",
+      "OutputTokenCount",
+      "ModelId",
+      "us.amazon.nova-2-lite-v1:0",
+      {
+        "stat": "Sum",
+        "label": "Output tokens"
+      }
+    ]
+  ],
+  "view": "bar",
+  "region": "us-west-2",
+  "title": "Amazon Bedrock: token counts | 3 Nov 2026, 22:25-22:35 IST",
+  "start": "2026-11-03T16:55:00Z",
+  "end": "2026-11-03T17:05:00Z",
+  "period": 60,
+  "timezone": "+0530",
+  "yAxis": {
+    "left": {
+      "min": 0
+    }
+  },
+  "legend": {
+    "position": "bottom"
+  }
+}

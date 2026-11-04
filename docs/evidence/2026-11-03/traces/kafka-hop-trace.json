@@ -1,0 +1,161 @@
+{
+  "event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+  "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+  "records": [
+    {
+      "topic": "governance.keycloak.v1",
+      "key": "evidence-demo-admin",
+      "value": {
+        "schema_version": "1.0",
+        "event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+        "event_time": "2026-11-03T16:58:08.386498Z",
+        "ingested_at": "2026-11-03T16:58:08.406731Z",
+        "producer": "KEYCLOAK",
+        "event_type": "LOGIN_SUCCESS",
+        "actor": {
+          "id": "evidence-demo-admin",
+          "type": "USER",
+          "roles": [
+            "registry-admin"
+          ],
+          "ip": null,
+          "namespace": null
+        },
+        "subject": {
+          "type": "CLIENT",
+          "id": "model-registry",
+          "namespace": null,
+          "model_name": null,
+          "model_version": null,
+          "data_classification": null
+        },
+        "action": "login_success",
+        "outcome": "SUCCESS",
+        "environment": "prod",
+        "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2",
+        "trace_id": null,
+        "attributes": {
+          "privileged_identity": true,
+          "mfa_used": false,
+          "tenant_id": "synthetic-demo"
+        },
+        "labels": {
+          "synthetic": "true",
+          "capture_date": "2026-11-03",
+          "adapter": "keycloak"
+        }
+      },
+      "timestamp": 1793725088386,
+      "partition": 4,
+      "offset": 0
+    },
+    {
+      "topic": "governance.findings.raw.v1",
+      "key": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+      "value": {
+        "schema_version": "1.0",
+        "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+        "rule_id": "GOV-003",
+        "title": "Privileged login without MFA",
+        "producer": "KEYCLOAK",
+        "source_event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+        "source_event_time": "2026-11-03T16:58:08.386498Z",
+        "detected_at": "2026-11-03T16:58:08.417558172Z",
+        "window_start": null,
+        "window_end": null,
+        "severity": 4,
+        "severity_label": "high",
+        "frequency": 1,
+        "frequency_band": 1,
+        "baseline_risk": 16.0,
+        "frameworks": {
+          "NIST_AI_RMF": [
+            "GOVERN-1.5",
+            "MANAGE-2.4"
+          ],
+          "ISO_IEC_42001": [
+            "7.2",
+            "A.3.2"
+          ],
+          "EU_AI_ACT": [
+            "Article-9",
+            "Article-15"
+          ],
+          "NIST_SP_800_53": [
+            "IA-2",
+            "AC-6"
+          ],
+          "GDPR": [
+            "Article-32"
+          ]
+        },
+        "evidence": {
+          "event_type": "LOGIN_SUCCESS",
+          "actor_id": "evidence-demo-admin",
+          "subject_id": "model-registry",
+          "environment": "prod",
+          "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2"
+        }
+      },
+      "timestamp": 1793725088386,
+      "partition": 3,
+      "offset": 12
+    },
+    {
+      "topic": "governance.findings.scored.v1",
+      "key": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+      "value": {
+        "schema_version": "1.0",
+        "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+        "rule_id": "GOV-003",
+        "title": "Privileged login without MFA",
+        "producer": "KEYCLOAK",
+        "source_event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+        "source_event_time": "2026-11-03T16:58:08.386498Z",
+        "detected_at": "2026-11-03T16:58:08.417558172Z",
+        "window_start": null,
+        "window_end": null,
+        "severity": 4,
+        "severity_label": "high",
+        "frequency": 1,
+        "frequency_band": 1,
+        "baseline_risk": 16.0,
+        "frameworks": {
+          "NIST_AI_RMF": [
+            "GOVERN-1.5",
+            "MANAGE-2.4"
+          ],
+          "ISO_IEC_42001": [
+            "7.2",
+            "A.3.2"
+          ],
+          "EU_AI_ACT": [
+            "Article-9",
+            "Article-15"
+          ],
+          "NIST_SP_800_53": [
+            "IA-2",
+            "AC-6"
+          ],
+          "GDPR": [
+            "Article-32"
+          ]
+        },
+        "evidence": {
+          "event_type": "LOGIN_SUCCESS",
+          "actor_id": "evidence-demo-admin",
+          "subject_id": "model-registry",
+          "environment": "prod",
+          "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2"
+        },
+        "isolation_forest_risk": 43.95,
+        "risk_delta": 27.95,
+        "recommended_risk": 43.95,
+        "model_status": "ready"
+      },
+      "timestamp": 1793725089461,
+      "partition": 5,
+      "offset": 9
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+  "rule_id": "GOV-003",
+  "title": "Privileged login without MFA",
+  "producer": "KEYCLOAK",
+  "source_event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+  "source_event_time": "2026-11-03 16:58:08.386498+00:00",
+  "detected_at": "2026-11-03 16:58:08.417558+00:00",
+  "window_start": null,
+  "window_end": null,
+  "severity": 4,
+  "severity_label": "high",
+  "frequency": 1,
+  "frequency_band": 1,
+  "baseline_risk": "16.00",
+  "isolation_forest_risk": "43.95",
+  "risk_delta": "27.95",
+  "recommended_risk": "43.95",
+  "model_status": "ready",
+  "frameworks": {
+    "GDPR": [
+      "Article-32"
+    ],
+    "EU_AI_ACT": [
+      "Article-9",
+      "Article-15"
+    ],
+    "NIST_AI_RMF": [
+      "GOVERN-1.5",
+      "MANAGE-2.4"
+    ],
+    "ISO_IEC_42001": [
+      "7.2",
+      "A.3.2"
+    ],
+    "NIST_SP_800_53": [
+      "IA-2",
+      "AC-6"
+    ]
+  },
+  "evidence": {
+    "actor_id": "evidence-demo-admin",
+    "event_type": "LOGIN_SUCCESS",
+    "subject_id": "model-registry",
+    "environment": "prod",
+    "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2"
+  },
+  "persisted_at": "2026-11-03 16:58:09.462596+00:00"
+}

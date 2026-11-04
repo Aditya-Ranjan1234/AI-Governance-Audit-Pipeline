@@ -1,0 +1,116 @@
+{
+  "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+  "job_id": "8bbb2403-a40c-4a88-9a96-88d63b8963d0",
+  "agent_version": "investigator-v1.3",
+  "policy_hash": "55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2",
+  "model_id": "us.amazon.nova-2-lite-v1:0",
+  "rule_id": "GOV-003",
+  "title": "Privileged login without MFA",
+  "severity_label": "high",
+  "recommended_risk": "43.95",
+  "run_id": "de499241-c17f-4236-95af-46aa85b0f0a4",
+  "report": {
+    "summary": {
+      "text": "A privileged login occurred without MFA, matching GOV-003.",
+      "evidence_refs": [
+        "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+        "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+      ]
+    },
+    "timeline": [
+      {
+        "event_ref": "event:9edbc195-3705-5aba-a0cc-dbed51530700",
+        "event_time": "2026-11-03T16:58:08.386498Z",
+        "description": "Privileged identity 'evidence-demo-admin' logged in without MFA to client 'model-registry'."
+      }
+    ],
+    "assessment": "evidence_review_complete",
+    "observations": [
+      {
+        "text": "The event shows privileged_identity=true and mfa_used=false for a LOGIN_SUCCESS.",
+        "evidence_refs": [
+          "event:9edbc195-3705-5aba-a0cc-dbed51530700"
+        ]
+      },
+      {
+        "text": "GOV-003 rule description confirms the requirement for second-factor authentication on privileged logins.",
+        "evidence_refs": [
+          "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2"
+        ]
+      }
+    ],
+    "missing_evidence": [],
+    "recommended_next_steps": [
+      "Implement MFA enforcement for privileged identities in Keycloak.",
+      "Audit recent privileged logins for MFA usage patterns.",
+      "Review Keycloak MFA policy configuration."
+    ]
+  },
+  "evidence": {
+    "event:9edbc195-3705-5aba-a0cc-dbed51530700": {
+      "actor": {
+        "id": "evidence-demo-admin"
+      },
+      "action": "login_success",
+      "outcome": "SUCCESS",
+      "subject": {
+        "id": "model-registry",
+        "type": "CLIENT",
+        "namespace": null,
+        "model_name": null,
+        "model_version": null
+      },
+      "event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+      "producer": "KEYCLOAK",
+      "attributes": {
+        "mfa_used": false,
+        "privileged_identity": true
+      },
+      "event_time": "2026-11-03T16:58:08.386498Z",
+      "event_type": "LOGIN_SUCCESS",
+      "environment": "prod",
+      "ingested_at": "2026-11-03T16:58:08.406731Z",
+      "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2"
+    },
+    "finding:05c1291a-2f47-3957-b0a0-c45947a6b3de": {
+      "title": "Privileged login without MFA",
+      "rule_id": "GOV-003",
+      "producer": "KEYCLOAK",
+      "finding_id": "05c1291a-2f47-3957-b0a0-c45947a6b3de",
+      "detected_at": "2026-11-03T16:58:08.417558Z",
+      "baseline_risk": 16.0,
+      "severity_label": "high",
+      "source_event_id": "9edbc195-3705-5aba-a0cc-dbed51530700",
+      "recommended_risk": 43.95,
+      "source_event_time": "2026-11-03T16:58:08.386498Z"
+    },
+    "rule:GOV-003:55231dee84ed6f79604fafd0330424dcfa0d834db4e7cad271213204a18365c2": {
+      "id": "GOV-003",
+      "title": "Privileged login without MFA",
+      "severity": 4,
+      "frameworks": {
+        "GDPR": [
+          "Article-32"
+        ],
+        "EU_AI_ACT": [
+          "Article-9",
+          "Article-15"
+        ],
+        "NIST_AI_RMF": [
+          "GOVERN-1.5",
+          "MANAGE-2.4"
+        ],
+        "ISO_IEC_42001": [
+          7.2,
+          "A.3.2"
+        ],
+        "NIST_SP_800_53": [
+          "IA-2",
+          "AC-6"
+        ]
+      },
+      "description": "A privileged identity authenticated without a second factor."
+    }
+  },
+  "finished_at": "2026-11-03 16:58:16.723279+00:00"
+}

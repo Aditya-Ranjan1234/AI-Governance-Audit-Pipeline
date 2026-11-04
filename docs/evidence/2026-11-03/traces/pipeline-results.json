@@ -1,0 +1,21 @@
+{
+  "run_id": "ee395f98-db8a-4632-b2b6-13a111522cd0",
+  "true_positive": 48,
+  "false_positive": 0,
+  "false_negative": 0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "latency_ms": {
+    "p50": 353.84,
+    "p95": 1878.88,
+    "p99": 2181.69
+  },
+  "throughput_events_per_second": 39.04,
+  "observed_findings": 48,
+  "expected_findings": 48,
+  "injected_events": 72,
+  "persisted_events": 72,
+  "missing_findings": [],
+  "unexpected_findings": [],
+  "passed": true
+}

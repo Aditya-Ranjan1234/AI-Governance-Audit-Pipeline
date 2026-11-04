@@ -1,0 +1,28 @@
+{
+  "id": "ba2fc020-96c4-4337-8a6c-a4f5f62711d2",
+  "type": "LOGIN",
+  "event_time": "2026-11-03T16:58:08.386498+00:00",
+  "userId": "evidence-demo-admin",
+  "actor": {
+    "id": "evidence-demo-admin",
+    "type": "USER",
+    "roles": [
+      "registry-admin"
+    ]
+  },
+  "subject": {
+    "type": "CLIENT",
+    "id": "model-registry"
+  },
+  "environment": "prod",
+  "correlation_id": "evidence-demo-ba2fc020-96c4-4337-8a6c-a4f5f62711d2",
+  "attributes": {
+    "privileged_identity": true,
+    "mfa_used": false,
+    "tenant_id": "synthetic-demo"
+  },
+  "labels": {
+    "synthetic": "true",
+    "capture_date": "2026-11-03"
+  }
+}

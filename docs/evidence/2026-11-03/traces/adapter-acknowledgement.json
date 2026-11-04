@@ -1,0 +1,10 @@
+{
+  "http_status": 202,
+  "received_at": "2026-11-03T16:58:08.413328+00:00",
+  "body": {
+    "accepted": 1,
+    "event_ids": [
+      "9edbc195-3705-5aba-a0cc-dbed51530700"
+    ]
+  }
+}
