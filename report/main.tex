@@ -232,11 +232,6 @@ Figure~\ref{fig:pipeline-flow} summarizes the implemented path from source syste
 \label{fig:pipeline-flow}
 \end{figure}
 \subsection{Kafka features incorporated}
-The project uses Kafka as an integration and recovery boundary rather than as a direct service-to-service call graph. The five producer topics isolate source contracts and allow each adapter to evolve independently. Keys are selected for the required state operation: actor IDs for failed-login windows and model keys for approval, evaluation, and promotion joins. The topology uses an event timestamp extractor so late or out-of-order records are evaluated against event time. A five-minute window with a one-minute grace period detects the fifth failed login without treating arrival time as the business event time.
-
-Kafka Streams state stores materialize the model-approval state, model-evaluation state, combined model-governance evidence, and the failed-login window. The topology uses a table-table outer join to combine approval and evaluation evidence, then a stream-table left join to check a production promotion against that evidence. Stateless rule findings and stateful findings are merged into one raw-finding topic, and the finding ID becomes the output key for downstream correlation. JSON serdes keep the event and finding records typed while retaining a human-readable contract.
-
-The deployment separates consumer groups for rule processing, risk scoring, persistence, and evaluation. This allows each downstream function to replay from its own committed offsets and prevents a reporting slowdown from blocking detection. The local Compose configuration creates six partitions per topic, runs two Kafka Streams threads, and uses Redpanda as the local Kafka-compatible broker. The AWS configuration raises durability through a three-broker MSK cluster, replication factor three, and minimum in-sync replica policy. These features support parallelism, replay, fault recovery, and independent scaling while keeping the audit trail reconstructable.
 \begin{table}[H]\centering\small\begin{tabular}{|p{3.0cm}|p{4.4cm}|p{3.8cm}|}\hline
 \textbf{Kafka feature} & \textbf{How it is incorporated} & \textbf{Project benefit}\\\hline
 Dedicated topics & One raw topic per producer domain & Isolates source contracts and supports independent evolution\\\hline
@@ -247,22 +242,15 @@ Consumer groups & Separate groups for rules, scoring, persistence, and evaluatio
 Durability and recovery & MSK replication factor three, minimum ISR two, committed offsets & Supports restart recovery and reconstructable audit trails\\\hline
 Typed serialization & JSON serializers/deserializers for events and findings & Preserves a readable, versioned message contract\\\hline
 \end{tabular}\caption{Kafka features incorporated in the project pipeline.}\label{tab:kafka-features}\end{table}
+The project uses Kafka as an integration and recovery boundary rather than as a direct service-to-service call graph. The five producer topics isolate source contracts and allow each adapter to evolve independently. Keys are selected for the required state operation: actor IDs for failed-login windows and model keys for approval, evaluation, and promotion joins. The topology uses an event timestamp extractor so late or out-of-order records are evaluated against event time. A five-minute window with a one-minute grace period detects the fifth failed login without treating arrival time as the business event time.
 
+Kafka Streams state stores materialize the model-approval state, model-evaluation state, combined model-governance evidence, and the failed-login window. The topology uses a table-table outer join to combine approval and evaluation evidence, then a stream-table left join to check a production promotion against that evidence. Stateless rule findings and stateful findings are merged into one raw-finding topic, and the finding ID becomes the output key for downstream correlation. JSON serdes keep the event and finding records typed while retaining a human-readable contract.
+
+The deployment separates consumer groups for rule processing, risk scoring, persistence, and evaluation. This allows each downstream function to replay from its own committed offsets and prevents a reporting slowdown from blocking detection. The local Compose configuration creates six partitions per topic, runs two Kafka Streams threads, and uses Redpanda as the local Kafka-compatible broker. The AWS configuration raises durability through a three-broker MSK cluster, replication factor three, and minimum in-sync replica policy. These features support parallelism, replay, fault recovery, and independent scaling while keeping the audit trail reconstructable.
 \chapter{Implementation}
 \noindent\textit{This chapter explains how the repository implements the architecture, contracts, rules, scoring, persistence, agent integration, deployment, and operational controls.}\par
-\section{Background Information}
-Recent guidance treats AI governance as a lifecycle practice involving accountability, documentation, measurement, monitoring, and human oversight rather than a one-time model check \cite{nist2023,nistgenai2024,iso42001,oecd2024,unesco2021,euaiact2024,stanford2024}. Security guidance also highlights prompt injection, data leakage, excessive agency, and supply-chain risks in LLM-enabled systems \cite{owasllm2025,mitreatlas2024,google2023}. The project responds to these themes through immutable evidence, explicit contracts, bounded agent loops, separate service identities, and a human-review terminal state.
-\begin{table}[H]\centering\small\begin{tabular}{|p{2.8cm}|p{1.0cm}|p{4.1cm}|p{4.0cm}|}\hline
-\textbf{Source} & \textbf{Year} & \textbf{Main contribution} & \textbf{Design implication for this project}\\\hline
-NIST AI RMF \cite{nist2023} & 2023 & Govern, map, measure, and manage AI risk & Rule catalogue, evidence, scores, and review states\\\hline
-NIST GenAI Profile \cite{nistgenai2024} & 2024 & GenAI-specific risk actions and lifecycle profile & Bedrock agent boundaries and evidence grounding\\\hline
-ISO/IEC 42001 \cite{iso42001} & 2023 & AI management-system requirements and continual improvement & Durable controls, ownership, audit history\\\hline
-EU AI Act \cite{euaiact2024} & 2024 & Risk-tiered obligations, transparency, and governance & Framework labels and human escalation\\\hline
-OWASP LLM Top 10 \cite{owasllm2025} & 2025 & Common LLM application security risks & Prompt isolation, structured tools, bounded execution\\\hline
-Kafka Streams documentation \cite{kafkastreams2024} & 2024 & Event-time state, joins, and processing guarantees & Windowed failed-login detection and promotion joins\\\hline
-Kubernetes documentation \cite{kubernetes2024} & 2024 & Probes, scaling, disruption budgets, and workload operation & Resilient service deployment and recovery checks\\\hline
-RAG survey literature \cite{ragsurvey2024} & 2024 & Retrieval grounding and evaluation concerns & Evidence snapshots and citation validation\\\hline
-\end{tabular}\caption{Comparison of recent sources and the corresponding implementation decision.}\end{table}
+\section{Implementation Context}
+This section describes how the repository turns the governance principles and research gap established in Chapter 2 into executable services, schemas, stream-processing logic, persistence models, and deployment artefacts. It is implementation context rather than a second literature review.
 \section{Research gap and project position}
 The literature provides principles, controls, and security taxonomies, but governance teams still need an operational evidence path that connects source activity to a finding, score, stored record, and review outcome. This repository occupies that implementation gap. Its contribution is systems integration and measurable traceability, not a new foundation model or a claim of legal certification.
 
