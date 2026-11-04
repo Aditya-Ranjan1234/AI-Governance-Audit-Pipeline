@@ -7,12 +7,12 @@
 \onehalfspacing\setlength{\emergencystretch}{3em}\captionsetup{font=small,labelfont=bf,skip=6pt}
 \let\oldunderscore\_\renewcommand{\_}{\oldunderscore\allowbreak}
 \renewcommand{\topfraction}{0.9}\renewcommand{\bottomfraction}{0.8}\renewcommand{\textfraction}{0.07}\renewcommand{\floatpagefraction}{0.75}
-\titleformat{\chapter}[display]{\normalfont\LARGE\bfseries\centering}{Chapter \thechapter}{1ex}{\MakeUppercase}\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
+\titleformat{\chapter}[display]{\normalfont\fontsize{16}{19}\bfseries\centering}{Chapter \thechapter}{1ex}{\MakeUppercase}\titlespacing*{\chapter}{0pt}{-10pt}{20pt}
 \titleformat{\section}{\normalfont\fontsize{14}{17}\bfseries}{\thesection}{0.6em}{}\titlespacing*{\section}{0pt}{18pt}{10pt}
-\titleformat{\subsection}{\normalfont\fontsize{12}{15}\bfseries}{\thesubsection}{0.6em}{}\titlespacing*{\subsection}{0pt}{10pt}{6pt}
+\titleformat{\subsection}{\normalfont\fontsize{14}{17}\bfseries}{\thesubsection}{0.6em}{}\titlespacing*{\subsection}{0pt}{10pt}{6pt}
 \newcommand{\ProjTitle}{Real-Time AI Governance Audit Pipeline}
-\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\textit{\ProjTitle}}\fancyhead[R]{2026--2027}\fancyfoot[L]{Department of AIML}\fancyfoot[R]{\thepage}\fancyheadoffset[L]{0.69cm}\fancyheadoffset[R]{0.70cm}\fancyfootoffset[L]{0.69cm}\fancyfootoffset[R]{0.70cm}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}
-\fancypagestyle{plain}{\fancyhf{}\fancyhead[L]{\textit{\ProjTitle}}\fancyhead[R]{2026--2027}\fancyfoot[L]{Department of AIML}\fancyfoot[R]{\thepage}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}}
+\pagestyle{fancy}\fancyhf{}\fancyhead[L]{\textit{\ProjTitle}}\fancyhead[R]{2026--2027}\fancyfoot[L]{Department of AIML, RVCE}\fancyfoot[R]{\thepage}\fancyheadoffset[L]{0.69cm}\fancyheadoffset[R]{0.70cm}\fancyfootoffset[L]{0.69cm}\fancyfootoffset[R]{0.70cm}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{\fancyhf{}\fancyhead[L]{\textit{\ProjTitle}}\fancyhead[R]{2026--2027}\fancyfoot[L]{Department of AIML, RVCE}\fancyfoot[R]{\thepage}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}}
 \fancypagestyle{front}{\fancyhf{}\fancyfoot[R]{\thepage}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}}
 \AddToShipoutPictureFG{\begin{tikzpicture}[overlay,remember picture]\draw[line width=1pt]([shift={(3.51cm,-2.24cm)}]current page.north west) rectangle ([shift={(-1.8cm,2.24cm)}]current page.south east);\end{tikzpicture}}
 \SetWatermarkText{\includegraphics[width=8cm]{logo.png}}\SetWatermarkScale{1}\SetWatermarkAngle{0}\SetWatermarkColor[gray]{0.9}\SetWatermarkHorCenter{11.355cm}\SetWatermarkVerCenter{14.85cm}
@@ -114,24 +114,42 @@ by the institution.
 
 \thispagestyle{empty}
 
-\pagestyle{fancy}\tableofcontents\thispagestyle{fancy}\clearpage\pagenumbering{arabic}\pagestyle{fancy}
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+This report presents the design, implementation, deployment evidence, and evaluation of a real-time AI governance audit pipeline. The system receives events from five producer domains, normalizes them into a versioned contract, evaluates sixteen governance rules with Kafka Streams, scores findings, persists evidence in PostgreSQL, and exposes reporting views through Tableau. Optional Bedrock-based Investigator and Evidence Reviewer agents support evidence-grounded analysis with bounded revision and human escalation. The report combines repository analysis with dated local and AWS evidence, including MSK, RDS, EKS, CloudWatch, Kafka-topic, and Tableau observations. Results include a labelled 72-event demonstration with 48 expected findings detected, measured recovery scenarios, and preserved audit traces. The implementation is presented as a reference architecture and does not claim legal conformity or general model accuracy.
+
+\clearpage
+\tableofcontents\thispagestyle{fancy}
+\clearpage
+\listoftables\addcontentsline{toc}{chapter}{List of Tables}
+\clearpage
+\listoffigures\addcontentsline{toc}{chapter}{List of Figures}
+\clearpage
+\pagenumbering{arabic}\pagestyle{fancy}
 
 \chapter{Introduction}
-\section{Objective}
+\section{Project Description}
 This report analyses the Git repository \textit{AI-Governance-Audit-Pipeline}, a runnable reference implementation for collecting AI-governance evidence, detecting compliance conditions, scoring risk, persisting findings, and supporting evidence-grounded investigation and review. It follows the supplied SPA report format: formal chapters, numbered sections, source references, and an evidence appendix.
-\section{Scope}
+\section{Report Organization}
 The analysis covers the source tree, schemas, rule catalogue, Kafka Streams processor, Python services, database schema, deployment files, evaluation material, and the dated evidence package. It does not claim that framework mappings establish legal conformity; the repository itself correctly treats them as evidence-routing decisions.
-\section{Executive summary}
+\section{System overview}
 The system is a modular event-to-framework pipeline. Five independent adapters normalize source events into a canonical contract and publish to dedicated topics. A stateful Kafka Streams processor evaluates 16 rules, then a risk scorer and idempotent PostgreSQL sink complete the path. Tableau views expose operational and compliance reporting. Optional Amazon Bedrock Investigator and Evidence Reviewer agents add bounded, durable, advisory analysis. The governance framing follows contemporary risk-management guidance from NIST, ISO, the OECD, UNESCO, and the EU AI Act \cite{nist2023,nistgenai2024,iso42001,oecd2024,unesco2021,euaiact2024}.
 
-\chapter{Problem Definition and Objectives}
-\section{Problem statement}
+\chapter{Problem Definition}
+\section{Problem Statement}
 AI systems generate evidence across identity, infrastructure, pipelines, model registries, and LLM gateways. Without a shared event contract and durable correlation, governance teams cannot reliably connect raw activity to controls, risk, evidence, and review outcomes. The project addresses this by combining source-specific adapters, event-time rules, risk scoring, persistence, and human-review boundaries. This emphasis on traceability and lifecycle controls is consistent with recent AI governance guidance \cite{nist2023,iso42001,euaiact2024,owasllm2025}.
-\section{Objectives}
+\chapter{Objectives}
+\section{Primary Objectives}
 \begin{enumerate}[leftmargin=*]\item Normalize five heterogeneous producer systems into one versioned governance event.\item Detect 16 executable governance controls with windows and stateful joins.\item Preserve event, finding, score, evidence, and review identity end to end.\item Provide deterministic and machine-learning risk signals without replacing the deterministic baseline.\item Demonstrate recovery, testing, traceability, and advisory agent review.\end{enumerate}
 
-\chapter{Literature Review}
-\section{Recent governance and engineering literature}
+\chapter{Tools and Techniques Used}
+\section{Tools}
+The project uses Python for adapters, scoring, evaluation, and agent workers; Java and Apache Kafka Streams for stateful stream processing; PostgreSQL for durable evidence; Docker Compose and Redpanda for local execution; Amazon MSK, RDS, EKS, CloudWatch, and Tableau for cloud deployment and reporting; Terraform and Kubernetes manifests for infrastructure automation; and XeLaTeX for this report. These tools correspond to the repository's service boundaries and deployment artefacts.
+\section{Techniques}
+The implementation applies schema-first event normalization, event-time windows, stateful joins, rule-based detection, deterministic severity-frequency scoring, Isolation Forest comparison, idempotent persistence, consumer-group recovery, evidence retrieval, structured validation, and bounded agent revision. These techniques were chosen to keep findings traceable, reproducible, and operationally recoverable.
+
+\chapter{Implementation}
+\section{Background Information}
 Recent guidance treats AI governance as a lifecycle practice involving accountability, documentation, measurement, monitoring, and human oversight rather than a one-time model check \cite{nist2023,nistgenai2024,iso42001,oecd2024,unesco2021,euaiact2024,stanford2024}. Security guidance also highlights prompt injection, data leakage, excessive agency, and supply-chain risks in LLM-enabled systems \cite{owasllm2025,mitreatlas2024,google2023}. The project responds to these themes through immutable evidence, explicit contracts, bounded agent loops, separate service identities, and a human-review terminal state.
 \begin{table}[H]\centering\small\begin{tabular}{|p{2.8cm}|p{1.0cm}|p{4.1cm}|p{4.0cm}|}\hline
 \textbf{Source} & \textbf{Year} & \textbf{Main contribution} & \textbf{Design implication for this project}\\\hline
@@ -147,7 +165,7 @@ RAG survey literature \cite{ragsurvey2024} & 2024 & Retrieval grounding and eval
 \section{Research gap and project position}
 The literature provides principles, controls, and security taxonomies, but governance teams still need an operational evidence path that connects source activity to a finding, score, stored record, and review outcome. This repository occupies that implementation gap. Its contribution is systems integration and measurable traceability, not a new foundation model or a claim of legal certification.
 
-\chapter{System Architecture}
+\section{Implementation architecture}
 \section{High-level architecture}
 \begin{figure}[H]
 \centering
@@ -187,7 +205,7 @@ source -> adapter -> raw topic -> canonical event -> rule engine
        -> finding -> risk scorer -> PostgreSQL -> Tableau / agents
 \end{lstlisting}
 
-\chapter{Data Sources and Contracts}
+\section{Data Sources and Contracts}
 \section{Producer groups}
 Each producer has its own adapter, health/readiness/metrics endpoints, image, deployment, scaling policy, IAM role, and topic. This reduces coupling and permits source-specific validation while maintaining a common downstream contract.
 \section{Canonical event contract}
@@ -196,14 +214,14 @@ The versioned governance-event schema captures identity, source, timestamps, act
 The repository defines one raw topic per producer and separate consumer groups for rule processing, scoring, persistence, and evaluation. Six partitions and independent consumer groups support parallelism; offsets, keys, and event IDs enable reconciliation.
 \begin{figure}[H]\centering\includegraphics[width=0.86\textwidth]{figures/02-producer-health.png}\caption{Captured health and accepted-event evidence for the five producer adapters.}\end{figure}
 
-\chapter{Rule Engine and Framework Mapping}
+\section{Rule Engine and Framework Mapping}
 \section{Executable controls}
 The 16-rule catalogue in \texttt{config/rules.yml} maps each control to NIST AI RMF 1.0, ISO/IEC 42001:2023, EU AI Act, NIST SP 800-53 Rev. 5, and GDPR. The Java implementation contains stateless predicates, a five-minute failed-login window with one-minute grace, and stateful promotion joins. The separation between a control mapping and a legal conclusion follows the risk-management approach in \cite{nist2023,iso42001,euaiact2024}.
 \section{Finding record}
 Findings retain rule ID, severity, triggering event identity, timestamps, framework labels, evidence, and processing metadata. This makes a control result inspectable rather than a transient alert.
 \begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{figures/04-persisted-finding.png}\caption{Persisted finding evidence showing the triggering event, rule, scores, and timestamps.}\end{figure}
 
-\chapter{Risk Scoring, Storage and Reporting}
+\section{Risk Scoring, Storage and Reporting}
 \section{Risk scoring}
 The deterministic baseline combines a 1--5 frequency bucket with severity and produces a normalized 0--100 score. An online Isolation Forest maintains bounded history and stores its score, delta, readiness status, and recommended score beside the baseline. The ML signal is comparative and does not remove the explainability of the rule result. The implementation uses the established scikit-learn API and keeps the baseline visible for auditability \cite{scikitlearn2024}.
 \section{Persistence model}
@@ -212,7 +230,7 @@ PostgreSQL stores raw events, findings, evidence, risk scores, jobs, agent repor
 The Investigator retrieves eligible evidence and writes a structured report. The Evidence Reviewer checks citations and completeness, can request at most one revision, and may terminate in human review. Reports and evidence snapshots remain immutable; agents do not remediate systems. This bounded pattern reflects current agent observability and responsible-agent guidance \cite{bedrock2025,cloudwatch2025,agentsurvey2024}.
 \begin{figure}[H]\centering\includegraphics[width=0.90\textwidth]{figures/05-agent-tool-trace.png}\caption{Live tool trace for the Investigator and Evidence Reviewer.}\end{figure}
 
-\chapter{Deployment and Operations}
+\section{Deployment and Operations}
 \section{Local operation}
 The documented local path uses Docker Desktop with at least 6 GB available: copy \texttt{.env.example}, start Compose, inject labelled evaluation events, and export a report. Redpanda stands in for MSK and a PostgreSQL container stands in for RDS.
 \section{AWS operation}
@@ -220,7 +238,7 @@ Terraform provisions a VPC, three-broker MSK, EKS, RDS, ECR, security groups, an
 \section{Resilience and controls}
 Idempotent writes, retrying producers, replication factor three, minimum ISR two, consumer groups, and reconciliation checks address loss and restart scenarios. Operational scripts pause and resume services; failure procedures distinguish the local single-broker demonstration from AWS broker failover.
 
-\chapter{Testing and Results}
+\chapter{Results and Discussion}
 \section{Verification coverage}
 The repository includes Python, Java, mapper, integration, settings, reviewer, topology, scorer, and evaluation tests. Requirements traceability links each major requirement to implementation and verification. The 3 November evidence package records 83 agent tests passed in 9.65 seconds.
 \section{Measured functional run}
@@ -233,7 +251,7 @@ The fresh 3 November evidence also reports 72 synthetic source-shaped events, 48
 \begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{figures/01-pipeline-run.png}\caption{Pipeline benchmark evidence for the labelled functional run.}\end{figure}
 \begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{figures/08-tests-and-consumer-checks.png}\caption{Automated tests and consumer-tail verification.}\end{figure}
 
-\chapter{Agentic AI Evaluation and Limitations}
+\section{Agentic AI Evaluation and Limitations}
 \section{Observed outcomes}
 One fresh individual case completed investigation and review with \texttt{review\_passed}; the original report and evidence snapshot were preserved. A saved correction example demonstrates cited feedback, one revision, recheck, and terminal \texttt{needs\_human\_review}. CloudWatch evidence for the selected window records five Bedrock invocations, 12,436 input tokens, 530 output tokens, and 1,476.4 ms average latency.
 \begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{figures/06-reviewed-report.png}\caption{Fresh reviewed report with preserved evidence.}\end{figure}
@@ -241,8 +259,34 @@ One fresh individual case completed investigation and review with \texttt{review
 \section{Limitations}
 The reviewer is advisory and must not be treated as an automatic approval gate. The evidence package contains selected demonstrations rather than corpus-wide semantic-quality evaluation. Framework labels are routing metadata, not legal conclusions. The AWS metrics are account/model/region aggregates for the selected window, while the application trace provides case-level correlation.
 
+\section{Discussion}
+The measured results indicate that the implemented objectives were met for the documented workloads: the labelled pipeline recovered all expected findings in the baseline and fault-injection demonstrations, while the evidence package preserves the separate agent outcomes and their limitations. The AWS screenshots corroborate that the cloud resources were provisioned and observable, but they do not replace a controlled production readiness review. The EKS control-plane logs also show stale metrics API discovery messages, which should be treated as an operational follow-up rather than silently classified as a successful health result.
+
 \chapter{Conclusion}
 The project is a coherent, runnable governance-audit platform with unusually strong traceability for a reference implementation. Its strongest engineering decisions are independent adapters, explicit contracts, event-time/stateful processing, idempotent persistence, measured recovery tests, immutable evidence, and bounded agent workflows. The main adoption requirement is operational discipline: execute the documented evaluation in the target environment, retain evidence, and preserve human review for uncertain or corrected agent outcomes.
+
+\chapter{Future Enhancements}
+Future work should add a production-scale semantic-quality benchmark for the agents, formal schema compatibility checks across release versions, stronger alerting for stale Kubernetes metrics APIs, automated evidence retention policies, multi-region disaster recovery, continuous Tableau refresh validation, and a governed approval workflow for changes to framework mappings. A larger labelled corpus would also allow calibration of risk thresholds beyond the current demonstration workloads.
+
+\chapter*{Appendix: Cloud and Reporting Evidence}
+\addcontentsline{toc}{chapter}{Appendix: Cloud and Reporting Evidence}
+The following screenshots were supplied with the project analysis package and are included as operational evidence. Figures 8.1--8.8 document cloud infrastructure and service observability. Figures 8.9--8.10 document the Tableau reporting layer. The screenshots are descriptive evidence of the captured environment and should be read with the repository's dated provenance files.
+
+\begin{figure}[H]\centering
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/01-msk-log-group.jpg}\caption{CloudWatch log group and MSK broker log streams.}\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/02-kafka-broker-logs.jpg}\caption{Kafka broker logs showing stabilized consumer coordination.}\end{minipage}\end{figure}
+\begin{figure}[H]\centering
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/03-msk-cluster.jpg}\caption{Active provisioned three-broker MSK cluster.}\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/04-kafka-topics.jpg}\caption{Governance topics with six partitions and replication factor three.}\end{minipage}\end{figure}
+\begin{figure}[H]\centering
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/05-rds-postgresql.jpg}\caption{RDS PostgreSQL configuration for durable evidence.}\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/06-postgresql-service-logs.jpg}\caption{PostgreSQL checkpoint activity in service logs.}\end{minipage}\end{figure}
+\begin{figure}[H]\centering
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/07-eks-worker-configuration.jpg}\caption{EKS worker-node configuration.}\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/08-eks-control-plane-logs.jpg}\caption{EKS control-plane metrics API messages requiring follow-up.}\end{minipage}\end{figure}
+\begin{figure}[H]\centering
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/09-tableau-dashboard.png}\caption{Tableau governance dashboard.}\end{minipage}\hfill
+\begin{minipage}{0.48\textwidth}\centering\includegraphics[width=\linewidth]{figures/cloud/10-tableau-desktop.png}\caption{Tableau Desktop authoring view.}\end{minipage}\end{figure}
 
 \chapter*{References}\addcontentsline{toc}{chapter}{References}
 \sloppy
