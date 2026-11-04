@@ -50,41 +50,41 @@ The screenshots are not mock-ups or reconstructed examples. They are rendered vi
 \clearpage
 \section{1. Producer adapters and event normalization}
 The pipeline starts with five producer domains: Keycloak identity, Kubernetes audit, Airflow/OpenLineage pipeline activity, model registry activity, and LLM gateway activity. The shared mapper layer converts source-specific payloads into the canonical governance-event contract while retaining source identifiers and evidence metadata.
-\shot{01-producer-adapter-mapping.png}{0.56\textheight}{Canonical mapping logic used by the producer adapters.}
-\shot{02-kafka-configuration.png}{0.44\textheight}{Repository Kafka-compatible broker, topic, and service configuration from Docker Compose.}
+\shot{01-github-producer-adapter.png}{0.56\textheight}{Actual GitHub source page for the producer adapter mapping layer.}
+\shot{02-github-kafka-configuration.png}{0.44\textheight}{Actual GitHub source page for Kafka-compatible broker, topic, and service configuration.}
 
 \clearpage
 \section{2. Kafka topics and stream processing}
 The normalized events are published to dedicated raw topics. The stream processor consumes those topics using Kafka Streams. The implementation uses event timestamps, state stores, windows, table-table joins, stream-table joins, keyed findings, and JSON serialization. The screenshot below is the actual topology source used to connect those operations.
-\shot{03-stream-topology.png}{0.68\textheight}{Kafka Streams topology source implementing rules, windows, joins, state, and finding emission.}
+\shot{03-github-stream-topology.png}{0.68\textheight}{Actual GitHub source page for the Kafka Streams topology, rules, windows, joins, and finding emission.}
 
 \clearpage
 \section{3. Governance rule catalogue}
 The rule catalogue is configuration-driven. It associates executable controls with severity and governance-framework metadata. Rule identity is preserved in every finding so that a reviewer can connect a result to the exact configured condition.
-\shot{04-rule-catalogue.png}{0.73\textheight}{The repository rule catalogue containing the configured governance controls.}
+\shot{04-github-rule-catalogue.png}{0.73\textheight}{Actual GitHub source page for the configured governance rule catalogue.}
 
 \clearpage
 \section{4. Risk scoring and durable evidence}
 After stream processing, findings are scored and persisted. The risk service keeps the deterministic baseline visible and adds an online Isolation Forest comparison once sufficient history is available. The PostgreSQL sink performs idempotent writes for events, findings, evidence, and scores.
-\shot{05-risk-scoring.png}{0.55\textheight}{Risk-scoring implementation with deterministic baseline and Isolation Forest comparison.}
-\shot{06-postgres-persistence.png}{0.45\textheight}{PostgreSQL sink implementation for durable, idempotent evidence persistence.}
+\shot{05-github-risk-scoring.png}{0.55\textheight}{Actual GitHub source page for deterministic baseline and Isolation Forest risk scoring.}
+\shot{06-github-postgres-persistence.png}{0.45\textheight}{Actual GitHub source page for durable, idempotent PostgreSQL evidence persistence.}
 
 \clearpage
 \section{5. Investigator and Evidence Reviewer agents}
 The agents run after durable evidence exists. The Investigator retrieves eligible evidence and writes a structured report. The Evidence Reviewer checks citations and completeness, may request a bounded correction, and can terminate with human review. Neither agent is an infrastructure-remediation authority.
-\shot{07-investigator-agent.png}{0.56\textheight}{Amazon Bedrock Investigator implementation and evidence-grounded report generation.}
-\shot{08-reviewer-workflow.png}{0.44\textheight}{Evidence Reviewer workflow with validation, bounded revision, and terminal review states.}
+\shot{07-github-investigator-agent.png}{0.56\textheight}{Actual GitHub source page for Amazon Bedrock Investigator report generation.}
+\shot{08-github-reviewer-workflow.png}{0.44\textheight}{Actual GitHub source page for Evidence Reviewer validation, bounded revision, and terminal states.}
 
 \clearpage
 \section{6. Evaluation and recovery evidence}
 The repository evaluation uses labelled source-shaped events and expected findings. The recorded demonstration contains 72 events and 48 expected findings across 16 rules. Baseline, processor-replacement, broker-restart, adapter, consumer-tail, and agent-review checks are kept as repository artefacts.
-\shot{09-evaluation-results.png}{0.63\textheight}{Recorded evaluation results and expected-versus-observed finding evidence.}
-\shot{10-recovery-evaluation.png}{0.43\textheight}{Recovery scenario evidence for restart, replay, and resilience verification.}
+\shot{09-github-evaluation-results.png}{0.63\textheight}{Actual GitHub source page for recorded evaluation results.}
+\shot{10-github-recovery-evaluation.png}{0.43\textheight}{Actual GitHub source page for restart, replay, and resilience verification.}
 
 \clearpage
 \section{7. Reporting output}
 The final stage exposes durable evidence through reporting views. The dashboard consumes stored findings, risk scores, framework associations, latency observations, and incident details. It is downstream of the detection and persistence path and does not replace the evidence records.
-\shot{11-reporting-schema.png}{0.53\textheight}{Reporting schema used to expose persisted governance evidence.}
+\shot{11-github-reporting-schema.png}{0.53\textheight}{Actual GitHub source page for the reporting schema exposing persisted governance evidence.}
 \begin{figure}[H]\centering
 \includegraphics[width=0.92\textwidth,height=0.43\textheight,keepaspectratio]{../report/figures/cloud/09-tableau-dashboard.png}
 \caption{Repository-provided Tableau dashboard evidence for the reporting stage.}
