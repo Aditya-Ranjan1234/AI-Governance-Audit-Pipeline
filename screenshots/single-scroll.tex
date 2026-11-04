@@ -11,16 +11,28 @@
 \centering
 {\Large\textbf{Source-Code Evidence for the Real-Time AI Governance Audit Pipeline}}\par\vspace{0.2in}
 {\large Complete unsplit GitHub source captures — dark mode}\par\vspace{0.35in}
-\newcommand{\fullshot}[1]{\includegraphics[width=0.98\paperwidth,keepaspectratio]{#1}\par\vspace{0.12in}}
+\newcommand{\sectiontitle}[1]{\vspace{0.18in}{\Large\textbf{#1}}\par\vspace{0.10in}}
+\newcommand{\fullshot}[1]{\includegraphics[width=\textwidth,keepaspectratio]{#1}\par\vspace{0.16in}}
+\sectiontitle{Pipeline Section 1: Producer Adapters and Event Normalization}
 \fullshot{01-github-producer-adapter.png}
+\sectiontitle{Pipeline Section 2: Kafka Configuration and Topic Boundary}
 \fullshot{02-github-kafka-configuration.png}
+\sectiontitle{Pipeline Section 3: Kafka Streams Topology}
 \fullshot{03-github-stream-topology.png}
+\sectiontitle{Pipeline Section 4: Governance Rule Catalogue}
 \fullshot{04-github-rule-catalogue.png}
+\sectiontitle{Pipeline Section 5: Risk Scoring}
 \fullshot{05-github-risk-scoring.png}
+\sectiontitle{Pipeline Section 6: PostgreSQL Evidence Persistence}
 \fullshot{06-github-postgres-persistence.png}
+\sectiontitle{Pipeline Section 7: Investigator Agent}
 \fullshot{07-github-investigator-agent.png}
+\sectiontitle{Pipeline Section 8: Evidence Reviewer Workflow}
 \fullshot{08-github-reviewer-workflow.png}
+\sectiontitle{Pipeline Section 9: Evaluation Results}
 \fullshot{09-github-evaluation-results.png}
+\sectiontitle{Pipeline Section 10: Recovery Evaluation}
 \fullshot{10-github-recovery-evaluation.png}
+\sectiontitle{Pipeline Section 11: Reporting Schema}
 \fullshot{11-github-reporting-schema.png}
 \end{document}
