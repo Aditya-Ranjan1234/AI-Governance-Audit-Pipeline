@@ -51,72 +51,98 @@ The screenshots are not mock-ups or reconstructed examples. They are rendered vi
 \section{1. Producer adapters and event normalization}
 The pipeline starts with five producer domains: Keycloak identity, Kubernetes audit, Airflow/OpenLineage pipeline activity, model registry activity, and LLM gateway activity. The shared mapper layer converts source-specific payloads into the canonical governance-event contract while retaining source identifiers and evidence metadata.
 \shot{01-github-producer-adapter-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the producer adapter mapping layer.}
-\shot{01-github-producer-adapter-2.png}{0.50\textheight}{Actual GitHub source page, middle segment, for the producer adapter mapping layer.}
-\shot{01-github-producer-adapter-3.png}{0.50\textheight}{Actual GitHub source page, final segment, for the producer adapter mapping layer.}
-\shot{01-github-producer-adapter-4.png}{0.50\textheight}{Actual GitHub source page, continued producer adapter mapping.}
-\shot{01-github-producer-adapter-5.png}{0.50\textheight}{Actual GitHub source page, continued producer adapter mapping.}
-\shot{01-github-producer-adapter-6.png}{0.50\textheight}{Actual GitHub source page, final producer adapter mapping segment.}
+\shot{01-github-producer-adapter-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
+\shot{01-github-producer-adapter-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
+\shot{01-github-producer-adapter-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
+\shot{01-github-producer-adapter-5.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
+\shot{01-github-producer-adapter-6.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
+\shot{01-github-producer-adapter-7.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
+\shot{01-github-producer-adapter-8.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
+\shot{01-github-producer-adapter-9.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
+\shot{01-github-producer-adapter-10.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the producer adapter mapping layer.}
 \shot{02-github-kafka-configuration-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for Kafka configuration.}
-\shot{02-github-kafka-configuration-2.png}{0.50\textheight}{Actual GitHub source page, middle segment, for Kafka configuration.}
-\shot{02-github-kafka-configuration-3.png}{0.50\textheight}{Actual GitHub source page, final segment, for Kafka configuration.}
-\shot{02-github-kafka-configuration-4.png}{0.50\textheight}{Actual GitHub source page, continued Kafka configuration.}
-\shot{02-github-kafka-configuration-5.png}{0.50\textheight}{Actual GitHub source page, continued Kafka configuration.}
-\shot{02-github-kafka-configuration-6.png}{0.50\textheight}{Actual GitHub source page, final Kafka configuration segment.}
+\shot{02-github-kafka-configuration-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
+\shot{02-github-kafka-configuration-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
+\shot{02-github-kafka-configuration-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
+\shot{02-github-kafka-configuration-5.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
+\shot{02-github-kafka-configuration-6.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
+\shot{02-github-kafka-configuration-7.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
+\shot{02-github-kafka-configuration-8.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
+\shot{02-github-kafka-configuration-9.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
+\shot{02-github-kafka-configuration-10.png}{0.50\textheight}{Actual GitHub source page, continued segment, for Kafka configuration.}
 
 \clearpage
 \section{2. Kafka topics and stream processing}
 The normalized events are published to dedicated raw topics. The stream processor consumes those topics using Kafka Streams. The implementation uses event timestamps, state stores, windows, table-table joins, stream-table joins, keyed findings, and JSON serialization. The screenshot below is the actual topology source used to connect those operations.
 \shot{03-github-stream-topology-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the Kafka Streams topology.}
-\shot{03-github-stream-topology-2.png}{0.50\textheight}{Actual GitHub source page, final segment, for rules, windows, joins, and finding emission.}
-\shot{03-github-stream-topology-3.png}{0.50\textheight}{Actual GitHub source page, continued stream topology.}
-\shot{03-github-stream-topology-4.png}{0.50\textheight}{Actual GitHub source page, final stream topology segment.}
+\shot{03-github-stream-topology-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Kafka Streams continuedology.}
+\shot{03-github-stream-topology-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Kafka Streams continuedology.}
+\shot{03-github-stream-topology-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Kafka Streams continuedology.}
+\shot{03-github-stream-topology-5.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Kafka Streams continuedology.}
+\shot{03-github-stream-topology-6.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Kafka Streams continuedology.}
+\shot{03-github-stream-topology-7.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Kafka Streams continuedology.}
 
 \clearpage
 \section{3. Governance rule catalogue}
 The rule catalogue is configuration-driven. It associates executable controls with severity and governance-framework metadata. Rule identity is preserved in every finding so that a reviewer can connect a result to the exact configured condition.
 \shot{04-github-rule-catalogue-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the governance rule catalogue.}
-\shot{04-github-rule-catalogue-2.png}{0.50\textheight}{Actual GitHub source page, final segment, for the governance rule catalogue.}
-\shot{04-github-rule-catalogue-3.png}{0.50\textheight}{Actual GitHub source page, continued governance rule catalogue.}
-\shot{04-github-rule-catalogue-4.png}{0.50\textheight}{Actual GitHub source page, final governance rule catalogue segment.}
+\shot{04-github-rule-catalogue-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the governance rule catalogue.}
+\shot{04-github-rule-catalogue-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the governance rule catalogue.}
+\shot{04-github-rule-catalogue-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the governance rule catalogue.}
+\shot{04-github-rule-catalogue-5.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the governance rule catalogue.}
+\shot{04-github-rule-catalogue-6.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the governance rule catalogue.}
+\shot{04-github-rule-catalogue-7.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the governance rule catalogue.}
 
 \clearpage
 \section{4. Risk scoring and durable evidence}
 After stream processing, findings are scored and persisted. The risk service keeps the deterministic baseline visible and adds an online Isolation Forest comparison once sufficient history is available. The PostgreSQL sink performs idempotent writes for events, findings, evidence, and scores.
 \shot{05-github-risk-scoring-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for risk scoring.}
-\shot{05-github-risk-scoring-2.png}{0.50\textheight}{Actual GitHub source page, final segment, for risk scoring.}
-\shot{05-github-risk-scoring-3.png}{0.50\textheight}{Actual GitHub source page, final risk scoring segment.}
+\shot{05-github-risk-scoring-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for risk scoring.}
+\shot{05-github-risk-scoring-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for risk scoring.}
+\shot{05-github-risk-scoring-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for risk scoring.}
 \shot{06-github-postgres-persistence-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for PostgreSQL persistence.}
-\shot{06-github-postgres-persistence-2.png}{0.50\textheight}{Actual GitHub source page, final segment, for PostgreSQL persistence.}
-\shot{06-github-postgres-persistence-3.png}{0.50\textheight}{Actual GitHub source page, continued PostgreSQL persistence.}
-\shot{06-github-postgres-persistence-4.png}{0.50\textheight}{Actual GitHub source page, final PostgreSQL persistence segment.}
+\shot{06-github-postgres-persistence-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for PostgreSQL persistence.}
+\shot{06-github-postgres-persistence-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for PostgreSQL persistence.}
+\shot{06-github-postgres-persistence-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for PostgreSQL persistence.}
+\shot{06-github-postgres-persistence-5.png}{0.50\textheight}{Actual GitHub source page, continued segment, for PostgreSQL persistence.}
+\shot{06-github-postgres-persistence-6.png}{0.50\textheight}{Actual GitHub source page, continued segment, for PostgreSQL persistence.}
 
 \clearpage
 \section{5. Investigator and Evidence Reviewer agents}
 The agents run after durable evidence exists. The Investigator retrieves eligible evidence and writes a structured report. The Evidence Reviewer checks citations and completeness, may request a bounded correction, and can terminate with human review. Neither agent is an infrastructure-remediation authority.
 \shot{07-github-investigator-agent-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the Investigator agent.}
-\shot{07-github-investigator-agent-2.png}{0.50\textheight}{Actual GitHub source page, middle segment, for the Investigator agent.}
-\shot{07-github-investigator-agent-3.png}{0.50\textheight}{Actual GitHub source page, final segment, for the Investigator agent.}
-\shot{07-github-investigator-agent-4.png}{0.50\textheight}{Actual GitHub source page, continued Investigator agent source.}
-\shot{07-github-investigator-agent-5.png}{0.50\textheight}{Actual GitHub source page, continued Investigator agent source.}
-\shot{07-github-investigator-agent-6.png}{0.50\textheight}{Actual GitHub source page, final Investigator agent segment.}
+\shot{07-github-investigator-agent-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
+\shot{07-github-investigator-agent-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
+\shot{07-github-investigator-agent-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
+\shot{07-github-investigator-agent-5.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
+\shot{07-github-investigator-agent-6.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
+\shot{07-github-investigator-agent-7.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
+\shot{07-github-investigator-agent-8.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
+\shot{07-github-investigator-agent-9.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
+\shot{07-github-investigator-agent-10.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Investigator agent.}
 \shot{08-github-reviewer-workflow-1.png}{0.50\textheight}{Actual GitHub source page, top segment, for the Reviewer workflow.}
-\shot{08-github-reviewer-workflow-2.png}{0.50\textheight}{Actual GitHub source page, final segment, for the Reviewer workflow.}
-\shot{08-github-reviewer-workflow-3.png}{0.50\textheight}{Actual GitHub source page, continued Reviewer workflow.}
-\shot{08-github-reviewer-workflow-4.png}{0.50\textheight}{Actual GitHub source page, final Reviewer workflow segment.}
+\shot{08-github-reviewer-workflow-2.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Reviewer workflow.}
+\shot{08-github-reviewer-workflow-3.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Reviewer workflow.}
+\shot{08-github-reviewer-workflow-4.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Reviewer workflow.}
+\shot{08-github-reviewer-workflow-5.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Reviewer workflow.}
+\shot{08-github-reviewer-workflow-6.png}{0.50\textheight}{Actual GitHub source page, continued segment, for the Reviewer workflow.}
 
 \clearpage
 \section{6. Evaluation and recovery evidence}
 The repository evaluation uses labelled source-shaped events and expected findings. The recorded demonstration contains 72 events and 48 expected findings across 16 rules. Baseline, processor-replacement, broker-restart, adapter, consumer-tail, and agent-review checks are kept as repository artefacts.
 \shot{09-github-evaluation-results-1.png}{0.50\textheight}{Actual GitHub source page for recorded evaluation results.}
-\shot{09-github-evaluation-results-2.png}{0.50\textheight}{Actual GitHub source page, continued recorded evaluation results.}
+\shot{09-github-evaluation-results-2.png}{0.50\textheight}{Actual GitHub source page for recorded evaluation results.}
+\shot{09-github-evaluation-results-3.png}{0.50\textheight}{Actual GitHub source page for recorded evaluation results.}
 \shot{10-github-recovery-evaluation-1.png}{0.50\textheight}{Actual GitHub source page for recovery evaluation.}
-\shot{10-github-recovery-evaluation-2.png}{0.50\textheight}{Actual GitHub source page, continued recovery evaluation.}
+\shot{10-github-recovery-evaluation-2.png}{0.50\textheight}{Actual GitHub source page for recovery evaluation.}
+\shot{10-github-recovery-evaluation-3.png}{0.50\textheight}{Actual GitHub source page for recovery evaluation.}
 
 \clearpage
 \section{7. Reporting output}
 The final stage exposes durable evidence through reporting views. The dashboard consumes stored findings, risk scores, framework associations, latency observations, and incident details. It is downstream of the detection and persistence path and does not replace the evidence records.
 \shot{11-github-reporting-schema-1.png}{0.50\textheight}{Actual GitHub source page for the reporting schema.}
-\shot{11-github-reporting-schema-2.png}{0.50\textheight}{Actual GitHub source page, continued reporting schema.}
+\shot{11-github-reporting-schema-2.png}{0.50\textheight}{Actual GitHub source page for the reporting schema.}
+\shot{11-github-reporting-schema-3.png}{0.50\textheight}{Actual GitHub source page for the reporting schema.}
 \begin{figure}[H]\centering
 \includegraphics[width=0.92\textwidth,height=0.43\textheight,keepaspectratio]{../report/figures/cloud/09-tableau-dashboard.png}
 \caption{Repository-provided Tableau dashboard evidence for the reporting stage.}
