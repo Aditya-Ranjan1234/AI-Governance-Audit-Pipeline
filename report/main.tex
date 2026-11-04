@@ -177,8 +177,8 @@ ISO/IEC (2023) \cite{iso42001} & ISO/IEC 42001 standard & AI management-system r
 OECD (2024) \cite{oecd2024} & OECD AI Principles & International policy principles and updates & Accountability, transparency, robustness, and human-centred values & Principles need operational control mappings and measurable evidence\\\hline
 European Parliament (2024) \cite{euaiact2024} & European Union regulation & Risk-tiered legal obligations & Defines governance and transparency expectations for high-risk AI & Regulation does not provide an implementation architecture for heterogeneous events\\\hline
 OWASP (2025) \cite{owasllm2025} & OWASP LLM Top 10 & Threat taxonomy for LLM applications & Organizes prompt, data, agency, and supply-chain risks & Does not connect security findings to durable governance cases and review states\\\hline
-Gao et al. (2024) \cite{ragsurvey2024} & Survey literature / arXiv & Review of retrieval-augmented generation methods & Highlights grounding and evaluation requirements & Does not solve end-to-end governance evidence provenance\\\hline
-Wang et al. (2024) \cite{agentsurvey2024} & Survey literature / arXiv & Review of autonomous-agent architectures & Summarizes planning, tools, memory, and evaluation issues & Bounded revision and mandatory human escalation remain implementation concerns\\\hline
+Gao et al. (2024) \cite{ragsurvey2024} & arXiv preprint 2312.10997 & Review of retrieval-augmented generation methods & Highlights grounding and evaluation requirements & Does not solve end-to-end governance evidence provenance\\\hline
+Wang et al. (2024) \cite{agentsurvey2024} & arXiv preprint 2308.11432 & Review of autonomous-agent architectures & Summarizes planning, tools, memory, and evaluation issues & Bounded revision and mandatory human escalation remain implementation concerns\\\hline
 \end{tabular}\caption{Literature review comparing governance, security, and agentic-AI sources with the project gap.}\label{tab:literature-review}\end{table}
 \chapter{Objectives}
 \noindent\textit{This chapter states the primary objectives used to guide implementation and evaluate whether the project outcomes were achieved.}\par
@@ -319,7 +319,7 @@ The Investigator retrieves eligible evidence and writes a structured report. The
 \section{Local operation}
 The documented local path uses Docker Desktop with at least 6 GB available: copy \texttt{.env.example}, start Compose, inject labelled evaluation events, and export a report. Redpanda stands in for MSK and a PostgreSQL container stands in for RDS.
 \section{AWS operation}
-Terraform provisions a VPC, three-broker MSK, EKS, RDS, ECR, security groups, and workload IAM. Kubernetes manifests define services, probes, HPAs, PDBs, and consumer scaling. The deployment instructions correctly require image publication, secret creation, placeholder replacement, and an evaluation before recording results.
+Terraform provisions a VPC, three-broker MSK, EKS, RDS, ECR, security groups, and workload IAM. Kubernetes manifests define services, probes, HPAs, PDBs, and consumer scaling. The deployment instructions correctly require image publication, secret creation, environment-specific value substitution, and an evaluation before recording results.
 \section{Resilience and controls}
 Idempotent writes, retrying producers, replication factor three, minimum ISR two, consumer groups, and reconciliation checks address loss and restart scenarios. Operational scripts pause and resume services; failure procedures distinguish the local single-broker demonstration from AWS broker failover.
 
