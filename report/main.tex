@@ -16,7 +16,7 @@
 \pagestyle{fancy}\fancyhf{}\fancyhead[L]{\textit{\ProjTitle}}\fancyhead[R]{2026--2027}\fancyfoot[L]{Department of AIML, RVCE}\fancyfoot[R]{\thepage}\fancyheadoffset[L]{0cm}\fancyheadoffset[R]{0cm}\fancyfootoffset[L]{0cm}\fancyfootoffset[R]{0cm}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}
 \fancypagestyle{plain}{\fancyhf{}\fancyhead[L]{\textit{\ProjTitle}}\fancyhead[R]{2026--2027}\fancyfoot[L]{Department of AIML, RVCE}\fancyfoot[R]{\thepage}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}}
 \fancypagestyle{front}{\fancyhf{}\fancyfoot[R]{\thepage}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0pt}}
-\AddToShipoutPictureFG{%
+\newcommand{\PageBorder}{%
   \begin{tikzpicture}[overlay,remember picture]
     \draw[line width=1pt]
       ([shift={(3.51cm,-2.24cm)}]current page.north west)
@@ -24,6 +24,7 @@
       ([shift={(-1.8cm,2.24cm)}]current page.south east);
   \end{tikzpicture}%
 }
+\AddToShipoutPictureFG{\PageBorder}
 \SetWatermarkText{\includegraphics[width=8cm]{logo.png}}\SetWatermarkScale{1}\SetWatermarkAngle{0}\SetWatermarkColor[gray]{0.9}\SetWatermarkHorCenter{11.355cm}\SetWatermarkVerCenter{14.85cm}
 \definecolor{codebg}{rgb}{0.96,0.96,0.98}\lstdefinestyle{code}{backgroundcolor=\color{codebg},basicstyle=\ttfamily\scriptsize,breaklines=true,frame=single,columns=fullflexible,keepspaces=true}\lstset{style=code}
 \begin{document}
@@ -77,6 +78,10 @@ Bengaluru--59 & Bengaluru--59
 
 \end{titlepage}
 \SetWatermarkText{\includegraphics[width=8cm]{logo.png}}
+\clearpage
+\ClearShipoutPictureFG
+\thispagestyle{empty}\null\clearpage
+\AddToShipoutPictureFG{\PageBorder}
 \newpage
 \cleardoublepage
 \pagestyle{empty}
@@ -136,6 +141,11 @@ by the institution.
 \vfill
 
 \thispagestyle{empty}
+
+\clearpage
+\ClearShipoutPictureFG
+\thispagestyle{empty}\null\clearpage
+\AddToShipoutPictureFG{\PageBorder}
 
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
