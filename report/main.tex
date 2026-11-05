@@ -381,11 +381,15 @@ The measured results indicate that the implemented objectives were met for the d
 
 \chapter{Conclusion}
 \noindent\textit{This chapter summarizes the engineering contribution, the evidence-supported outcomes, and the practical significance of the completed pipeline.}\par
-The project is a coherent, runnable governance-audit platform with unusually strong traceability for a reference implementation. Its strongest engineering decisions are independent adapters, explicit contracts, event-time/stateful processing, idempotent persistence, measured recovery tests, immutable evidence, and bounded agent workflows. The main adoption requirement is operational discipline: execute the documented evaluation in the target environment, retain evidence, and preserve human review for uncertain or corrected agent outcomes.
+The project is a coherent, runnable governance-audit platform with unusually strong traceability for a reference implementation. Its strongest engineering decisions are independent adapters, explicit contracts, event-time and stateful processing, idempotent persistence, measured recovery tests, and durable evidence. Together, these design choices connect heterogeneous source activity to a reproducible finding, risk score, stored evidence record, and reporting view.
+
+The optional Investigator and Evidence Reviewer agents extend this path with bounded, evidence-grounded analysis while preserving human responsibility. The main adoption requirement is operational discipline: execute the documented evaluation in the target environment, retain the evidence, and preserve human review for uncertain or corrected agent outcomes. The measured demonstrations support the implementation objectives, but they do not establish legal conformity, production readiness, or general model accuracy.
 
 \chapter{Future Enhancements}
 \noindent\textit{This chapter identifies the next engineering improvements required to move the reference implementation toward broader operational use.}\par
-Future work should add a production-scale semantic-quality benchmark for the agents, formal schema compatibility checks across release versions, stronger alerting for stale Kubernetes metrics APIs, automated evidence retention policies, multi-region disaster recovery, continuous Tableau refresh validation, and a governed approval workflow for changes to framework mappings. A larger labelled corpus would also allow calibration of risk thresholds beyond the current demonstration workloads.
+Future work should add a production-scale semantic-quality benchmark for the agents, formal schema compatibility checks across release versions, and stronger alerting for stale Kubernetes metrics APIs. Automated evidence-retention policies, multi-region disaster recovery, continuous Tableau refresh validation, and improved operational dashboards would strengthen long-term reliability and observability.
+
+A governed approval workflow should also be introduced for changes to framework mappings, rules, schemas, and risk thresholds. A larger labelled corpus would allow calibration of risk thresholds beyond the current demonstration workloads, while controlled load testing could establish capacity limits and scaling targets for Kafka, the rule engine, the scorer, and the PostgreSQL sink.
 
 \chapter*{Appendix: Cloud and Reporting Evidence}
 \addcontentsline{toc}{chapter}{Appendix: Cloud and Reporting Evidence}
