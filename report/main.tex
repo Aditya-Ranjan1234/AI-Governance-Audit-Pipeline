@@ -297,11 +297,27 @@ Each producer has its own adapter, health/readiness/metrics endpoints, image, de
 The versioned governance-event schema captures identity, source, timestamps, actor, object, action, attributes, and evidence metadata. Mappers remove source-specific variation while preserving useful provenance. Safe dead-letter handling prevents malformed input from silently entering the main path. This is aligned with current software supply-chain and observability practice \cite{openssf2024,opentelemetry2024}.
 \section{Topics and integration}
 The repository defines one raw topic per producer and separate consumer groups for rule processing, scoring, persistence, and evaluation. Six partitions and independent consumer groups support parallelism; offsets, keys, and event IDs enable reconciliation.
+\begin{lstlisting}[caption={Kafka topic initialization excerpt.}]
+for topic in governance.keycloak.v1 governance.kubernetes.v1
+  governance.pipeline.v1 governance.model-registry.v1
+  governance.llm-gateway.v1 governance.findings.raw.v1
+  governance.findings.scored.v1 governance.dead-letter.v1; do
+  rpk topic create --partitions 6 --replicas 1 $topic || true
+done
+\end{lstlisting}
 \begin{figure}[H]\centering\includegraphics[width=0.86\textwidth]{figures/02-producer-health.png}\caption{Captured health and accepted-event evidence for the five producer adapters.}\end{figure}
 
 \section{Rule Engine and Framework Mapping}
 \section{Executable controls}
 The 16-rule catalogue in \texttt{config/rules.yml} maps each control to NIST AI RMF 1.0, ISO/IEC 42001:2023, EU AI Act, NIST SP 800-53 Rev. 5, and GDPR. The Java implementation contains stateless predicates, a five-minute failed-login window with one-minute grace, and stateful promotion joins. The separation between a control mapping and a legal conclusion follows the risk-management approach in \cite{nist2023,iso42001,euaiact2024}.
+\begin{lstlisting}[caption={Configuration-driven governance rule excerpt.}]
+- id: GOV-004
+  producer: KUBERNETES
+  event_type: POD_CREATE
+  severity: 5
+  frameworks: [NIST_AI_RMF, ISO_IEC_42001]
+  predicate: privileged == true or image_approved == false
+\end{lstlisting}
 \section{Finding record}
 Findings retain rule ID, severity, triggering event identity, timestamps, framework labels, evidence, and processing metadata. This makes a control result inspectable rather than a transient alert.
 \begin{figure}[H]\centering\includegraphics[width=0.92\textwidth]{figures/04-persisted-finding.png}\caption{Persisted finding evidence showing the triggering event, rule, scores, and timestamps.}\end{figure}
@@ -309,10 +325,24 @@ Findings retain rule ID, severity, triggering event identity, timestamps, framew
 \section{Risk Scoring, Storage and Reporting}
 \section{Risk scoring}
 The deterministic baseline combines a 1--5 frequency bucket with severity and produces a normalized 0--100 score. An online Isolation Forest maintains bounded history and stores its score, delta, readiness status, and recommended score beside the baseline. The ML signal is comparative and does not remove the explainability of the rule result. The implementation uses the established scikit-learn API and keeps the baseline visible for auditability \cite{scikitlearn2024}.
+\begin{lstlisting}[caption={Online Isolation Forest training policy excerpt.}]
+if len(history) >= min_samples and since_fit >= retrain_every:
+    model = IsolationForest(n_estimators=200,
+        max_samples=min(256, len(history)),
+        contamination="auto", random_state=42)
+    model.fit(np.asarray(history, dtype=float))
+\end{lstlisting}
 \section{Persistence model}
 PostgreSQL stores raw events, findings, evidence, risk scores, jobs, agent reports, reviews, and audit history. Upserts and indexes support idempotency and case retrieval. Tableau views cover framework status, risk trend, incident history, and pipeline latency.
 \section{Agent integration}
 The Investigator retrieves eligible evidence and writes a structured report. The Evidence Reviewer checks citations and completeness, can request at most one revision, and may terminate in human review. Reports and evidence snapshots remain immutable; agents do not remediate systems. This bounded pattern reflects current agent observability and responsible-agent guidance \cite{bedrock2025,cloudwatch2025,agentsurvey2024}.
+\begin{lstlisting}[caption={Bounded agent review sequence excerpt.}]
+finding -> investigator report -> evidence review
+          -> request one correction if required
+          -> recheck report or escalate to human review
+reports and evidence snapshots remain immutable
+agents have read-only evidence tools and no remediation authority
+\end{lstlisting}
 \begin{figure}[H]\centering\includegraphics[width=0.90\textwidth]{figures/05-agent-tool-trace.png}\caption{Live tool trace for the Investigator and Evidence Reviewer.}\end{figure}
 
 \section{Deployment and Operations}
@@ -353,7 +383,8 @@ The measured results indicate that the implemented objectives were met for the d
 \noindent\textit{This chapter summarizes the engineering contribution, the evidence-supported outcomes, and the practical significance of the completed pipeline.}\par
 The project is a coherent, runnable governance-audit platform with unusually strong traceability for a reference implementation. Its strongest engineering decisions are independent adapters, explicit contracts, event-time/stateful processing, idempotent persistence, measured recovery tests, immutable evidence, and bounded agent workflows. The main adoption requirement is operational discipline: execute the documented evaluation in the target environment, retain evidence, and preserve human review for uncertain or corrected agent outcomes.
 
-\section{Future Enhancements}
+\chapter{Future Enhancements}
+\noindent\textit{This chapter identifies the next engineering improvements required to move the reference implementation toward broader operational use.}\par
 Future work should add a production-scale semantic-quality benchmark for the agents, formal schema compatibility checks across release versions, stronger alerting for stale Kubernetes metrics APIs, automated evidence retention policies, multi-region disaster recovery, continuous Tableau refresh validation, and a governed approval workflow for changes to framework mappings. A larger labelled corpus would also allow calibration of risk thresholds beyond the current demonstration workloads.
 
 \chapter*{Appendix: Cloud and Reporting Evidence}
